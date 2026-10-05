@@ -20,7 +20,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Financial and Insurance Industry",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Affero General Public License v3",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -34,7 +33,7 @@ classifiers = [
 Homepage = "https://github.com/DEDNSCFV/MNFC"
 Repository = "https://github.com/DEDNSCFV/MNFC"
 "Programa de Investigacion" = "https://github.com/DEDNSCFV/Programa-de-Investigacion-SCFV"
-"Licencia comercial" = "mailto:lic.dedn@gmail.com"
+"Licencia comercial" = "https://github.com/DEDNSCFV/MNFC/blob/main/COMMERCIAL.md"
 
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
