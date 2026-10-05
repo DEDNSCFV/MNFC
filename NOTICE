@@ -1,0 +1,169 @@
+MNFC · Motor Nucleo Fractal Contable
+Copyright (c) 2026 Domingo Eduardo Diaz Navas
+Programa de Investigacion SCFV
+lic.dedn@gmail.com
+
+==============================================================================
+ATRIBUCION Y PROCEDENCIA
+==============================================================================
+
+MNFC hereda seis tradiciones formales. Cada capa cita su fuente primaria
+con linea de raw verificada.
+
+------------------------------------------------------------------------------
+1. Algebra logica
+------------------------------------------------------------------------------
+
+    George Boole
+    The Mathematical Analysis of Logic (1847)
+
+    Aporte:
+        - Ley fundamental del pensamiento: xx = x (L2022)
+        - Simbolos electivos distributivos y conmutativos (L2089)
+        - Regla de casos mutuamente exclusivos (L6066)
+
+    Uso en MNFC:
+        - Capa 0 (xnor.py): invariante de partida doble.
+
+------------------------------------------------------------------------------
+2. Algebra elemental
+------------------------------------------------------------------------------
+
+    Aurelio Baldor
+    Algebra
+
+    Aporte:
+        - Ley de signos (L1885-1888)
+        - Leyes formales de la suma (L1676-1680)
+        - Leyes formales de la multiplicacion (L1689-1699)
+        - Reduccion de terminos semejantes (L874-997)
+
+    Uso en MNFC:
+        - Capa 1 (baldor.py): aritmetica contable trazable.
+
+    Raw: ~/.baldor_algebra_raw.txt
+    SHA256 raw: 63fe32a1ece2e183c43a5d040003c1efc6f6745e0afa976c7aed052c77f5fbaf
+
+------------------------------------------------------------------------------
+3. Estadistica
+------------------------------------------------------------------------------
+
+    Mendenhall / Beaver / Beaver
+    Introduccion a la probabilidad y estadistica, 13a ed.
+
+    Aporte:
+        - Descriptivas (L6777-6820)
+        - Distribuciones (L16827-16880)
+        - Muestreo y error estandar (L17791-18667)
+        - Tabla 8.7 tamanos muestrales (L22541-22560)
+        - Estimacion (L22731+)
+
+    Uso en MNFC:
+        - Capa 2 (estadistica.py): medida estadistica aplicada.
+
+    Raw: ~/tmp/estadistica.txt (50729 lineas)
+    SHA256 raw: 0ef0e73603575096363f40cde63c52381e16349e6c81a5bd7ef6f3dc90baa488
+
+------------------------------------------------------------------------------
+4. Geometria fractal
+------------------------------------------------------------------------------
+
+    Benoit Mandelbrot
+    Les objets fractals (1975)
+    La geometria fractal de la naturaleza (1982)
+
+    Aporte:
+        - Autosimilitud (1975 L11-13)
+        - Exponente = dimension fractal (1975 L461-462)
+        - Escalante suaviza el significado (1982 L769)
+        - Cascada de escalas (1982 L738-744)
+        - Invariancia por cambio de escala y autosemejanza (1982 L747)
+
+    Uso en MNFC:
+        - Capa 3 (fractal.py): autosimilitud escalante en cascada.
+
+    Raw 1975: ~/.mandelbrot_1975_raw.txt
+    Raw 1982: ~/.mandelbrot_1982_raw.txt
+
+------------------------------------------------------------------------------
+5. Criptografia - arbol de autenticacion
+------------------------------------------------------------------------------
+
+    Ralph C. Merkle
+    A Certified Digital Signature (1979)
+
+    Aporte:
+        - Arbol de autenticacion (L2463)
+        - Camino de autenticacion (L2475)
+        - Raiz del arbol (L2564)
+        - Winternitz one time signature (L243)
+
+    Uso en MNFC:
+        - Capa 6 (ledger.py): cadena de hashes inmutable.
+
+    Raw: ~/.merkle_1979_raw.txt (4725 lineas)
+
+------------------------------------------------------------------------------
+6. Control de versiones
+------------------------------------------------------------------------------
+
+    Scott Chacon / Ben Straub
+    Pro Git (2014)
+
+    Aporte:
+        - Direccionamiento por hash de contenido (L494)
+        - Almacenamiento inmutable (L500, L684)
+        - Firma y verificacion con GPG (L2127)
+
+    Uso en MNFC:
+        - Procedencia criptografica de releases (firma SSH de commits y tags).
+
+    Raw: ~/.progit_2014_raw.txt (18554 lineas)
+
+==============================================================================
+OBLIGACION DE ATRIBUCION
+==============================================================================
+
+Cualquier distribucion, uso comercial, o servicio de red que incluya MNFC
+debe preservar este archivo NOTICE y declarar explicitamente que usa MNFC
+en los creditos de su producto o en su documentacion de licencias.
+
+Ejemplo de declaracion minima:
+
+    "Este producto usa MNFC · Motor Nucleo Fractal Contable
+     (c) Domingo Eduardo Diaz Navas - Programa de Investigacion SCFV"
+
+==============================================================================
+PROCEDENCIA CRIPTOGRAFICA
+==============================================================================
+
+Los commits y tags del repositorio MNFC estan firmados con SSH ED25519.
+La clave publica del autor es:
+
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAzUAwWk3URiSqBDCAaGhfSXQk1H1gvZNy72NjNQw9Yr lic.dedn@gmail.com
+
+Fingerprint SHA256:
+
+    SHA256:C6OnkI1RAx7ffyKsMR0kQrfnIw6vnAFsFB1p1nYRTO4
+
+Para verificar la procedencia de un release:
+
+    git clone https://github.com/DEDNSCFV/MNFC.git
+    cd MNFC
+    git tag -v v0.1.0
+    # Debe mostrar "Good 'git' signature"
+
+==============================================================================
+LICENCIA
+==============================================================================
+
+MNFC se distribuye bajo licencia dual:
+
+    - AGPL-3.0-or-later  (ver LICENSE)
+    - Licencia comercial (ver COMMERCIAL.md)
+
+Contacto: lic.dedn@gmail.com
+
+==============================================================================
+FIN DEL NOTICE
+==============================================================================
