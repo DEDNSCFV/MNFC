@@ -58,7 +58,8 @@ def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
             continue
         m = sum(agregada) / len(agregada)
         v = sum((x - m) ** 2 for x in agregada) / len(agregada)
-        resultado.append((k, v))
+        if v > 0:
+            resultado.append((k, v))
     return resultado
 
 
