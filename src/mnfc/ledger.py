@@ -68,7 +68,14 @@ class Ledger:
         self._contenidos: List[dict] = []
 
     def append(self, contenido: dict) -> str:
-        """Anade un bloque. Devuelve su hash."""
+        """Anade un bloque. Devuelve su hash.
+
+        Lanza TypeError si contenido no es dict.
+        """
+        if not isinstance(contenido, dict):
+            raise TypeError(
+                f"contenido debe ser dict, no {type(contenido).__name__}"
+            )
         prev = self._hashes[-1] if self._hashes else GENESIS
         h = _hash_bloque(prev, contenido)
         self._hashes.append(h)
