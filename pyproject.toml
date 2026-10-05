@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mnfc"
+version = "0.1.0"
+description = "MNFC - Motor Nucleo Fractal Contable. Kernel formal del Programa de Investigacion SCFV."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "AGPL-3.0-or-later OR Commercial" }
+authors = [
+    { name = "Domingo Eduardo Diaz Navas", email = "lic.dedn@gmail.com" }
+]
+keywords = [
+    "contabilidad", "partida-doble", "xnor", "boole", "merkle",
+    "fractal", "ledger", "scfv", "kernel"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Homepage = "https://github.com/DEDNSCFV/MNFC"
+Repository = "https://github.com/DEDNSCFV/MNFC"
+"Programa de Investigacion" = "https://github.com/DEDNSCFV/Programa-de-Investigacion-SCFV"
+"Licencia comercial" = "mailto:lic.dedn@gmail.com"
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "build", "twine"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v -m 'not slow'"
+markers = [
+    "slow: tests de estres (correr con -m slow -s)",
+]
