@@ -6,6 +6,61 @@ El versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [0.2.0] - 2026-10-07
+
+Kernel + extensiones. Persistencia, maquina de estados y reportes.
+
+### Anadido
+
+**Capa 7 - Extensiones del kernel:**
+
+- `extensiones/estados.py` - Enums y VersionContexto (migrado de SCFV_DSR).
+- `extensiones/reticulo.py` - Reticulo booleano de cuentas. Misma algebra
+  que xnor, a otra escala (autosimilitud verificable).
+- `extensiones/serializador.py` - Serializacion canonica determinista.
+  Garantiza hashes estables entre sesiones.
+- `extensiones/modelos.py` - Modelos tipados (Asiento, LineaAsiento,
+  PartidaAutorizada, ContextoContable).
+- `extensiones/maquina.py` - Maquina de estados del asiento con historial
+  hasheado.
+- `extensiones/examinador.py` - Validador de evidencia (linea + conjunto).
+- `extensiones/persistencia/base.py` - Interfaz abstracta `StoreBase`.
+- `extensiones/persistencia/sqlite_store.py` - Implementacion SQLite
+  con cadena hash Merkle.
+- `extensiones/persistencia/json_store.py` - Implementacion JSON con
+  misma semantica y **compatibilidad cross-backend** (mismo evento,
+  mismo hash).
+- `extensiones/reportes.py` - CSV diario, mayor y balance. PDF opcional.
+- `extensiones/__init__.py` - Fachada publica con 22 simbolos.
+
+**Tests:**
+
+- `tests/test_extensiones.py` - 37 tests (incluye integracion
+  end-to-end kernel + extensiones).
+- Suite completa: **108 tests** en 1.77 segundos.
+
+### Corregido
+
+- `maquina.py`: `Transicion.hash()` usaba `.value` (int) en concatenacion
+  con strings. Cambiado a `.name`. Bug heredado de SCFV_DSR.
+- `reportes.py`: `generar_csv_balance()` sumaba cuentas 5xxx (gastos) a
+  CAPITAL. Corregido a rubro GASTOS y agregado RESULTADO (INGRESOS -
+  GASTOS). Bug heredado de SCFV_DSR.
+- `sqlite_store.py`: `guardar()` ahora captura `sqlite3.IntegrityError`
+  y relanza como `ValueError` para cumplir el contrato de `StoreBase`.
+
+### Arquitectura
+
+- Kernel (capas 0-6) sin cambios: xnor, baldor, estadistica, fractal,
+  mnfc, ledger.
+- Extensiones (capa 7) nueva, importable desde `mnfc.extensiones`.
+- La API publica de `mnfc` (`from mnfc import procesar_asiento`) no
+  cambia. Es una version menor: agrega sin romper.
+- Persistencia intercambiable: `SQLiteStore` y `JSONStore` cumplen
+  `StoreBase` (Liskov). Misma semantica, mismo hash.
+
+---
+
 ## [0.1.0] - 2026-10-05
 
 Primera materializacion del nucleo MNFC.
