@@ -71,7 +71,10 @@ def modas(xs: List[float]) -> List[float]:
 
 
 def varianza_muestral(xs: List[float]) -> float:
-    """s2 = sum((xi-x_bar)^2)/(n-1). Mendenhall L6801-6809 (§2.3)."""
+    """s2 = sum((xi-x_bar)^2)/(n-1). Mendenhall L6801-6809 (§2.3).
+
+    N3-textual: Ejemplo 2.5 (L5239) - datos [5,7,1,2,4] -> s^2 = 5.70.
+    """
     if len(xs) < 2:
         raise ValueError("n >= 2")
     m = media(xs)
@@ -79,7 +82,10 @@ def varianza_muestral(xs: List[float]) -> float:
 
 
 def desviacion_muestral(xs: List[float]) -> float:
-    """s = sqrt(s2). Mendenhall L6813-6814 (§2.3)."""
+    """s = sqrt(s2). Mendenhall L6813-6814 (§2.3).
+
+    N3-textual: Ejemplo 2.5 (L5239) - datos [5,7,1,2,4] -> s ~= 2.39.
+    """
     return sqrt(varianza_muestral(xs))
 
 

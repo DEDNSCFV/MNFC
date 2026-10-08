@@ -115,3 +115,30 @@ class TestModas:
     def test_modas_todas_empatadas(self):
         from mnfc.estadistica import modas
         assert sorted(modas([1, 2, 3])) == [1, 2, 3]
+
+
+class TestEjemplo25:
+    """EJEMPLO 2.5 - Mendenhall 13ed, L5239 (§2.3).
+
+    Datos (tabla 2.2): 5, 7, 1, 2, 4.
+    Solucion del libro, via formula computacional:
+        Sum xi = 19, Sum xi^2 = 95
+        Sum (xi - x_bar)^2 = 22.80
+        s^2 = 22.80 / 4 = 5.70
+        s   = sqrt(5.70) ~= 2.39
+
+    Nota sobre tolerancia:
+        s^2 = 5.70 es exacto.
+        s   = 2.39 es redondeo del libro a 2 decimales.
+        Se usa abs=0.01 para respetar la precision del texto fuente.
+    """
+
+    DATOS = [5, 7, 1, 2, 4]
+
+    def test_varianza(self):
+        from mnfc.estadistica import varianza_muestral
+        assert varianza_muestral(self.DATOS) == pytest.approx(5.70)
+
+    def test_desviacion(self):
+        from mnfc.estadistica import desviacion_muestral
+        assert desviacion_muestral(self.DATOS) == pytest.approx(2.39, abs=0.01)
