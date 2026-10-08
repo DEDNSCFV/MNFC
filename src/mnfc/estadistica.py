@@ -336,14 +336,27 @@ def proyeccion_error(error_muestra: float, N: int, n: int) -> float:
 
 
 def ic_una_cola_sup(xs: List[float], z_alpha: float) -> float:
-    """x_bar + Z_alpha*sigma/sqrt(n). Mendenhall §8.8."""
+    """x_bar + Z_alpha*sigma/sqrt(n). Mendenhall §8.8.
+
+    N3-textual (reconstruccion por parametros):
+        Ejercicio 8.65 (resp. L48977):
+            a. n=40, x_bar=75, s=sqrt(65), z=.10=1.282 -> 76.63.
+            b. n=100, x_bar=1.6, s=2.3, z=.10=1.282 -> 1.895 (libro 1.89).
+        El libro publica (x_bar, s, n), no la lista cruda. Ver
+        tests/test_n3_estadistica.py::TestEjercicio865.
+    """
     m = media(xs)
     s = desviacion_muestral(xs)
     return m + z_alpha * s / sqrt(len(xs))
 
 
 def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
-    """x_bar - Z_alpha*sigma/sqrt(n). Mendenhall §8.8."""
+    """x_bar - Z_alpha*sigma/sqrt(n). Mendenhall §8.8.
+
+    N2: el libro no tiene ejemplo de limite INFERIOR de una cola
+    para media. Solo superior (Ejerc. 8.65). El caso de proporcion
+    (Ejerc. 8.66) no aplica a esta funcion.
+    """
     m = media(xs)
     s = desviacion_muestral(xs)
     return m - z_alpha * s / sqrt(len(xs))

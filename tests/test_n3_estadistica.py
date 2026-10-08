@@ -779,3 +779,48 @@ class TestEjercicio749:
         from mnfc.estadistica import limite_control_media
         _, lci = limite_control_media(self._muestra(), k=3.0)
         assert lci == pytest.approx(150.13, abs=0.01)
+
+
+class TestEjercicio865:
+    """Ejercicio 8.65 - Mendenhall 13ed, L22620 (§8.8).
+
+    Limite superior de confianza de una cola al 90% (z=.10=1.282)
+    para mu:
+
+        a. n=40, s^2=65 (s=sqrt(65)=8.062), x_bar=75
+           L_sup = 75 + 1.282 * sqrt(65)/sqrt(40) = 76.63
+           Libro: 76.63 (resp. L48977).
+
+        b. n=100, s=2.3, x_bar=1.6
+           L_sup = 1.6 + 1.282 * 2.3/sqrt(100) = 1.895 -> 1.89
+           Libro: 1.89.
+
+    Nota: el libro publica (x_bar, s, n), no la lista cruda.
+    Test por reconstruccion.
+
+    ic_una_cola_inf NO se verifica: el libro no tiene ejemplo de
+    una cola inferior para media. Se queda en N2.
+    """
+
+    def test_caso_a(self):
+        from math import sqrt
+        from mnfc.estadistica import ic_una_cola_sup
+        n, x_bar, s = 40, 75.0, sqrt(65)
+        xs = _muestra_con_parametros(x_bar, s, n)
+        limite = ic_una_cola_sup(xs, z_alpha=1.282)
+        assert limite == pytest.approx(76.63, abs=0.01)
+
+    def test_caso_b(self):
+        from mnfc.estadistica import ic_una_cola_sup
+        n, x_bar, s = 100, 1.6, 2.3
+        xs = _muestra_con_parametros(x_bar, s, n)
+        limite = ic_una_cola_sup(xs, z_alpha=1.282)
+        assert limite == pytest.approx(1.895, abs=0.01)
+
+    def test_mayor_que_la_media(self):
+        """El limite superior esta arriba de x_bar. Propiedad estructural."""
+        from math import sqrt
+        from mnfc.estadistica import ic_una_cola_sup
+        n, x_bar, s = 40, 75.0, sqrt(65)
+        xs = _muestra_con_parametros(x_bar, s, n)
+        assert ic_una_cola_sup(xs, z_alpha=1.282) > 75.0
