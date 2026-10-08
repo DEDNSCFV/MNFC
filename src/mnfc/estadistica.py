@@ -90,7 +90,17 @@ def desviacion_muestral(xs: List[float]) -> float:
 
 
 def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
-    """Q1 .25(n+1), Q2 .5(n+1), Q3 .75(n+1). Mendenhall L6827-6829 (§2.7)."""
+    """Q1 .25(n+1), Q2 .5(n+1), Q3 .75(n+1). Mendenhall L6827-6829 (§2.7).
+
+    Interpolacion lineal cuando la posicion no es entera, segun
+    Mendenhall L~6210: "Cuando .25(n+1) y .75(n+1) no son enteros,
+    los cuartiles se encuentran por interpolacion, usando los valores
+    de las dos posiciones adyacentes."
+
+    N3-textual: Ejemplo 2.13 (L~6222) - datos [16,25,4,18,11,13,20,
+    8,11,9] -> Q1=8.75, Q3=18.5. Tambien Repertorio A (L~6303):
+    [2,5,7,1,1,2,8] -> Q1=1, Q3=7 (posiciones enteras, sin interpolacion).
+    """
     if not xs:
         raise ValueError("serie vacia")
     s = sorted(xs)
@@ -98,7 +108,13 @@ def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
 
     def pos(p):
         idx = p * (n + 1)
-        return s[max(1, min(n, int(idx))) - 1]
+        k = int(idx)
+        f = idx - k
+        if f == 0:
+            return float(s[k - 1])
+        if k >= n:
+            return float(s[n - 1])
+        return s[k - 1] + f * (s[k] - s[k - 1])
 
     return pos(.25), pos(.50), pos(.75)
 

@@ -142,3 +142,67 @@ class TestEjemplo25:
     def test_desviacion(self):
         from mnfc.estadistica import desviacion_muestral
         assert desviacion_muestral(self.DATOS) == pytest.approx(2.39, abs=0.01)
+
+
+class TestEjemplo213:
+    """EJEMPLO 2.13 - Mendenhall 13ed, L~6222 (§2.6).
+
+    Datos: 16, 25, 4, 18, 11, 13, 20, 8, 11, 9.
+    Ordenado: 4, 8, 9, 11, 11, 13, 16, 18, 20, 25 (n=10).
+
+    Posiciones:
+        Q1: .25(10+1) = 2.75  -> interpola entre s[1]=8 y s[2]=9
+             Q1 = 8 + .75*(9-8) = 8.75
+        Q3: .75(10+1) = 8.25  -> interpola entre s[7]=18 y s[8]=20
+             Q3 = 18 + .25*(20-18) = 18.5
+    IQR = 18.5 - 8.75 = 9.75.
+
+    Este test expone y bloquea el bug de truncamiento: la version
+    previa devolvia Q1=8, Q3=20 por usar int(idx) sin interpolar.
+    """
+
+    DATOS = [16, 25, 4, 18, 11, 13, 20, 8, 11, 9]
+
+    def test_q1(self):
+        from mnfc.estadistica import cuartiles
+        q1, _, _ = cuartiles(self.DATOS)
+        assert q1 == pytest.approx(8.75)
+
+    def test_q2(self):
+        # Q2 = mediana = promedio de s[4]=11 y s[5]=13 = 12.0
+        from mnfc.estadistica import cuartiles
+        _, q2, _ = cuartiles(self.DATOS)
+        assert q2 == pytest.approx(12.0)
+
+    def test_q3(self):
+        from mnfc.estadistica import cuartiles
+        _, _, q3 = cuartiles(self.DATOS)
+        assert q3 == pytest.approx(18.5)
+
+    def test_iqr(self):
+        from mnfc.estadistica import iqr
+        assert iqr(self.DATOS) == pytest.approx(9.75)
+
+
+class TestRepertorioA:
+    """Repertorio de ejercicios A - Mendenhall 13ed, L~6303.
+
+    Conjunto ya resuelto por el libro:
+        2, 5, 7, 1, 1, 2, 8   (n=7)
+        Ordenado: 1, 1, 2, 2, 5, 7, 8
+        Pos Q1 = .25(8) = 2 -> s[1] = 1
+        Pos Q3 = .75(8) = 6 -> s[5] = 7
+    Sin interpolacion (posiciones enteras).
+    """
+
+    DATOS = [2, 5, 7, 1, 1, 2, 8]
+
+    def test_q1_sin_interpolar(self):
+        from mnfc.estadistica import cuartiles
+        q1, _, _ = cuartiles(self.DATOS)
+        assert q1 == pytest.approx(1.0)
+
+    def test_q3_sin_interpolar(self):
+        from mnfc.estadistica import cuartiles
+        _, _, q3 = cuartiles(self.DATOS)
+        assert q3 == pytest.approx(7.0)
