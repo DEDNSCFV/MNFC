@@ -42,10 +42,32 @@ def mediana(xs: List[float]) -> float:
 
 
 def moda(xs: List[float]) -> float:
-    """Valor mas frecuente. Mendenhall L6784 (§2.2)."""
+    """Una de las modas (la primera hallada). Mendenhall L6784 (§2.2).
+
+    Nota: en distribuciones multimodales devuelve la primera segun
+    orden de insercion en Counter. Para obtener todas las modas, usar
+    modas(). Mendenhall Ejercicio 2.3: "c. 5 y 6".
+    """
     if not xs:
         raise ValueError("serie vacia")
     return Counter(xs).most_common(1)[0][0]
+
+
+def modas(xs: List[float]) -> List[float]:
+    """Todas las modas. Mendenhall L4789 (definicion).
+
+    Devuelve la lista de valores con frecuencia maxima. Si la
+    distribucion es unimodal, lista de un solo elemento. Si bimodal
+    o multimodal, todos los valores empatados en el maximo.
+
+    Verificacion N3-textual: Mendenhall Ejercicio 2.3 (L4865,
+    respuesta en L48515): datos [3,5,4,6,10,5,6,9,2,8] -> [5, 6].
+    """
+    if not xs:
+        raise ValueError("serie vacia")
+    c = Counter(xs)
+    max_f = max(c.values())
+    return [v for v, f in c.items() if f == max_f]
 
 
 def varianza_muestral(xs: List[float]) -> float:

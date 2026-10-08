@@ -75,3 +75,43 @@ class TestEjemplo24:
     def test_posicion_n_par(self):
         # Ejemplo 2.3: n=6 -> posicion 3.5 (semi-entero)
         assert 0.5 * (6 + 1) == 3.5
+
+
+class TestEjercicio23:
+    """Ejercicio 2.3 - Mendenhall 13ed, L4865 (enunciado), L48515 (respuesta).
+
+    Datos: 3, 5, 4, 6, 10, 5, 6, 9, 2, 8.
+    Respuestas del libro:
+        a. x_bar = 5.8
+        b. m     = 5.5
+        c. moda  = 5 y 6  (bimodal)
+    """
+
+    DATOS = [3, 5, 4, 6, 10, 5, 6, 9, 2, 8]
+
+    def test_media(self):
+        assert media(self.DATOS) == pytest.approx(5.8)
+
+    def test_mediana(self):
+        assert mediana(self.DATOS) == pytest.approx(5.5)
+
+
+class TestModas:
+    """Mendenhall Ejercicio 2.3 - verificacion multimodal.
+
+    El libro reconoce explicitamente distribuciones multimodales
+    (L4808: "Es posible que una distribucion de mediciones tenga
+    mas de una moda"). modas() reproduce el caso.
+    """
+
+    def test_modas_ejercicio_23(self):
+        from mnfc.estadistica import modas
+        assert sorted(modas([3, 5, 4, 6, 10, 5, 6, 9, 2, 8])) == [5, 6]
+
+    def test_modas_unimodal(self):
+        from mnfc.estadistica import modas
+        assert modas([1, 2, 2, 3]) == [2]
+
+    def test_modas_todas_empatadas(self):
+        from mnfc.estadistica import modas
+        assert sorted(modas([1, 2, 3])) == [1, 2, 3]
