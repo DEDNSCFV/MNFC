@@ -34,7 +34,7 @@ from .baldor import (
 
 # Capa 2 - estadistica aplicada
 from .estadistica import (
-    media, mediana, moda, varianza_muestral, desviacion_muestral,
+    media, mediana, moda, modas, varianza_muestral, desviacion_muestral,
     cuartiles, iqr, z_score, coef_variacion,
     normal_pdf, normal_cdf, z_critico_90, z_critico_95, z_critico_99,
     error_estandar_media, error_estandar_proporcion,
@@ -69,7 +69,7 @@ __all__ = [
     "regla_de_tres_directa", "regla_de_tres_inversa",
     "logaritmo", "resolver_exponencial",
     # Capa 2
-    "media", "mediana", "moda", "varianza_muestral", "desviacion_muestral",
+    "media", "mediana", "moda", "modas", "varianza_muestral", "desviacion_muestral",
     "cuartiles", "iqr", "z_score", "coef_variacion",
     "normal_pdf", "normal_cdf", "z_critico_90", "z_critico_95", "z_critico_99",
     "error_estandar_media", "error_estandar_proporcion",

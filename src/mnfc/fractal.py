@@ -47,6 +47,11 @@ def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
     Locus: Mandelbrot 1982 L738-744 (cascada de escalas de un mapa);
     1982 L121-122 ("identico a todas las escalas").
 
+    Sensibilidad al orden: la agregacion se hace sobre bloques
+    CONSECUTIVOS (xs[i:i+k]). El orden de la serie ES la informacion;
+    permutarla cambia el resultado. No usar sobre series que no tengan
+    orden temporal. Ver tests/test_determinismo.py::TestSensibilidadAlOrden.
+
     Devuelve: [(nivel, varianza_agregada), ...]
     """
     resultado = []
