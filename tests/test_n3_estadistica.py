@@ -518,3 +518,84 @@ class TestEjercicio89:
         """MOE(p) == MOE(1-p). Propiedad estructural."""
         for p in [.05, .15, .25, .35, .45]:
             assert self._moe(p) == pytest.approx(self._moe(1 - p), abs=1e-10)
+
+
+class TestEjemplo813:
+    """EJEMPLO 8.13 - Mendenhall 13ed, L22431 (§8.9).
+
+    Productores de tubo de polivinilo. p=.5 (maximo), B=.04, z=1.645
+    (confianza .90).
+    El libro: n = 422.7 -> 423.
+    """
+
+    def test_tamano(self):
+        from mnfc.estadistica import tamano_muestra_proporcion
+        assert tamano_muestra_proporcion(1.645, 0.5, 0.04) == 423
+
+
+class TestEjercicio869:
+    """Ejercicio 8.69 - Mendenhall 13ed, L22649 (§8.9).
+
+    Estimar p a no mas de .04, confianza .95. p entre .1 y .3.
+    El libro toma p=.3 (maximiza pq en el rango) y obtiene 505.
+    Respuesta: L48961.
+
+    CASO DE BUG: 1.96^2 * .3 * .7 / .04^2 = 504.21. ceil=505.
+    round() daria 504.
+    """
+
+    def test_tamano(self):
+        from mnfc.estadistica import tamano_muestra_proporcion
+        assert tamano_muestra_proporcion(1.96, 0.3, 0.04) == 505
+
+
+class TestEjercicio873:
+    """Ejercicio 8.73 - Mendenhall 13ed, L22643 (§8.9).
+
+    Encuesta con error no mayor a 1%, confianza .95. p=.5.
+    Respuesta: 9604. L48961.
+    """
+
+    def test_tamano(self):
+        from mnfc.estadistica import tamano_muestra_proporcion
+        assert tamano_muestra_proporcion(1.96, 0.5, 0.01) == 9604
+
+
+class TestEjercicio877:
+    """Ejercicio 8.77 - Mendenhall 13ed, L22713 (§8.9).
+
+    Encuesta de cacería, sigma=10, B=2 (confianza .95, z=1.96).
+    Respuesta: 97. L48961.
+
+    CASO DE BUG: 1.96^2 * 100 / 4 = 96.04. ceil=97.
+    round() daria 96.
+    """
+
+    def test_tamano(self):
+        from mnfc.estadistica import tamano_muestra_media
+        assert tamano_muestra_media(1.96, 10, 2) == 97
+
+
+class TestRedondeoHaciaArriba:
+    """El tamano muestral se redondea hacia arriba, nunca hacia abajo.
+
+    Razon matematica: si el calculo exacto da 504.21 sujetos, tomar
+    504 no cumple "a no mas de B de error". Hay que tomar 505.
+
+    Este test es la razon del cambio round() -> ceil().
+    """
+
+    def test_nunca_redondea_abajo(self):
+        from math import ceil
+        from mnfc.estadistica import tamano_muestra_proporcion
+        # Caso con n exacto 504.21
+        n = tamano_muestra_proporcion(1.96, 0.3, 0.04)
+        assert n == 505  # no 504
+
+    def test_coincide_con_ceil(self):
+        from math import ceil
+        from mnfc.estadistica import tamano_muestra_media
+        # Cualquier caso: n == ceil(n_exacto)
+        for sigma, B in [(10, 2), (5, 1), (3.7, 0.8), (12.7, 1.6)]:
+            n_exacto = (1.96 * sigma / B) ** 2
+            assert tamano_muestra_media(1.96, sigma, B) == ceil(n_exacto)

@@ -20,7 +20,7 @@ Estado epistemico:
 Frontera: el modulo no decide contabilidad. Mide series contables.
 """
 
-from math import sqrt, log, exp, erf, isnan, isinf
+from math import sqrt, log, exp, erf, isnan, isinf, ceil
 from typing import List, Tuple
 from collections import Counter
 
@@ -234,21 +234,38 @@ def error_estandar_proporcion(p: float, n: int) -> float:
 
 
 def tamano_muestra_media(z: float, sigma: float, B: float) -> int:
-    """n = z^2*sigma^2/B^2. Mendenhall L22545-22548 (Tabla 8.7)."""
+    """n = z^2*sigma^2/B^2. Mendenhall L22545-22548 (Tabla 8.7).
+
+    Redondeo: ceil (hacia arriba). El tamano muestral debe garantizar
+    "a no mas de B de error", no puede quedarse corto. Ejercicio 8.77:
+    n exacto = 96.04 -> libro reporta 97.
+
+    N3-textual: Ejercicio 8.77 (resp. L48961) - sigma=10, B=2, z=1.96
+    -> n=97.
+    """
     if B <= 0:
         raise ValueError("B > 0")
     if sigma < 0:
         raise ValueError("sigma >= 0")
-    return int(round((z * sigma / B) ** 2))
+    return ceil((z * sigma / B) ** 2)
 
 
 def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
-    """n = z^2*p*q/B^2. Mendenhall L22561-22564 (Tabla 8.7)."""
+    """n = z^2*p*q/B^2. Mendenhall L22561-22564 (Tabla 8.7).
+
+    Redondeo: ceil (hacia arriba). Ejercicio 8.69: n exacto = 504.21
+    -> libro reporta 505.
+
+    N3-textual:
+        Ejemplo 8.13 (L22431): p=.5, B=.04, z=1.645 -> n=423.
+        Ejercicio 8.69 (resp. L48961): p=.3, B=.04, z=1.96 -> n=505.
+        Ejercicio 8.73 (resp. L48961): p=.5, B=.01, z=1.96 -> n=9604.
+    """
     if B <= 0:
         raise ValueError("B > 0")
     if not 0 <= p <= 1:
         raise ValueError("p in [0,1]")
-    return int(round(z * z * p * (1 - p) / (B * B)))
+    return ceil(z * z * p * (1 - p) / (B * B))
 
 
 def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]:
