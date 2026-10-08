@@ -151,7 +151,19 @@ def z_score(x: float, xs: List[float]) -> float:
 
 
 def coef_variacion(xs: List[float]) -> float:
-    """CV = s/x_bar. Mendenhall §2.3."""
+    """CV = s/x_bar. Coeficiente de variacion (forma estandar).
+
+    N0: sin locus verificado en el corpus actual.
+    La cita "Mendenhall 13ed §2.3" del docstring previo era
+    incorrecta: el libro cubre varianza y desviacion estandar,
+    no el CV. Busqueda exhaustiva en ~/tmp/estadistica.txt:
+    "CV" aparece 0 veces, "coef...variaci" 1 vez en contexto
+    de regresion (error residual).
+
+    La formula s/x_bar es estandar en estadistica descriptiva
+    (Pearson, 1897). Pendiente: verificar contra fuente
+    legitima para ascender a N1.
+    """
     m = media(xs)
     if m == 0:
         raise ValueError("media cero")
