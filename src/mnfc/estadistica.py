@@ -289,7 +289,18 @@ def margen_error(z: float, sigma: float, n: int) -> float:
 
 
 def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
-    """x_bar +/- Z*sigma/sqrt(n). Mendenhall §8.5."""
+    """x_bar +/- Z*sigma/sqrt(n). Mendenhall §8.5.
+
+    N3-textual (reconstruccion por parametros):
+        Ejemplo 8.6 (L~20950): n=50, x_bar=756, s=35, z=1.96
+            -> IC=(746.30, 765.70).
+        Ejemplo 8.7 (L~21067): mismo caso, z=2.58
+            -> IC=(743.23, 768.77).
+
+    Nota: el libro publica (x_bar, s, n), no la lista cruda. El
+    test usa una muestra sintetica que reproduce esos parametros.
+    Ver tests/test_n3_estadistica.py::_muestra_con_parametros.
+    """
     m = media(xs)
     s = desviacion_muestral(xs)
     n = len(xs)

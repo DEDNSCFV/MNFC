@@ -599,3 +599,105 @@ class TestRedondeoHaciaArriba:
         for sigma, B in [(10, 2), (5, 1), (3.7, 0.8), (12.7, 1.6)]:
             n_exacto = (1.96 * sigma / B) ** 2
             assert tamano_muestra_media(1.96, sigma, B) == ceil(n_exacto)
+
+
+def _muestra_con_parametros(x_bar: float, s: float, n: int) -> list:
+    """Construye una muestra sintetica con media y desviacion dados.
+
+    Asume n par: n/2 valores en x_bar - a, n/2 en x_bar + a,
+    donde a se elige para que s² = n·a²/(n-1) exactamente.
+
+    Uso: verificar funciones que toman xs crudos cuando el libro
+    solo publica los parametros (x_bar, s, n), no la lista completa.
+    """
+    from math import sqrt
+    a = sqrt(s * s * (n - 1) / n)
+    return [x_bar - a] * (n // 2) + [x_bar + a] * (n // 2)
+
+
+class TestEjemplo86:
+    """EJEMPLO 8.6 - Mendenhall 13ed, L~20950 (§8.5).
+
+    Ingesta de lacteos: n=50, x_bar=756 g/dia, s=35 g/dia.
+    IC 95%: x_bar +/- 1.96*s/sqrt(n) = 756 +/- 9.70
+    El libro: (746.30, 765.70).
+
+    Nota: el libro publica x_bar, s, n. La muestra sintetica
+    reproduce esos parametros. Este test es N3-textual pero
+    verifica una reconstruccion, no la lista cruda original.
+    """
+
+    N = 50
+    X_BAR = 756.0
+    S = 35.0
+
+    def test_margen_error(self):
+        from math import sqrt
+        from mnfc.estadistica import margen_error
+        me = margen_error(1.96, self.S, self.N)
+        assert me == pytest.approx(9.70, abs=0.01)
+
+    def test_ic_lower(self):
+        from mnfc.estadistica import ic_media
+        xs = _muestra_con_parametros(self.X_BAR, self.S, self.N)
+        lo, _ = ic_media(xs)
+        assert lo == pytest.approx(746.30, abs=0.01)
+
+    def test_ic_upper(self):
+        from mnfc.estadistica import ic_media
+        xs = _muestra_con_parametros(self.X_BAR, self.S, self.N)
+        _, hi = ic_media(xs)
+        assert hi == pytest.approx(765.70, abs=0.01)
+
+
+class TestEjemplo87:
+    """EJEMPLO 8.7 - Mendenhall 13ed, L~21067 (§8.5).
+
+    Mismo caso del Ejemplo 8.6 (ingesta de lacteos), pero con
+    confianza 99% -> z = 2.58.
+    IC 99%: 756 +/- 2.58*35/sqrt(50) = 756 +/- 12.77
+    El libro: (743.23, 768.77).
+    """
+
+    N = 50
+    X_BAR = 756.0
+    S = 35.0
+
+    def test_ic_lower(self):
+        from mnfc.estadistica import ic_media
+        xs = _muestra_con_parametros(self.X_BAR, self.S, self.N)
+        lo, _ = ic_media(xs, z=2.58)
+        assert lo == pytest.approx(743.23, abs=0.01)
+
+    def test_ic_upper(self):
+        from mnfc.estadistica import ic_media
+        xs = _muestra_con_parametros(self.X_BAR, self.S, self.N)
+        _, hi = ic_media(xs, z=2.58)
+        assert hi == pytest.approx(768.77, abs=0.01)
+
+
+class TestEjemplo88:
+    """EJEMPLO 8.8 - Mendenhall 13ed, L~21201 (§8.5).
+
+    Encuesta electoral: n=985, x=592 votantes.
+    p_hat = 592/985 = .601
+    SE = sqrt(.601*.399/985) = .016
+    IC 90%: .601 +/- 1.645*.016 = .601 +/- .026 = (.575, .627)
+    """
+
+    N = 985
+    X = 592
+
+    def test_p_hat(self):
+        p = self.X / self.N
+        assert p == pytest.approx(0.601, abs=0.001)
+
+    def test_ic_lower(self):
+        from mnfc.estadistica import ic_proporcion
+        lo, _ = ic_proporcion(0.601, 985, z=1.645)
+        assert lo == pytest.approx(0.575, abs=0.001)
+
+    def test_ic_upper(self):
+        from mnfc.estadistica import ic_proporcion
+        _, hi = ic_proporcion(0.601, 985, z=1.645)
+        assert hi == pytest.approx(0.627, abs=0.001)
