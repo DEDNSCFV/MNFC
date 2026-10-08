@@ -701,3 +701,81 @@ class TestEjemplo88:
         from mnfc.estadistica import ic_proporcion
         _, hi = ic_proporcion(0.601, 985, z=1.645)
         assert hi == pytest.approx(0.627, abs=0.001)
+
+
+class TestEsAtipicoZ:
+    """Umbral |z| > 3 segun Mendenhall L6824 (§2.6).
+
+    El Ejemplo 2.11 da un caso explicito:
+        datos = [1,1,0,15,2,3,4,0,1,3], x=15 -> z=2.71
+        El libro: "Aun cuando el puntaje z no excede de 3, esta
+        cercano lo suficiente para sospechar que x=15 es un
+        resultado atipico."
+
+    Conclusion: 2.71 < 3 -> es_atipico_z(15, datos, umbral=3) == False.
+    El libro NO lo llama atipico formal, solo sospechoso.
+    """
+
+    DATOS = [1, 1, 0, 15, 2, 3, 4, 0, 1, 3]
+
+    def test_15_no_es_atipico_con_umbral_3(self):
+        from mnfc.estadistica import es_atipico_z
+        assert es_atipico_z(15, self.DATOS, umbral=3.0) is False
+
+    def test_15_es_atipico_con_umbral_2_5(self):
+        """Con umbral mas laxo, si lo seria (z=2.71 > 2.5)."""
+        from mnfc.estadistica import es_atipico_z
+        assert es_atipico_z(15, self.DATOS, umbral=2.5) is True
+
+    def test_valor_tipico_no_es_atipico(self):
+        """Un valor cercano a la media no es atipico."""
+        from mnfc.estadistica import es_atipico_z
+        assert es_atipico_z(3, self.DATOS, umbral=3.0) is False
+
+
+class TestEjercicio749:
+    """Ejercicio 7.49 - Mendenhall 13ed, L19347 (§7.7).
+
+    Control estadistico de procesos. 40 muestras de tamano n=5,
+    la media de las medias es x_bar=155.9 y la desviacion estandar
+    combinada es s=4.3.
+
+    Limites de control (k=3):
+        LCS = x_bar + 3*s/sqrt(n) = 161.67
+        LCI = x_bar - 3*s/sqrt(n) = 150.13
+
+    Respuesta: L48973 ("7.49 a. LCL=150.13; UCL=161.67").
+
+    Nota: el libro publica (x_bar, s, n), no la lista cruda.
+    Test por reconstruccion: muestra [155.9-4.3, 155.9-4.3, 155.9,
+    155.9+4.3, 155.9+4.3] tiene media=155.9 y stdev muestral=4.3.
+    """
+
+    N = 5
+    X_BAR = 155.9
+    S = 4.3
+
+    def _muestra(self):
+        return [
+            self.X_BAR - self.S,
+            self.X_BAR - self.S,
+            self.X_BAR,
+            self.X_BAR + self.S,
+            self.X_BAR + self.S,
+        ]
+
+    def test_muestra_tiene_parametros_correctos(self):
+        from statistics import mean, stdev
+        xs = self._muestra()
+        assert mean(xs) == pytest.approx(self.X_BAR)
+        assert stdev(xs) == pytest.approx(self.S)
+
+    def test_lcs(self):
+        from mnfc.estadistica import limite_control_media
+        lcs, _ = limite_control_media(self._muestra(), k=3.0)
+        assert lcs == pytest.approx(161.67, abs=0.01)
+
+    def test_lci(self):
+        from mnfc.estadistica import limite_control_media
+        _, lci = limite_control_media(self._muestra(), k=3.0)
+        assert lci == pytest.approx(150.13, abs=0.01)

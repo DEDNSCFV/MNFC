@@ -269,7 +269,16 @@ def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
 
 
 def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]:
-    """LCS/LCI = x_bar +/- k*sigma/sqrt(n). Mendenhall L18107 (§7.7)."""
+    """LCS/LCI = x_bar +/- k*sigma/sqrt(n). Mendenhall L18107 (§7.7).
+
+    N3-textual (reconstruccion por parametros):
+        Ejercicio 7.49 (resp. L48973) - x_bar=155.9, s=4.3, n=5,
+        k=3 -> LCS=161.67, LCI=150.13.
+
+    Nota: el libro publica (x_bar, s, n), no la lista cruda. Ver
+    tests/test_n3_estadistica.py::TestEjercicio749 para la muestra
+    sintetica que reproduce esos parametros.
+    """
     m = media(xs)
     s = desviacion_muestral(xs)
     n = len(xs)
@@ -341,7 +350,12 @@ def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
 
 
 def es_atipico_z(x: float, xs: List[float], umbral: float = 3.0) -> bool:
-    """|z| > 3. Mendenhall L6824 (§2.6)."""
+    """|z| > umbral. Mendenhall L6824 (§2.6).
+
+    N3-textual: Ejemplo 2.11 (L~6104) - datos [1,1,0,15,2,3,4,0,1,3],
+    x=15, z=2.71. El libro declara que NO es atipico formal (2.71 < 3),
+    solo "cercano lo suficiente para sospechar".
+    """
     return abs(z_score(x, xs)) > umbral
 
 
