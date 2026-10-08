@@ -46,6 +46,43 @@ Un **kernel** de partida doble. Seis capas fractales:
 
 ---
 
+## Limitacion numerica conocida
+
+MNFC usa `float` (IEEE 754 binario) en capas 1, 4 y 6. Esto es
+**inaceptable para uso contable real**: la aritmetica decimal exacta
+es un requisito de la disciplina, no una preferencia.
+
+Demostracion:
+
+    >>> from mnfc import sumar_montos
+    >>> sumar_montos([0.1, 0.2])
+    0.30000000000000004     # no es 0.3
+
+    >>> 10.1 * 3
+    30.299999999999997      # no es 30.3
+
+    >>> from mnfc import verificar_cuadre
+    >>> verificar_cuadre(100.0, 100.0009)
+    True                    # tolera 0.0009 de diferencia
+
+En contabilidad formal, `ΣDEBE == ΣHABER` debe ser exacto. La
+tolerancia de 0.001 en `verificar_cuadre` existe para acomodar el
+error de IEEE 754, no porque sea correcta.
+
+**Migracion planificada a `decimal.Decimal`:**
+
+- Capas afectadas: 1 (baldor), 4 (mnfc), 6 (ledger).
+- Capas que seguiran en float: 2 (estadistica), 3 (fractal), porque
+  `math.erf`, `math.sqrt`, `math.log` son float-only y el dominio
+  (estimacion, analisis fractal) es inherentemente aproximado.
+- Frontera explicita al cruzar de capa 2 a capa 1.
+- Ver `tests/test_limites_numericos.py` para la documentacion
+  ejecutable del problema.
+
+Fecha estimada: v0.3.0. Ver CHANGELOG para seguimiento.
+
+---
+
 ## Instalacion
 
 Desde GitHub:
