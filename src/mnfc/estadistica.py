@@ -20,15 +20,27 @@ Estado epistemico:
 Frontera: el modulo no decide contabilidad. Mide series contables.
 """
 
-from math import sqrt, log, exp, erf
+from math import sqrt, log, exp, erf, isnan, isinf
 from typing import List, Tuple
 from collections import Counter
 
 
+def _validar_serie(xs: List[float]) -> None:
+    """Rechaza NaN e Inf. Los montos contables son finitos."""
+    for x in xs:
+        if isinstance(x, float) and (isnan(x) or isinf(x)):
+            raise ValueError("valor no finito en serie: " + repr(x))
+
+
 def media(xs: List[float]) -> float:
-    """Media aritmetica. Mendenhall L6781-6782 (§2.2)."""
+    """Media aritmetica. Mendenhall L6781-6782 (§2.2).
+
+    Limitacion conocida: suma directa. Series con valores > 1e154
+    pueden desbordar a inf. No aplica a montos contables reales.
+    """
     if not xs:
         raise ValueError("serie vacia")
+    _validar_serie(xs)
     return sum(xs) / len(xs)
 
 
@@ -36,6 +48,7 @@ def mediana(xs: List[float]) -> float:
     """Posicion .5(n+1). Mendenhall L6783 (§2.2)."""
     if not xs:
         raise ValueError("serie vacia")
+    _validar_serie(xs)
     s = sorted(xs)
     n = len(s)
     return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
@@ -50,6 +63,7 @@ def moda(xs: List[float]) -> float:
     """
     if not xs:
         raise ValueError("serie vacia")
+    _validar_serie(xs)
     return Counter(xs).most_common(1)[0][0]
 
 
@@ -65,6 +79,7 @@ def modas(xs: List[float]) -> List[float]:
     """
     if not xs:
         raise ValueError("serie vacia")
+    _validar_serie(xs)
     c = Counter(xs)
     max_f = max(c.values())
     return [v for v, f in c.items() if f == max_f]
@@ -103,6 +118,7 @@ def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
     """
     if not xs:
         raise ValueError("serie vacia")
+    _validar_serie(xs)
     s = sorted(xs)
     n = len(s)
 
@@ -177,6 +193,8 @@ def error_estandar_media(sigma: float, n: int) -> float:
     """SE = sigma/sqrt(n). Mendenhall L18107 (§7.5)."""
     if n <= 0:
         raise ValueError("n > 0")
+    if sigma < 0:
+        raise ValueError("sigma >= 0")
     return sigma / sqrt(n)
 
 
@@ -191,6 +209,8 @@ def tamano_muestra_media(z: float, sigma: float, B: float) -> int:
     """n = z^2*sigma^2/B^2. Mendenhall L22545-22548 (Tabla 8.7)."""
     if B <= 0:
         raise ValueError("B > 0")
+    if sigma < 0:
+        raise ValueError("sigma >= 0")
     return int(round((z * sigma / B) ** 2))
 
 
@@ -198,6 +218,8 @@ def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
     """n = z^2*p*q/B^2. Mendenhall L22561-22564 (Tabla 8.7)."""
     if B <= 0:
         raise ValueError("B > 0")
+    if not 0 <= p <= 1:
+        raise ValueError("p in [0,1]")
     return int(round(z * z * p * (1 - p) / (B * B)))
 
 
@@ -233,6 +255,8 @@ def proyeccion_error(error_muestra: float, N: int, n: int) -> float:
     """error_muestra * (N/n). Mendenhall §8.9."""
     if n <= 0:
         raise ValueError("n > 0")
+    if n > N:
+        raise ValueError("n <= N")
     return error_muestra * (N / n)
 
 

@@ -23,6 +23,7 @@ Frontera declarada (D-BALDOR-2):
     cálculo de mora legal, operaciones específicas de industria.
 """
 
+from math import isnan, isinf
 from typing import List, Tuple
 
 
@@ -164,13 +165,23 @@ def reducir_terminos_semejantes(terminos: List[Termino]) -> Termino:
     return reducir_signo_distinto([(coef_pos, +1, parte), (coef_neg, -1, parte)])
 
 
+def _validar_finito(x, nombre: str = "valor") -> None:
+    """Rechaza NaN e Inf. Los montos contables son finitos."""
+    if isinstance(x, float) and (isnan(x) or isinf(x)):
+        raise ValueError(nombre + " no finito: " + repr(x))
+
+
 def sumar_montos(montos: List[float]) -> float:
-    """Suma algebraica de montos. Raw L874-997 (reducción de términos)."""
+    """Suma algebraica de montos. Raw L874-997 (reduccion de terminos)."""
+    for m in montos:
+        _validar_finito(m, "monto")
     return sum(montos)
 
 
 def verificar_cuadre(total_debe: float, total_haber: float) -> bool:
-    """ΣDEBE == ΣHABER. Raw L1676 (conmutatividad) + L874 (reducción)."""
+    """ΣDEBE == ΣHABER. Raw L1676 (conmutatividad) + L874 (reduccion)."""
+    _validar_finito(total_debe, "total_debe")
+    _validar_finito(total_haber, "total_haber")
     return abs(total_debe - total_haber) < 0.001
 
 
