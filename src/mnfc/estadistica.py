@@ -209,7 +209,10 @@ def z_critico_90() -> float:
 
 
 def error_estandar_media(sigma: float, n: int) -> float:
-    """SE = sigma/sqrt(n). Mendenhall L18107 (§7.5)."""
+    """SE = sigma/sqrt(n). Mendenhall L18107 (§7.5).
+
+    N3-textual: Ejemplo 8.4 (L20396) - s=105, n=50 -> SE=14.849.
+    """
     if n <= 0:
         raise ValueError("n > 0")
     if sigma < 0:
@@ -218,7 +221,13 @@ def error_estandar_media(sigma: float, n: int) -> float:
 
 
 def error_estandar_proporcion(p: float, n: int) -> float:
-    """SE = sqrt(pq/n). Mendenhall L18667 (§7.6)."""
+    """SE = sqrt(pq/n). Mendenhall L18667 (§7.6).
+
+    N3-textual:
+        Ejemplo 7.6 (L18672): p=.60, n=500 -> SE=.022.
+        Ejemplo 8.5 (L20560): p=.73, n=100 -> SE=.0444.
+        Ejercicio 8.9 (L20554): p=.5,  n=100 -> MOE=.098 (maximo).
+    """
     if not 0 <= p <= 1 or n <= 0:
         raise ValueError("p in [0,1], n > 0")
     return sqrt(p * (1 - p) / n)
@@ -251,7 +260,14 @@ def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]
 
 
 def margen_error(z: float, sigma: float, n: int) -> float:
-    """Z*sigma/sqrt(n). Mendenhall §8.5."""
+    """Z*sigma/sqrt(n). Mendenhall §8.5.
+
+    N3-textual:
+        Ejemplo 8.4 (L20396): z=1.96, s=105, n=50 -> ME=29.10.
+        Ejercicio 8.3 (resp. L48961): n=30 con sigma^2 en {.2,.9,1.5}.
+        Ejercicio 8.5 (resp. L48962): sigma^2=4 con n en {50,500,5000}.
+        Ejercicio 8.7 (resp. L48962): p=.5 con n en {30,100,400,1000}.
+    """
     return z * error_estandar_media(sigma, n)
 
 
@@ -265,7 +281,10 @@ def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
 
 
 def ic_proporcion(p: float, n: int, z: float = 1.96) -> Tuple[float, float]:
-    """p_hat +/- Z*sqrt(pq/n). Mendenhall §8.5."""
+    """p_hat +/- Z*sqrt(pq/n). Mendenhall §8.5.
+
+    N3-textual: Ejemplo 8.5 (L20560) - p=.73, n=100 -> IC=(.64, .82).
+    """
     se = error_estandar_proporcion(p, n)
     return p - z * se, p + z * se
 

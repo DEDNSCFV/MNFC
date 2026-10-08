@@ -327,3 +327,194 @@ class TestEjemplo610:
     def test_z_critico_90(self):
         from mnfc.estadistica import z_critico_90
         assert z_critico_90() == pytest.approx(1.645)
+
+
+class TestEjemplo84:
+    """EJEMPLO 8.4 - Mendenhall 13ed, L20396 (§8.4).
+
+    Oso polar: muestra n=50, x_bar=980 lb, s=105 lb.
+    El libro calcula:
+        SE = s/sqrt(n) = 105/sqrt(50) = 14.849
+        95% ME = 1.96 * SE = 1.96 * 105/sqrt(50) = 29.10 ~= 29
+
+    Verifica error_estandar_media() y margen_error().
+    """
+
+    N = 50
+    S = 105.0
+
+    def test_error_estandar(self):
+        from mnfc.estadistica import error_estandar_media
+        se = error_estandar_media(self.S, self.N)
+        assert se == pytest.approx(14.849, abs=0.001)
+
+    def test_margen_error(self):
+        from mnfc.estadistica import margen_error
+        me = margen_error(1.96, self.S, self.N)
+        assert me == pytest.approx(29.10, abs=0.01)
+
+
+class TestEjemplo85:
+    """EJEMPLO 8.5 - Mendenhall 13ed, L20560 (§8.4).
+
+    Calentamiento global: p_hat = .73, n = 100.
+    El libro:
+        SE = sqrt(.73*.27/100) = .0444
+        ME = 1.96 * SE = .09
+        IC: .73 +/- .09 = (.64, .82)
+
+    Verifica error_estandar_proporcion() e ic_proporcion().
+    """
+
+    P = 0.73
+    N = 100
+
+    def test_error_estandar(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        se = error_estandar_proporcion(self.P, self.N)
+        assert se == pytest.approx(0.0444, abs=0.0001)
+
+    def test_ic(self):
+        from mnfc.estadistica import ic_proporcion
+        lo, hi = ic_proporcion(self.P, self.N)
+        # Libro: .64 a .82 (2 decimales)
+        assert lo == pytest.approx(0.64, abs=0.01)
+        assert hi == pytest.approx(0.82, abs=0.01)
+
+
+class TestEjemplo76:
+    """EJEMPLO 7.6 - Mendenhall 13ed, L18672 (§7.6).
+
+    Encuesta: p=.60, n=500.
+    El libro: 2SE = .044, por tanto SE = .022.
+    (El libro no escribe SE explicito; lo da via 2SE en la figura.)
+    """
+
+    def test_error_estandar(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        se = error_estandar_proporcion(0.60, 500)
+        assert se == pytest.approx(0.022, abs=0.001)
+
+
+class TestEjercicio83:
+    """Ejercicio 8.3 - Mendenhall 13ed, L20534 (§8.4).
+
+    Margen de error para estimar mu:
+        a. n=30, sigma^2=.2 -> MOE = .160
+        b. n=30, sigma^2=.9 -> MOE = .339
+        c. n=30, sigma^2=1.5 -> MOE = .438
+    Respuestas: L48961.
+    """
+
+    N = 30
+
+    def test_a(self):
+        from math import sqrt
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, sqrt(.2), self.N) == pytest.approx(.160, abs=0.001)
+
+    def test_b(self):
+        from math import sqrt
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, sqrt(.9), self.N) == pytest.approx(.339, abs=0.001)
+
+    def test_c(self):
+        from math import sqrt
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, sqrt(1.5), self.N) == pytest.approx(.438, abs=0.001)
+
+
+class TestEjercicio85:
+    """Ejercicio 8.5 - Mendenhall 13ed, L20540 (§8.4).
+
+    Margen de error para estimar mu, sigma^2=4:
+        a. n=50   -> MOE = .554
+        b. n=500  -> MOE = .175
+        c. n=5000 -> MOE = .055
+    Respuestas: L48962.
+    """
+
+    def test_a(self):
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, 2.0, 50) == pytest.approx(.554, abs=0.001)
+
+    def test_b(self):
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, 2.0, 500) == pytest.approx(.175, abs=0.001)
+
+    def test_c(self):
+        from mnfc.estadistica import margen_error
+        assert margen_error(1.96, 2.0, 5000) == pytest.approx(.055, abs=0.001)
+
+
+class TestEjercicio87:
+    """Ejercicio 8.7 - Mendenhall 13ed, L20546 (§8.4).
+
+    Margen de error al estimar proporcion binomial, p=.5:
+        a. n=30   -> MOE = .179
+        b. n=100  -> MOE = .098
+        c. n=400  -> MOE = .049
+        d. n=1000 -> MOE = .031
+    Respuestas: L48962.
+    """
+
+    P = 0.5
+
+    def test_a(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        me = 1.96 * error_estandar_proporcion(self.P, 30)
+        assert me == pytest.approx(.179, abs=0.001)
+
+    def test_b(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        me = 1.96 * error_estandar_proporcion(self.P, 100)
+        assert me == pytest.approx(.098, abs=0.001)
+
+    def test_c(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        me = 1.96 * error_estandar_proporcion(self.P, 400)
+        assert me == pytest.approx(.049, abs=0.001)
+
+    def test_d(self):
+        from mnfc.estadistica import error_estandar_proporcion
+        me = 1.96 * error_estandar_proporcion(self.P, 1000)
+        assert me == pytest.approx(.031, abs=0.001)
+
+
+class TestEjercicio89:
+    """Ejercicio 8.9 - Mendenhall 13ed, L20554 (§8.4).
+
+    Margen de error para proporcion binomial, n=100:
+        a. p=.1 -> MOE = .0588
+        b. p=.3 -> MOE = .0898
+        c. p=.5 -> MOE = .098 (maximo)
+        d. p=.7 -> MOE = .0898
+        e. p=.9 -> MOE = .0588
+    Respuestas: L48962. Verifica tambien la simetria p <-> 1-p.
+    """
+
+    N = 100
+
+    def _moe(self, p):
+        from mnfc.estadistica import error_estandar_proporcion
+        return 1.96 * error_estandar_proporcion(p, self.N)
+
+    def test_a(self):
+        assert self._moe(.1) == pytest.approx(.0588, abs=0.0001)
+
+    def test_b(self):
+        assert self._moe(.3) == pytest.approx(.0898, abs=0.0001)
+
+    def test_c_maximo(self):
+        assert self._moe(.5) == pytest.approx(.098, abs=0.001)
+
+    def test_d(self):
+        assert self._moe(.7) == pytest.approx(.0898, abs=0.0001)
+
+    def test_e(self):
+        assert self._moe(.9) == pytest.approx(.0588, abs=0.0001)
+
+    def test_simetria(self):
+        """MOE(p) == MOE(1-p). Propiedad estructural."""
+        for p in [.05, .15, .25, .35, .45]:
+            assert self._moe(p) == pytest.approx(self._moe(1 - p), abs=1e-10)
