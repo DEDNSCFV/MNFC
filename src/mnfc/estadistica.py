@@ -167,7 +167,13 @@ def normal_pdf(x: float, mu: float = 0, sigma: float = 1) -> float:
 
 
 def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
-    """F(x) = integral_-inf^x f(t)dt. Mendenhall L16851 (§6.3)."""
+    """F(x) = integral_-inf^x f(t)dt. Mendenhall L16851 (§6.3).
+
+    N3-textual: Ejemplos 6.4 (L15644), 6.5 (L15666), 6.7 (L15768),
+    6.10 (L15950). Verifica F(-0.5)=.3085, F(0.5)=.6915, F(1.0)=.8413,
+    F(1.96)=.9750, F(1.645)=.9500 (tolerancia abs=0.0001 = 4 decimales
+    como reporta el libro).
+    """
     if sigma <= 0:
         raise ValueError("sigma > 0")
     z = (x - mu) / sigma
@@ -175,17 +181,30 @@ def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
 
 
 def z_critico_95() -> float:
-    """z = 1.96. Mendenhall L16872."""
+    """z = 1.96. Mendenhall L16872.
+
+    N3-textual: Ejemplo 6.7 (L15768) - derivacion.
+    Cola derecha .025, area acumulada .975.
+    """
     return 1.96
 
 
 def z_critico_99() -> float:
-    """z = 2.58. Mendenhall L16872."""
+    """z = 2.58. Mendenhall L16872.
+
+    N2: solo aparece en tabla (area de cola .005). Sin ejemplo
+    resuelto que lo derive. Se mantiene en N2 hasta hallar
+    derivacion o renunciar a N3.
+    """
     return 2.58
 
 
 def z_critico_90() -> float:
-    """z = 1.645. Mendenhall L16872."""
+    """z = 1.645. Mendenhall L16872.
+
+    N3-textual: Ejemplo 6.10 (L15950) - derivacion.
+    Cola derecha .05, area acumulada .95.
+    """
     return 1.645
 
 

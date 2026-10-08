@@ -240,3 +240,90 @@ class TestEjemplo211:
     def test_z_score(self):
         from mnfc.estadistica import z_score
         assert z_score(self.X, self.DATOS) == pytest.approx(2.71, abs=0.01)
+
+
+class TestEjemplo64:
+    """EJEMPLO 6.4 - Mendenhall 13ed, L15644 (§6.3).
+
+    Encuentre P(z > 0.5).
+    El libro consulta la tabla 3 y da:
+        area a la izquierda de z=-0.5 (A1) = .3085
+        P(z > 0.5) = 1 - .3085 = .6915
+    """
+
+    def test_cdf_neg_0_5(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(-0.5) == pytest.approx(0.3085, abs=0.0001)
+
+    def test_cdf_pos_0_5(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(0.5) == pytest.approx(0.6915, abs=0.0001)
+
+
+class TestEjemplo65:
+    """EJEMPLO 6.5 - Mendenhall 13ed, L15666 (§6.3).
+
+    Encuentre P(-0.5 < z < 1.0).
+    El libro consulta la tabla 3 y da:
+        area a la izquierda de z=-0.5  = .3085
+        area a la izquierda de z=1.0   = .8413
+        P(-0.5 < z < 1.0) = .8413 - .3085 = .5328
+    """
+
+    def test_cdf_neg_0_5(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(-0.5) == pytest.approx(0.3085, abs=0.0001)
+
+    def test_cdf_pos_1_0(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(1.0) == pytest.approx(0.8413, abs=0.0001)
+
+    def test_probabilidad_intervalo(self):
+        from mnfc.estadistica import normal_cdf
+        p = normal_cdf(1.0) - normal_cdf(-0.5)
+        assert p == pytest.approx(0.5328, abs=0.0001)
+
+
+class TestEjemplo67:
+    """EJEMPLO 6.7 - Mendenhall 13ed, L15768 (§6.3).
+
+    Encuentre z0 tal que .95 del area este a no mas de z0
+    desviaciones estandar de la media.
+
+    El libro:
+        area de cola total = 1 - .95 = .05
+        area de cola derecha = .05/2 = .025
+        area acumulada a la izquierda de z0 = .95 + .025 = .9750
+        z0 = 1.96
+
+    Este ejemplo DERIVA z_critico_95 (no solo lo tabula).
+    """
+
+    def test_cdf_1_96(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(1.96) == pytest.approx(0.9750, abs=0.0001)
+
+    def test_z_critico_95(self):
+        from mnfc.estadistica import z_critico_95
+        assert z_critico_95() == pytest.approx(1.96)
+
+
+class TestEjemplo610:
+    """EJEMPLO 6.10 - Mendenhall 13ed, L15950 (§6.3).
+
+    Contexto: x ~ N(mu=25.5, sigma=4.5). Encontrar x0 tal que
+    .95 del area este a la izquierda de x0.
+        z0 tal que F(z0) = .95
+        El libro: "el area .9500 esta exactamente a la mitad entre
+        las areas para z=1.64 y z=1.65. Por tanto z0 = 1.645".
+
+    Este ejemplo DERIVA z_critico_90 (cola derecha .05).
+    """
+
+    def test_cdf_1_645(self):
+        from mnfc.estadistica import normal_cdf
+        assert normal_cdf(1.645) == pytest.approx(0.9500, abs=0.0001)
+
+    def test_z_critico_90(self):
+        from mnfc.estadistica import z_critico_90
+        assert z_critico_90() == pytest.approx(1.645)
