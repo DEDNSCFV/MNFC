@@ -206,3 +206,37 @@ class TestRepertorioA:
         from mnfc.estadistica import cuartiles
         _, _, q3 = cuartiles(self.DATOS)
         assert q3 == pytest.approx(7.0)
+
+
+class TestEjemplo211:
+    """EJEMPLO 2.11 - Mendenhall 13ed, L~6104 (§2.6).
+
+    Datos: 1, 1, 0, 15, 2, 3, 4, 0, 1, 3.  (n=10)
+    Medicion sospechosa: x = 15.
+
+    Solucion del libro:
+        x_bar = 3.0
+        s     = 4.42
+        z     = (15 - 3.0) / 4.42 = 2.71
+
+    Conclusion del libro: "la medicion x=15 esta 2.71 desviaciones
+    estandar arriba de la media muestral".
+
+    Nota: s=4.42 es redondeo a 2 decimales. Se verifica cada valor
+    contra el libro con tolerancias correspondientes.
+    """
+
+    DATOS = [1, 1, 0, 15, 2, 3, 4, 0, 1, 3]
+    X = 15
+
+    def test_media_del_conjunto(self):
+        from mnfc.estadistica import media
+        assert media(self.DATOS) == pytest.approx(3.0)
+
+    def test_desviacion_del_conjunto(self):
+        from mnfc.estadistica import desviacion_muestral
+        assert desviacion_muestral(self.DATOS) == pytest.approx(4.42, abs=0.01)
+
+    def test_z_score(self):
+        from mnfc.estadistica import z_score
+        assert z_score(self.X, self.DATOS) == pytest.approx(2.71, abs=0.01)

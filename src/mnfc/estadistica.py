@@ -126,7 +126,11 @@ def iqr(xs: List[float]) -> float:
 
 
 def z_score(x: float, xs: List[float]) -> float:
-    """z = (x - x_bar)/s. Mendenhall L6824 (§2.6)."""
+    """z = (x - x_bar)/s. Mendenhall L6824 (§2.6).
+
+    N3-textual: Ejemplo 2.11 (L~6104) - datos [1,1,0,15,2,3,4,0,1,3],
+    x=15 -> z ~= 2.71 (atipico sospechoso).
+    """
     return (x - media(xs)) / desviacion_muestral(xs)
 
 
