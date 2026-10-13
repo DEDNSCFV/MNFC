@@ -1,0 +1,157 @@
+(* ═══════════════════════════════════════════════════════════════════ *)
+(* MNFC DSL — Grammar v1.6                                             *)
+(* Fase 1 · Contrato Fase 0 v1.0                                       *)
+(* Candidata para verificación ejecutable. LL(1) no declarado.         *)
+(*                                                                      *)
+(* Frontera universal/local:                                            *)
+(*   El DSL cita categorías, hechos, elementos, marcos y citas          *)
+(*   normativas. NO cita cuentas concretas, alícuotas ni entes.         *)
+(*                                                                      *)
+(* Precedencia (de mayor a menor):                                      *)
+(*   ¬  ∖  ∩  ∪  (∈ ⊆)  (== != >= <= > <)  NO  Y  O                    *)
+(* ═══════════════════════════════════════════════════════════════════ *)
+
+
+(* ─── Programa ─── *)
+
+program          = dsl_version, declaration, { declaration } ;
+dsl_version      = "DSL_VERSION", string_literal, ";" ;
+
+declaration      = elemento_block
+                 | marco_block
+                 | categoria_decl
+                 | hecho_decl
+                 | fractal_block ;
+
+
+(* ─── Vocabulario ─── *)
+
+elemento_block   = "ELEMENTOS", "{", { elemento_decl }, "}" ;
+elemento_decl    = identifier, [ ":", string_literal ], ";" ;
+
+marco_block      = "MARCOS", "{", { marco_decl }, "}" ;
+marco_decl       = identifier, ";" ;
+
+categoria_decl   = "CATEGORIA", identifier, "=",
+                   "elemento", ":", identifier, ";",
+                   "universal", ":", boolean_lit, ";" ;
+
+hecho_decl       = "HECHO", identifier, ";" ;
+
+boolean_lit      = "VERDADERO" | "FALSO" ;
+
+
+(* ─── Fractales y reglas ─── *)
+
+fractal_block    = "FRACTAL", identifier, ":", regla, { regla } ;
+
+regla            = "REGLA", identifier, ":", "SI", condicion,
+                   "ENTONCES", accion, { accion }, ";" ;
+
+
+(* ─── Condiciones booleanas ─── *)
+
+condicion        = disyuncion ;
+disyuncion       = conjuncion, { "O", conjuncion } ;
+conjuncion       = neg_bool, { "Y", neg_bool } ;
+neg_bool         = "NO", neg_bool
+                 | atomo ;
+
+atomo            = "[", condicion, "]"
+                 | operand_chain
+                 | set_chain ;
+
+
+(* ─── Cadena escalar (identificadores y comparaciones) ─── *)
+
+operand_chain    = identifier, [ comp_op, operand ] ;
+operand          = identifier
+                 | string_literal
+                 | number_lit ;
+comp_op          = "==" | "!=" | ">=" | "<=" | ">" | "<" ;
+
+
+(* ─── Cadena de conjuntos (reticular) ─── *)
+
+set_chain        = set_expr, set_rel_op, set_expr ;
+set_rel_op       = "∈" | "⊆" ;
+
+set_expr         = set_union ;
+set_union        = set_inter, { "∪", set_inter } ;
+set_inter        = set_diff,  { "∩", set_diff } ;
+set_diff         = set_unary, { "∖", set_unary } ;
+set_unary        = "¬", set_unary
+                 | set_primary ;
+
+set_primary      = categoria_ref
+                 | set_literal
+                 | "(", set_expr, ")" ;
+
+categoria_ref    = "categoria", "(", identifier, ")" ;
+
+set_literal      = "{", [ identifier, { ",", identifier } ], "}" ;
+
+
+(* ─── Acciones ─── *)
+
+accion           = "GENERAR", "CONSECUENCIA", "(",
+                   argumento, { ",", argumento }, ")" ;
+
+argumento        = categoria_arg
+                 | operacion_arg
+                 | movimiento_arg
+                 | fuente_arg
+                 | evidencia_arg ;
+
+categoria_arg    = "categoria",   "=", set_expr ;
+operacion_arg    = "operacion",   "=", identifier ;
+movimiento_arg   = "movimiento",  "=", movimiento_lit ;
+fuente_arg       = "fuente",      "=", cita ;
+evidencia_arg    = "evidencia",   "=", identifier ;
+
+movimiento_lit   = "AUMENTA" | "DISMINUYE" ;
+
+
+(* ─── Citas normativas ─── *)
+
+cita             = identifier, ":", section ;
+section          = section_atom, { ".", section_atom } ;
+section_atom     = identifier
+                 | digits ;
+digits           = digit, { digit } ;
+
+
+(* ─── Terminales léxicos ─── *)
+
+identifier       = letter, { letter | digit | "_" } ;
+letter           = "A".."Z" | "a".."z" ;
+digit            = "0".."9" ;
+string_literal   = '"', { string_char }, '"' ;
+number_lit       = [ "-" ], digit, { digit },
+                   [ ".", digit, { digit } ] ;
+
+
+(* ═══════════════════════════════════════════════════════════════════ *)
+(* LÉXICO — declaración complementaria (informal, para el lexer)        *)
+(*                                                                      *)
+(* Tokens reservados (no pueden ser `identifier`):                     *)
+(*   DSL_VERSION  ELEMENTOS  MARCOS  CATEGORIA  HECHO  FRACTAL          *)
+(*   REGLA  SI  ENTONCES  GENERAR  CONSECUENCIA                         *)
+(*   Y  O  NO  VERDADERO  FALSO                                         *)
+(*   categoria  elemento  universal  operacion  movimiento              *)
+(*   fuente  evidencia  AUMENTA  DISMINUYE                              *)
+(*                                                                      *)
+(* Tokens de operador y delimitador:                                    *)
+(*   ∪  ∩  ∖  ¬  ∈  ⊆                                                  *)
+(*   [  ]  {  }  (  )                                                   *)
+(*   ;  :  ,  =  .                                                      *)
+(*   ==  !=  >=  <=  >  <                                               *)
+(*                                                                      *)
+(* Maximal munch: el lexer reconoce el token más largo posible.         *)
+(*   Orden de preferencia: keyword > identifier > number > operador.    *)
+(*   Entre operadores: `==` antes que `=`, `>=` antes que `>`.          *)
+(*                                                                      *)
+(* Comentarios: `#` hasta fin de línea. No anidan. Ignorados.           *)
+(* Whitespace: ignorado entre tokens. No significativo.                 *)
+(* EOF: requerido al final de `program`.                                *)
+(* ═══════════════════════════════════════════════════════════════════ *)
