@@ -652,10 +652,11 @@ class Parser:
         if t.tipo == "IDENT":
             self._avanzar(); return t.valor
         if t.tipo == "NUMBER":
-            # Acepta sólo enteros sin signo ni punto (digits de la gramática)
-            if "." in t.valor or t.valor.startswith("-"):
+            # Acepta NUMBER con o sin punto (lexer por maximal munch).
+            # El '-' no es válido: gramática digits = digit { digit }.
+            if t.valor.startswith("-"):
                 raise DSLSyntaxError(
-                    f"section_atom: dígitos sin signo ni punto, recibió {t.valor!r}",
+                    f"section_atom: dígitos sin signo, recibió {t.valor!r}",
                     t.linea, t.col, self.archivo)
             self._avanzar(); return t.valor
         raise DSLSyntaxError(
