@@ -1,33 +1,27 @@
-"""MNFC DSL — Fases 2 + 3a
-Parser (Fase 2) y validación semántica (Fase 3a) para la gramática v1.6.
+"""MNFC DSL — Fases 2 + 3a + 3b
+Parser, validación semántica y evaluador para la gramática v1.6.
 
 API pública:
-    parse(texto: str, archivo: str = "<input>") -> Programa
-    validar(programa: Programa) -> None
-    DSLSyntaxError
-    DSLSemanticError
-
-Uso:
-    from mnfc.dsl import parse, validar, DSLSyntaxError, DSLSemanticError
-
-    try:
-        ast = parse(texto)
-        validar(ast)
-    except DSLSyntaxError as e:
-        print("sintaxis:", e)
-    except DSLSemanticError as e:
-        print("semántica:", e)
+    parse(texto) -> Programa
+    validar(programa) -> None
+    evaluar(programa, contexto, pcu, operaciones, marco, corr) -> list[ResultadoAccion]
+    DSLSyntaxError, DSLSemanticError, DSLEvaluationError
+    Programa, ResultadoAccion
 
 Sin dependencias externas. Solo stdlib.
 """
 
 from .parser import parse, Programa, DSLSyntaxError
 from .semantic import validar, DSLSemanticError
+from .evaluator import evaluar, ResultadoAccion, DSLEvaluationError
 
 __all__ = [
     "parse",
     "validar",
+    "evaluar",
     "Programa",
+    "ResultadoAccion",
     "DSLSyntaxError",
     "DSLSemanticError",
+    "DSLEvaluationError",
 ]
