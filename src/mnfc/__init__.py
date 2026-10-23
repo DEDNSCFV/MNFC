@@ -56,7 +56,7 @@ from .mnfc import Asiento, procesar_asiento
 # Capa 6 - ledger inmutable
 from .ledger import Ledger, GENESIS
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     # Capa 0
