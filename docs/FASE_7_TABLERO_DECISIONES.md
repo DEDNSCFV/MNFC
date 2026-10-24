@@ -174,7 +174,7 @@ echo "decl_reservas:        $(grep -cE '^- Reservas sin asignar: 1' $F)"
 Valores esperados:
 
 Variable Esperado
-lineas 150–200
+lineas 190–220
 secciones 9
 filas_D_total 15
 filas_condicionales 1
