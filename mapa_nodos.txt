@@ -1,0 +1,7 @@
+01_Central|01 Central|01_central
+04_La_Urbina|04 La Urbina|04_la_urbina
+05_Cua|05 Cúa|05_cua
+06_TERE|06 TERE|06_tere
+08_Charallave|08 Charallave|08_charallave
+La_Raiza|La Raiza|la_raiza
+Palo_Verde|Palo Verde|palo_verde

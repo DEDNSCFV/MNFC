@@ -1,0 +1,415 @@
+==================================================
+  MATRIZ DE MIGRACIÓN float → Decimal
+  Generada: 2026-10-18 09:34
+  Base: commit 56a4ba0 2026-10-17 19:02:29 -0400
+==================================================
+
+[1] INVENTARIO DE 'float' POR ARCHIVO Y LÍNEA
+--------------------------------------------------
+baldor.py                           L107   Termino = Tuple[float, int, str]   # (coeficiente, signo, parte_literal)
+baldor.py                           L170   if isinstance(x, float) and (isnan(x) or isinf(x))
+baldor.py                           L174   def sumar_montos(montos: List[float]) -> float:
+baldor.py                           L181   def verificar_cuadre(total_debe: float, total_haber: float) -> bool:
+baldor.py                           L188   def calcular_base_e_iva(monto_con_iva: float, tasa: float) -> tuple:
+baldor.py                           L211   def termino_nesimo_ap(a: float, r: float, n: int) -> float:
+baldor.py                           L216   def razon_ap(a: float, u: float, n: int) -> float:
+baldor.py                           L223   def suma_ap(a: float, r: float, n: int) -> float:
+baldor.py                           L232   def numero_terminos_ap(a: float, u: float, r: float) -> int:
+baldor.py                           L248   def termino_nesimo_pg(a: float, r: float, n: int) -> float:
+baldor.py                           L253   def razon_pg(a: float, u: float, n: int) -> float:
+baldor.py                           L262   def suma_pg(a: float, r: float, n: int) -> float:
+baldor.py                           L272   def suma_pg_infinita(a: float, r: float) -> float:
+baldor.py                           L282   def numero_terminos_pg(a: float, u: float, r: float) -> int:
+baldor.py                           L303   def logaritmo(x: float, base: float = 10) -> float:
+baldor.py                           L313   def antilog(y: float, base: float = 10) -> float:
+baldor.py                           L326   def log_producto(A: float, B: float, base: float = 10) -> float:
+baldor.py                           L331   def log_cociente(A: float, B: float, base: float = 10) -> float:
+baldor.py                           L336   def log_potencia(A: float, n: float, base: float = 10) -> float:
+baldor.py                           L341   def log_raiz(A: float, n: float, base: float = 10) -> float:
+baldor.py                           L352   def colog(x: float, base: float = 10) -> float:
+baldor.py                           L363   def caracteristica(x: float) -> int:
+baldor.py                           L371   def mantisa(x: float) -> float:
+baldor.py                           L378   def log_por_factores(factores: List[Tuple[int, int]], base: float = 10) -> float:
+baldor.py                           L403   def capital_final(c: float, r: float, t: float) -> float:
+baldor.py                           L408   def capital_inicial(C: float, r: float, t: float) -> float:
+baldor.py                           L413   def tiempo_ic(C: float, c: float, r: float) -> float:
+baldor.py                           L424   def tasa_ic(C: float, c: float, t: float) -> float:
+baldor.py                           L441   def constante_directa(A: float, B: float) -> float:
+baldor.py                           L448   def constante_inversa(A: float, B: float) -> float:
+baldor.py                           L453   def proporcional_directa(k: float, B: float) -> float:
+baldor.py                           L458   def proporcional_inversa(k: float, B: float) -> float:
+baldor.py                           L465   def proporcional_conjunta(k: float, B: float, C: float) -> float:
+baldor.py                           L470   def regla_de_tres_directa(a: float, b: float, c: float) -> float:
+baldor.py                           L480   def regla_de_tres_inversa(a: float, b: float, c: float) -> float:
+baldor.py                           L501   def resolver_2x2(a1: float, b1: float, c1: float,
+baldor.py                           L502   a2: float, b2: float, c2: float) -> Tuple[float, float]:
+baldor.py                           L525   def discriminante(a: float, b: float, c: float) -> float:
+baldor.py                           L530   def resolver_cuadratica(a: float, b: float, c: float) -> Tuple:
+baldor.py                           L554   def raiz_potencia(a: float, m: float, n: float) -> float:
+baldor.py                           L565   def raiz_enesima(a: float, n: float) -> float:
+baldor.py                           L584   def resolver_exponencial(b: float, k: float) -> float:
+baldor.py                           L600   def calcular_por_logaritmos(operaciones: List[Tuple[str, float]],
+baldor.py                           L601   base: float = 10) -> float:
+estadistica.py                      L28    def _validar_serie(xs: List[float]) -> None:
+estadistica.py                      L31    if isinstance(x, float) and (isnan(x) or isinf(x))
+estadistica.py                      L35    def media(xs: List[float]) -> float:
+estadistica.py                      L47    def mediana(xs: List[float]) -> float:
+estadistica.py                      L57    def moda(xs: List[float]) -> float:
+estadistica.py                      L70    def modas(xs: List[float]) -> List[float]:
+estadistica.py                      L88    def varianza_muestral(xs: List[float]) -> float:
+estadistica.py                      L99    def desviacion_muestral(xs: List[float]) -> float:
+estadistica.py                      L107   def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
+estadistica.py                      L130   return float(s[k - 1])
+estadistica.py                      L132   return float(s[n - 1])
+estadistica.py                      L138   def iqr(xs: List[float]) -> float:
+estadistica.py                      L144   def z_score(x: float, xs: List[float]) -> float:
+estadistica.py                      L153   def coef_variacion(xs: List[float]) -> float:
+estadistica.py                      L173   def normal_pdf(x: float, mu: float = 0, sigma: float = 1) -> float:
+estadistica.py                      L181   def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
+estadistica.py                      L195   def z_critico_95() -> float
+estadistica.py                      L204   def z_critico_99() -> float
+estadistica.py                      L214   def z_critico_90() -> float
+estadistica.py                      L223   def error_estandar_media(sigma: float, n: int) -> float:
+estadistica.py                      L235   def error_estandar_proporcion(p: float, n: int) -> float:
+estadistica.py                      L248   def tamano_muestra_media(z: float, sigma: float, B: float) -> int:
+estadistica.py                      L265   def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
+estadistica.py                      L283   def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]:
+estadistica.py                      L300   def margen_error(z: float, sigma: float, n: int) -> float:
+estadistica.py                      L312   def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
+estadistica.py                      L332   def ic_proporcion(p: float, n: int, z: float = 1.96) -> Tuple[float, float]:
+estadistica.py                      L341   def proyeccion_error(error_muestra: float, N: int, n: int) -> float:
+estadistica.py                      L350   def ic_una_cola_sup(xs: List[float], z_alpha: float) -> float:
+estadistica.py                      L365   def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
+estadistica.py                      L377   def es_atipico_z(x: float, xs: List[float], umbral: float = 3.0) -> bool:
+estadistica.py                      L387   def es_atipico_iqr(x: float, xs: List[float], k: float = 1.5) -> bool:
+estadistica.py                      L394   def z_score_serie(xs: List[float]) -> List[float]:
+estadistica.py                      L401   def stock_seguridad(z: float, sigma_d: float, L: float) -> float:
+estadistica.py                      L406   def pronostico_media_movil(xs: List[float], n: int) -> float:
+fractal.py                          L42    def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
+fractal.py                          L71    def exponente_escalante(xs: List[float],
+fractal.py                          L72    niveles: List[int] = None) -> float:
+fractal.py                          L102   def clasificar_cascada(xs: List[float]) -> str:
+fractal.py                          L125   def reporte_cascada(xs: List[float]) -> dict:
+mnfc.py                             L24    total_debe: float = 0.0
+mnfc.py                             L25    total_haber: float = 0.0
+mnfc.py                             L41    monto: float
+mnfc.py                             L55    monto = float(l["monto"])
+extensiones/serializador.py         L11    float      -> float
+extensiones/serializador.py         L64    if isinstance(obj, float)
+extensiones/serializador.py         L87    (str, int, float, bool)
+extensiones/serializador.py         L198   if tipo_real in (str, int, float, bool)
+extensiones/serializador.py         L261   if isinstance(data, (bool, int, float, str))
+extensiones/modelos.py              L30    monto: float
+extensiones/modelos.py              L43    monto: float
+extensiones/modelos.py              L52    total_debe: float = 0.0
+extensiones/modelos.py              L53    total_haber: float = 0.0
+extensiones/persistencia/sqlite_store.py L72    if not isinstance(tipo_evento_canonico, (str, int, float, bool))
+extensiones/persistencia/json_store.py L100   if not isinstance(tipo_evento_canonico, (str, int, float, bool))
+extensiones/reportes.py             L51    monto = float(p.get("monto", 0))
+dsl/evaluator.py                    L10    - operaciones: dict {nombre: fn(contexto) -> float}.
+dsl/evaluator.py                    L178   return float(ref)
+dsl/evaluator.py                    L257   if not isinstance(monto, (int, float))
+dsl/evaluator.py                    L262   monto = float(monto)
+dsl/assembler.py                    L9     El assembler acepta int y float (no bool). El tipo Decimal no es
+dsl/assembler.py                    L13    en float;
+dsl/assembler.py                    L14    (b) mezclar Decimal y float en sumas produce TypeError, lo que
+dsl/assembler.py                    L27    Los totales se pre-chequean por overflow (suma de floats finitos
+dsl/assembler.py                    L112   def _validar_monto(monto, cuenta: str, ctx: str) -> float:
+dsl/assembler.py                    L113   """Valida monto individual. Devuelve float normalizado.
+dsl/assembler.py                    L125   if not isinstance(monto, (int, float))
+dsl/assembler.py                    L138   return float(monto)
+dsl/assembler.py                    L178   def _describir_diferencia(total_debe: float, total_haber: float) -> str:
+dsl/assembler.py                    L194   # Pre-check: suma de floats finitos puede desbordar a inf.
+dsl/registry.py                     L79    fn: Callable[[dict], float]
+
+[2] CLASIFICACIÓN PRELIMINAR (heurística, requiere revisión humana)
+--------------------------------------------------
+  Criterio:
+    [M] = posible MONETARIO (monto, debe, haber, saldo, precio, costo, iva)
+    [E] = posible ESTADÍSTICO (varianza, media, correlación, std, erf, sqrt)
+    [?] = AMBIGUO (requiere revisión)
+
+  [?] baldor.py                        L107   Termino = Tuple[float, int, str]   # (coeficiente, signo, parte_literal)
+  [?] baldor.py                        L170   if isinstance(x, float) and (isnan(x) or isinf(x))
+  [M] baldor.py                        L174   def sumar_montos(montos: List[float]) -> float:
+  [M] baldor.py                        L181   def verificar_cuadre(total_debe: float, total_haber: float) -> bool:
+  [M] baldor.py                        L188   def calcular_base_e_iva(monto_con_iva: float, tasa: float) -> tuple:
+  [?] baldor.py                        L211   def termino_nesimo_ap(a: float, r: float, n: int) -> float:
+  [?] baldor.py                        L216   def razon_ap(a: float, u: float, n: int) -> float:
+  [?] baldor.py                        L223   def suma_ap(a: float, r: float, n: int) -> float:
+  [?] baldor.py                        L232   def numero_terminos_ap(a: float, u: float, r: float) -> int:
+  [?] baldor.py                        L248   def termino_nesimo_pg(a: float, r: float, n: int) -> float:
+  [?] baldor.py                        L253   def razon_pg(a: float, u: float, n: int) -> float:
+  [?] baldor.py                        L262   def suma_pg(a: float, r: float, n: int) -> float:
+  [?] baldor.py                        L272   def suma_pg_infinita(a: float, r: float) -> float:
+  [?] baldor.py                        L282   def numero_terminos_pg(a: float, u: float, r: float) -> int:
+  [E] baldor.py                        L303   def logaritmo(x: float, base: float = 10) -> float:
+  [E] baldor.py                        L313   def antilog(y: float, base: float = 10) -> float:
+  [E] baldor.py                        L326   def log_producto(A: float, B: float, base: float = 10) -> float:
+  [E] baldor.py                        L331   def log_cociente(A: float, B: float, base: float = 10) -> float:
+  [E] baldor.py                        L336   def log_potencia(A: float, n: float, base: float = 10) -> float:
+  [E] baldor.py                        L341   def log_raiz(A: float, n: float, base: float = 10) -> float:
+  [E] baldor.py                        L352   def colog(x: float, base: float = 10) -> float:
+  [?] baldor.py                        L363   def caracteristica(x: float) -> int:
+  [?] baldor.py                        L371   def mantisa(x: float) -> float:
+  [E] baldor.py                        L378   def log_por_factores(factores: List[Tuple[int, int]], base: float = 10) -> float:
+  [?] baldor.py                        L403   def capital_final(c: float, r: float, t: float) -> float:
+  [?] baldor.py                        L408   def capital_inicial(C: float, r: float, t: float) -> float:
+  [?] baldor.py                        L413   def tiempo_ic(C: float, c: float, r: float) -> float:
+  [?] baldor.py                        L424   def tasa_ic(C: float, c: float, t: float) -> float:
+  [?] baldor.py                        L441   def constante_directa(A: float, B: float) -> float:
+  [?] baldor.py                        L448   def constante_inversa(A: float, B: float) -> float:
+  [?] baldor.py                        L453   def proporcional_directa(k: float, B: float) -> float:
+  [?] baldor.py                        L458   def proporcional_inversa(k: float, B: float) -> float:
+  [?] baldor.py                        L465   def proporcional_conjunta(k: float, B: float, C: float) -> float:
+  [?] baldor.py                        L470   def regla_de_tres_directa(a: float, b: float, c: float) -> float:
+  [?] baldor.py                        L480   def regla_de_tres_inversa(a: float, b: float, c: float) -> float:
+  [?] baldor.py                        L501   def resolver_2x2(a1: float, b1: float, c1: float,
+  [?] baldor.py                        L502   a2: float, b2: float, c2: float) -> Tuple[float, float]:
+  [?] baldor.py                        L525   def discriminante(a: float, b: float, c: float) -> float:
+  [?] baldor.py                        L530   def resolver_cuadratica(a: float, b: float, c: float) -> Tuple:
+  [?] baldor.py                        L554   def raiz_potencia(a: float, m: float, n: float) -> float:
+  [?] baldor.py                        L565   def raiz_enesima(a: float, n: float) -> float:
+  [E] baldor.py                        L584   def resolver_exponencial(b: float, k: float) -> float:
+  [E] baldor.py                        L600   def calcular_por_logaritmos(operaciones: List[Tuple[str, float]],
+  [?] baldor.py                        L601   base: float = 10) -> float:
+  [?] estadistica.py                   L28    def _validar_serie(xs: List[float]) -> None:
+  [?] estadistica.py                   L31    if isinstance(x, float) and (isnan(x) or isinf(x))
+  [E] estadistica.py                   L35    def media(xs: List[float]) -> float:
+  [E] estadistica.py                   L47    def mediana(xs: List[float]) -> float:
+  [?] estadistica.py                   L57    def moda(xs: List[float]) -> float:
+  [?] estadistica.py                   L70    def modas(xs: List[float]) -> List[float]:
+  [E] estadistica.py                   L88    def varianza_muestral(xs: List[float]) -> float:
+  [E] estadistica.py                   L99    def desviacion_muestral(xs: List[float]) -> float:
+  [?] estadistica.py                   L107   def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
+  [?] estadistica.py                   L130   return float(s[k - 1])
+  [?] estadistica.py                   L132   return float(s[n - 1])
+  [?] estadistica.py                   L138   def iqr(xs: List[float]) -> float:
+  [?] estadistica.py                   L144   def z_score(x: float, xs: List[float]) -> float:
+  [?] estadistica.py                   L153   def coef_variacion(xs: List[float]) -> float:
+  [?] estadistica.py                   L173   def normal_pdf(x: float, mu: float = 0, sigma: float = 1) -> float:
+  [?] estadistica.py                   L181   def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
+  [?] estadistica.py                   L195   def z_critico_95() -> float
+  [?] estadistica.py                   L204   def z_critico_99() -> float
+  [?] estadistica.py                   L214   def z_critico_90() -> float
+  [E] estadistica.py                   L223   def error_estandar_media(sigma: float, n: int) -> float:
+  [?] estadistica.py                   L235   def error_estandar_proporcion(p: float, n: int) -> float:
+  [E] estadistica.py                   L248   def tamano_muestra_media(z: float, sigma: float, B: float) -> int:
+  [?] estadistica.py                   L265   def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
+  [E] estadistica.py                   L283   def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]:
+  [?] estadistica.py                   L300   def margen_error(z: float, sigma: float, n: int) -> float:
+  [E] estadistica.py                   L312   def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
+  [?] estadistica.py                   L332   def ic_proporcion(p: float, n: int, z: float = 1.96) -> Tuple[float, float]:
+  [?] estadistica.py                   L341   def proyeccion_error(error_muestra: float, N: int, n: int) -> float:
+  [?] estadistica.py                   L350   def ic_una_cola_sup(xs: List[float], z_alpha: float) -> float:
+  [?] estadistica.py                   L365   def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
+  [?] estadistica.py                   L377   def es_atipico_z(x: float, xs: List[float], umbral: float = 3.0) -> bool:
+  [?] estadistica.py                   L387   def es_atipico_iqr(x: float, xs: List[float], k: float = 1.5) -> bool:
+  [?] estadistica.py                   L394   def z_score_serie(xs: List[float]) -> List[float]:
+  [?] estadistica.py                   L401   def stock_seguridad(z: float, sigma_d: float, L: float) -> float:
+  [E] estadistica.py                   L406   def pronostico_media_movil(xs: List[float], n: int) -> float:
+  [?] fractal.py                       L42    def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
+  [E] fractal.py                       L71    def exponente_escalante(xs: List[float],
+  [?] fractal.py                       L72    niveles: List[int] = None) -> float:
+  [?] fractal.py                       L102   def clasificar_cascada(xs: List[float]) -> str:
+  [?] fractal.py                       L125   def reporte_cascada(xs: List[float]) -> dict:
+  [M] mnfc.py                          L24    total_debe: float = 0.0
+  [M] mnfc.py                          L25    total_haber: float = 0.0
+  [M] mnfc.py                          L41    monto: float
+  [M] mnfc.py                          L55    monto = float(l["monto"])
+  [?] extensiones/serializador.py      L11    float      -> float
+  [?] extensiones/serializador.py      L64    if isinstance(obj, float)
+  [?] extensiones/serializador.py      L87    (str, int, float, bool)
+  [?] extensiones/serializador.py      L198   if tipo_real in (str, int, float, bool)
+  [?] extensiones/serializador.py      L261   if isinstance(data, (bool, int, float, str))
+  [M] extensiones/modelos.py           L30    monto: float
+  [M] extensiones/modelos.py           L43    monto: float
+  [M] extensiones/modelos.py           L52    total_debe: float = 0.0
+  [M] extensiones/modelos.py           L53    total_haber: float = 0.0
+  [?] extensiones/persistencia/sqlite_store.py L72    if not isinstance(tipo_evento_canonico, (str, int, float, bool))
+  [?] extensiones/persistencia/json_store.py L100   if not isinstance(tipo_evento_canonico, (str, int, float, bool))
+  [M] extensiones/reportes.py          L51    monto = float(p.get("monto", 0))
+  [?] dsl/evaluator.py                 L10    - operaciones: dict {nombre: fn(contexto) -> float}.
+  [?] dsl/evaluator.py                 L178   return float(ref)
+  [M] dsl/evaluator.py                 L257   if not isinstance(monto, (int, float))
+  [M] dsl/evaluator.py                 L262   monto = float(monto)
+  [?] dsl/assembler.py                 L9     El assembler acepta int y float (no bool). El tipo Decimal no es
+  [?] dsl/assembler.py                 L13    en float;
+  [?] dsl/assembler.py                 L14    (b) mezclar Decimal y float en sumas produce TypeError, lo que
+  [E] dsl/assembler.py                 L27    Los totales se pre-chequean por overflow (suma de floats finitos
+  [M] dsl/assembler.py                 L112   def _validar_monto(monto, cuenta: str, ctx: str) -> float:
+  [M] dsl/assembler.py                 L113   """Valida monto individual. Devuelve float normalizado.
+  [M] dsl/assembler.py                 L125   if not isinstance(monto, (int, float))
+  [M] dsl/assembler.py                 L138   return float(monto)
+  [M] dsl/assembler.py                 L178   def _describir_diferencia(total_debe: float, total_haber: float) -> str:
+  [?] dsl/assembler.py                 L194   # Pre-check: suma de floats finitos puede desbordar a inf.
+  [?] dsl/registry.py                  L79    fn: Callable[[dict], float]
+
+[3] CONVERSIONES Y TYPE-CHECKS EXPLÍCITOS (puntos críticos)
+--------------------------------------------------
+  >>> float(x) — conversión, puede perder precisión
+    estadistica.py:130:            return float(s[k - 1])
+    estadistica.py:132:            return float(s[n - 1])
+    mnfc.py:55:        monto = float(l["monto"])
+    extensiones/reportes.py:51:            monto = float(p.get("monto", 0))
+    dsl/evaluator.py:178:        return float(ref)
+    dsl/evaluator.py:262:    monto = float(monto)
+    dsl/assembler.py:138:    return float(monto)
+
+  >>> isinstance(x, float) — type-check, probablemente válido
+    baldor.py:170:    if isinstance(x, float) and (isnan(x) or isinf(x)):
+    estadistica.py:31:        if isinstance(x, float) and (isnan(x) or isinf(x)):
+    extensiones/serializador.py:64:    if isinstance(obj, float):
+    extensiones/serializador.py:261:    if isinstance(data, (bool, int, float, str)):
+    extensiones/persistencia/sqlite_store.py:72:        if not isinstance(tipo_evento_canonico, (str, int, float, bool)):
+    extensiones/persistencia/json_store.py:100:        if not isinstance(tipo_evento_canonico, (str, int, float, bool)):
+    dsl/evaluator.py:257:    if not isinstance(monto, (int, float)):
+    dsl/assembler.py:125:    if not isinstance(monto, (int, float)):
+
+[4] MODELOS CONTABLES — campos declarados con float
+--------------------------------------------------
+    baldor.py:174:def sumar_montos(montos: List[float]) -> float:
+    baldor.py:181:def verificar_cuadre(total_debe: float, total_haber: float) -> bool:
+    baldor.py:188:def calcular_base_e_iva(monto_con_iva: float, tasa: float) -> tuple:
+    mnfc.py:24:    total_debe: float = 0.0
+    mnfc.py:25:    total_haber: float = 0.0
+    mnfc.py:41:        monto: float
+    mnfc.py:55:        monto = float(l["monto"])
+    extensiones/modelos.py:30:    monto: float
+    extensiones/modelos.py:43:    monto: float
+    extensiones/modelos.py:52:    total_debe: float = 0.0
+    extensiones/modelos.py:53:    total_haber: float = 0.0
+    extensiones/reportes.py:51:            monto = float(p.get("monto", 0))
+    dsl/evaluator.py:257:    if not isinstance(monto, (int, float)):
+    dsl/evaluator.py:262:    monto = float(monto)
+    dsl/assembler.py:112:def _validar_monto(monto, cuenta: str, ctx: str) -> float:
+    dsl/assembler.py:113:    """Valida monto individual. Devuelve float normalizado.
+    dsl/assembler.py:125:    if not isinstance(monto, (int, float)):
+    dsl/assembler.py:138:    return float(monto)
+    dsl/assembler.py:178:def _describir_diferencia(total_debe: float, total_haber: float) -> str:
+
+[5] SERIALIZADOR — ¿qué tipos acepta y rechaza?
+--------------------------------------------------
+  Tipos aceptados (detección heurística):
+    4:Convierte objetos Python soportados en estructuras JSON canonicas,
+    9:    bool       -> bool
+    10:    int        -> int
+    11:    float      -> float
+    12:    str        -> str
+    23:Migrado desde SCFV_DSR/scfv_dsr/infraestructura/serializador_canonico.py.
+    33:    """Error de integridad de persistencia."""
+    37:def _es_enum(tipo: Any) -> bool:
+    38:    return isinstance(tipo, type) and issubclass(tipo, Enum)
+    42:    """Extrae el tipo interno de Optional[T]."""
+    47:            tipo_interno = next(
+    50:            return tipo_interno, True
+    55:    """Convierte recursivamente un objeto a una estructura JSON canonica."""
+    59:    # bool antes que int por herencia de Python
+    60:    if isinstance(obj, bool):
+
+  Menciones de 'Decimal' en el serializador:
+    0 menciones
+
+[6] LEDGER — método de hashing
+--------------------------------------------------
+  Referencias a hash, float, str:
+    4:Encadenamiento por hash de bloques. Cada bloque incluye el hash del
+    18:        L494   - Git usa hash SHA-1 como suma de comprobacion
+    19:        L500   - "Git guarda todo no por nombre de archivo, sino por hash"
+    28:Implementacion: cadena de hashes (Merkle DAG degenerado - un arbol
+    35:import hashlib
+    43:def _hash_bloque(prev_hash: str, contenido: dict) -> str:
+    45:    H = SHA256(prev_hash || canonical_json(contenido)).
+    48:    ProGit 2014 L494 ("hash SHA-1 como suma de comprobacion").
+    51:    payload = f"{prev_hash}|{canonical}".encode("utf-8")
+    52:    return hashlib.sha256(payload).hexdigest()
+    57:    Cadena de hashes de bloques contables.
+    61:        h1 = ledger.append(asiento_1)   # -> hash 64 hex
+    62:        h2 = ledger.append(asiento_2)   # -> hash encadenado a h1
+    67:        self._hashes: List[str] = []
+    71:        """Anade un bloque. Devuelve su hash.
+
+[7] TESTS con valores monetarios (monto, 0.X, saldo)
+--------------------------------------------------
+    tests/test_integracion.py:116:    assert a.total_debe == 800.0
+    tests/test_integracion.py:117:    assert a.total_haber == 800.0
+    tests/test_bordes.py:25:        assert a.total_debe == 0.0
+    tests/test_bordes.py:26:        assert a.total_haber == 0.0
+    tests/test_bordes.py:57:        assert a.total_debe == 1000.0
+    tests/test_bordes.py:123:        assert capital_final(1000.0, 0.05, 0) == 1000.0
+    tests/test_contratos.py:147:        base, iva = calcular_base_e_iva(1160.0, 0.16)
+    tests/test_fuzzing.py:54:    monto_base = rng.uniform(0.01, 1e6)
+    tests/test_fuzzing.py:68:        parte = round(rng.uniform(0.01, restante / 2), 2)
+    tests/test_fuzzing.py:77:        parte = round(rng.uniform(0.01, restante / 2), 2)
+    tests/test_fuzzing.py:151:                "monto": round(rng.uniform(0.01, 1e6), 2),
+    tests/test_estres.py:24:    if t < 0.001:
+    tests/test_estres.py:41:    """100.000 llamadas a calcular_ubicacion."""
+    tests/test_estres.py:85:    """Ledger con 10.000 bloques."""
+    tests/test_estres.py:93:        l.append({"n": i, "monto": i * 0.01})
+    tests/test_estres.py:114:    """Memoria de un ledger de 10.000 bloques."""
+    tests/test_estres.py:123:            l.append({"n": i, "monto": i * 0.01})
+    tests/test_estres.py:143:        lineas.append({"naturaleza": "DEUDORA",   "movimiento": "AUMENTA", "monto": 0.01})
+    tests/test_estres.py:145:        lineas.append({"naturaleza": "ACREEDORA", "movimiento": "AUMENTA", "monto": 0.01})
+    tests/test_estres.py:164:    """Fractal sobre serie de 100.000 elementos."""
+
+[8] DEPENDENCIAS — quién usa 'baldor', 'mnfc', 'serializador'
+--------------------------------------------------
+  Archivos que importan 'baldor':
+    src/mnfc/mnfc.py
+    src/mnfc/__init__.py
+    src/mnfc/dsl/assembler.py
+
+  Archivos que importan 'mnfc':
+    src/mnfc/__init__.py
+    src/mnfc/extensiones/__init__.py
+    tests/test_integracion.py
+    tests/test_bordes.py
+    tests/test_contratos.py
+    tests/test_fuzzing.py
+    tests/test_estres.py
+    tests/test_extensiones.py
+    tests/test_n3_estadistica.py
+    tests/test_determinismo.py
+    tests/test_golpes.py
+    tests/test_limites_numericos.py
+    tests/test_dsl_parser.py
+    tests/test_dsl_semantic.py
+    tests/test_dsl_evaluator.py
+    tests/test_dsl_assembler.py
+    tests/test_dsl_registry.py
+    tests/test_dsl_persistencia.py
+
+  Archivos que importan 'serializador':
+    src/mnfc/extensiones/__init__.py
+    src/mnfc/extensiones/persistencia/sqlite_store.py
+    src/mnfc/extensiones/persistencia/json_store.py
+    src/mnfc/dsl/persistencia.py
+
+  Archivos que importan 'estadistica':
+    src/mnfc/__init__.py
+    tests/test_n3_estadistica.py
+
+[9] RESUMEN NUMÉRICO (para la matriz de decisión)
+--------------------------------------------------
+  Total menciones 'float':      115
+  Total conversiones float():   7
+  Total isinstance(_, float):   8
+  Total menciones 'Decimal':    6
+
+  Archivos afectados (ordenados por menciones):
+    baldor.py:44
+    estadistica.py:35
+    dsl/assembler.py:10
+    fractal.py:5
+    extensiones/serializador.py:5
+    mnfc.py:4
+    extensiones/modelos.py:4
+    dsl/evaluator.py:4
+    extensiones/reportes.py:1
+    extensiones/persistencia/sqlite_store.py:1
+    extensiones/persistencia/json_store.py:1
+    dsl/registry.py:1
+
+==================================================
+[ Protocolo STOP: Solo lectura. Matriz generada. ]
+==================================================

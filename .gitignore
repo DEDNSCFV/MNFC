@@ -33,3 +33,8 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc

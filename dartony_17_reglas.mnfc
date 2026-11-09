@@ -1,0 +1,79 @@
+DSL_VERSION "1.6";
+
+ELEMENTOS {
+  regla_1 : "No borrar historicos";
+  regla_2 : "No modificar historicos";
+  regla_3 : "No reingerir mismo archivo";
+  regla_4 : "Toda correccion auditada";
+  regla_5 : "Kardex cuadra";
+  regla_6 : "SHA de fuentes coincide";
+  regla_7 : "No facturar con stock 0";
+  regla_8 : "No crear SKU duplicado";
+  regla_9 : "No ajustar sin motivo";
+  regla_10 : "No valorizar sin precio";
+  regla_11 : "No valorizar sin costo";
+  regla_12 : "Transferencia sin recepcion >7d";
+  regla_13 : "Ajuste >$500 requiere autorizacion";
+  regla_14 : "SKU inactivo sin stock";
+  regla_15 : "Facturacion automatica sin stock";
+  regla_16 : "Compensacion de facturas sin stock";
+  regla_17 : "Coherencia bimonetaria";
+  regla_18 : "No duplicar movimientos";
+}
+
+HECHO violacion_1;
+HECHO violacion_2;
+HECHO violacion_3;
+HECHO violacion_4;
+HECHO violacion_5;
+HECHO violacion_6;
+HECHO violacion_7;
+HECHO violacion_8;
+HECHO violacion_9;
+HECHO violacion_10;
+HECHO violacion_11;
+HECHO violacion_12;
+HECHO violacion_13;
+HECHO violacion_14;
+HECHO violacion_15;
+HECHO violacion_16;
+HECHO violacion_17;
+HECHO violacion_18;
+
+FRACTAL inventario:
+  REGLA regla_1:
+    SI violacion_1 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_1), operacion = violacion_regla_1, movimiento = DISMINUYE, fuente = PokaYoke:1, evidencia = regla_1_log);
+  REGLA regla_2:
+    SI violacion_2 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_2), operacion = violacion_regla_2, movimiento = DISMINUYE, fuente = PokaYoke:2, evidencia = regla_2_log);
+  REGLA regla_3:
+    SI violacion_3 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_3), operacion = violacion_regla_3, movimiento = DISMINUYE, fuente = PokaYoke:3, evidencia = regla_3_log);
+  REGLA regla_4:
+    SI violacion_4 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_4), operacion = violacion_regla_4, movimiento = DISMINUYE, fuente = PokaYoke:4, evidencia = regla_4_log);
+  REGLA regla_5:
+    SI violacion_5 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_5), operacion = violacion_regla_5, movimiento = DISMINUYE, fuente = PokaYoke:5, evidencia = regla_5_log);
+  REGLA regla_6:
+    SI violacion_6 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_6), operacion = violacion_regla_6, movimiento = DISMINUYE, fuente = PokaYoke:6, evidencia = regla_6_log);
+  REGLA regla_7:
+    SI violacion_7 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_7), operacion = violacion_regla_7, movimiento = DISMINUYE, fuente = PokaYoke:7, evidencia = regla_7_log);
+  REGLA regla_8:
+    SI violacion_8 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_8), operacion = violacion_regla_8, movimiento = DISMINUYE, fuente = PokaYoke:8, evidencia = regla_8_log);
+  REGLA regla_9:
+    SI violacion_9 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_9), operacion = violacion_regla_9, movimiento = DISMINUYE, fuente = PokaYoke:9, evidencia = regla_9_log);
+  REGLA regla_10:
+    SI violacion_10 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_10), operacion = violacion_regla_10, movimiento = DISMINUYE, fuente = PokaYoke:10, evidencia = regla_10_log);
+  REGLA regla_11:
+    SI violacion_11 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_11), operacion = violacion_regla_11, movimiento = DISMINUYE, fuente = PokaYoke:11, evidencia = regla_11_log);
+  REGLA regla_12:
+    SI violacion_12 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_12), operacion = violacion_regla_12, movimiento = DISMINUYE, fuente = PokaYoke:12, evidencia = regla_12_log);
+  REGLA regla_13:
+    SI violacion_13 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_13), operacion = violacion_regla_13, movimiento = DISMINUYE, fuente = PokaYoke:13, evidencia = regla_13_log);
+  REGLA regla_14:
+    SI violacion_14 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_14), operacion = violacion_regla_14, movimiento = DISMINUYE, fuente = PokaYoke:14, evidencia = regla_14_log);
+  REGLA regla_15:
+    SI violacion_15 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_15), operacion = violacion_regla_15, movimiento = DISMINUYE, fuente = PokaYoke:15, evidencia = regla_15_log);
+  REGLA regla_16:
+    SI violacion_16 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_16), operacion = violacion_regla_16, movimiento = DISMINUYE, fuente = PokaYoke:16, evidencia = regla_16_log);
+  REGLA regla_17:
+    SI violacion_17 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_17), operacion = violacion_regla_17, movimiento = DISMINUYE, fuente = PokaYoke:17, evidencia = regla_17_log);
+  REGLA regla_18:
+    SI violacion_18 ENTONCES GENERAR CONSECUENCIA (categoria = categoria(violacion_18), operacion = violacion_regla_18, movimiento = DISMINUYE, fuente = PokaYoke:18, evidencia = regla_18_log);
