@@ -205,3 +205,100 @@ Tras dos pases de `ruff --fix`, quedan ~59 errores no auto-fixables:
 - ~33 requieren refactor (no automático)
 
 Acción: sprint dedicado por archivo. No bloquea baseline.
+
+### Fase 2.3 — Intento pausado (2026-11-12)
+
+Sub-fase 2.3 (PartidaAutorizada.monto_cent como fuente) intentada y
+revertida. El diagnóstico reveló 3 cambios de contrato mayores:
+
+1. Tolerancia float 0.001 desaparece al redondear a centavos
+   (99.999 → 100.00). Dos tests de TestTolerancia asumen el contrato
+   viejo. Requieren reescritura, no son bugs.
+2. String "100" debe seguir siendo "no numérico" (contrato viejo).
+   Ajuste necesario en constructor.
+3. Detección de overflow (1e308) se mueve de suma (ensamblar) a
+   validación individual (_validar_monto). Cambio de semántica
+   que solo se cierra con 2.4 (acumulación en centavos).
+
+Decisión: parar en 2.2 (mnfc.py migrado, suite 624 verde).
+2.3-2.6 requieren sesión dedicada con plan de reescritura de tests
+(estimado: 4-6 tests afectados, ~2 h de trabajo enfocado).
+
+### Fase 2.4b — Pausada por regresión de persistencia (2026-11-12)
+
+Intento de migrar `LineaAsiento.monto` a @property reveló una regresión
+silenciosa: **la persistencia deja de guardar los montos**.
+
+## Causa
+`serializar()` (en `extensiones/serializador.py`) usa `dataclasses.fields()`
+para obtener los campos a serializar. Al convertir `monto` de field a
+@property, el campo desaparece del payload JSON:
+
+  ANTES (fase 1):
+    fields(LineaAsiento) = ['cuenta', 'ubicacion', 'monto', 'naturaleza', 'movimiento']
+    serializar incluye monto ✓
+
+  DESPUÉS (2.4b intento):
+    fields(LineaAsiento) = ['cuenta', 'ubicacion', 'naturaleza', 'movimiento']
+    serializar NO incluye monto ✗
+
+## Por qué los tests no lo detectan
+Los tests de persistencia verifican estructura y errores de serialización,
+pero **no verifican que el payload guardado contenga los montos**.
+
+## El test viejo de Decimal
+`test_decimal_en_partida_falla_sin_escritura` estaba verde en fase 1 porque
+`Decimal` era un field. Al migrar a @property, el test pierde su razón de
+ser: ya no hay Decimal en el payload, así que no puede fallar.
+
+## Decisión: ADR-006 antes de reintentar
+
+Antes de reintentar 2.4b, escribir ADR-006 con decisión:
+- ¿`monto_cent` es field del dataclass (int) y se serializa?
+- ¿O se amplía `serializar()` para incluir @properties?
+- ¿Cómo se verifica que el payload incluye todos los montos?
+
+Estado: 2.4a verde, 2.4b revertida. 3/7 sub-fases cerradas.
+
+## [v0.5.0] — Fase 2 decimal CERRADA (2026-11-12)
+
+Kernel de MNFC opera 100% en centavos (int). Fase 2 completa.
+
+### Sub-fases cerradas (7/7)
+- 2.1: @property monto_cent derivadas en ambas capas
+- 2.2: mnfc.Asiento usa centavos como fuente (total_debe_cent int)
+- 2.3: PartidaAutorizada.monto_cent como field serializable
+- 2.4a: Asiento (modelos) con total_*_cent como field
+- 2.4b: LineaAsiento con monto_cent como field serializable
+- 2.5: assembler._validar_monto retorna int centavos
+- 2.6: Migración de datos + tag (esta versión)
+
+### Cambios en API
+- @property monto/total_debe/total_haber: deprecated, eliminar en v0.6.0
+- Código nuevo debe usar .monto_cent / .total_*_cent
+- Persistencia serializa monto_cent (int) en payload
+- Constructor sigue aceptando monto= (pesos) para compat
+
+### Migración de datos
+- Script: migrar_monto_a_cent.py (idempotente, dry-run por defecto)
+- Uso: python migrar_monto_a_cent.py <db> --aplicar
+- Backup automático antes de aplicar
+
+### ADRs
+- ADR-003: migración completa del kernel a centavos
+- ADR-004: cadena capa 4 → capa 7 (no duplicación)
+- ADR-005: decisiones de contrato (tolerancia, strings, overflow)
+- ADR-006: persistencia de centavos en dataclasses
+- ADR-007: deprecación de @property monto para v0.6.0
+
+### Deuda explícita (fase 3, v0.6.0)
+- Eliminar @property monto/total_debe/total_haber
+- Reescribir ~25 tests para usar .monto_cent
+- Warnings de deprecación opcionales
+
+### Tests
+- Suite: 625 passed, 0 failed, 1 xfailed
+- Reescritos: test_redondeo_bancario_cuadra, test_diferencia_de_un_centimo_descuadra,
+  test_diferencia_centimo_y_medio_descuadra, test_monto_decimal_ahora_es_valido_en_fase2,
+  test_monto_fuera_de_rango_rechazado, test_tipo_no_serializable_en_partida_...,
+  test_segundo_asiento_no_serializable_...

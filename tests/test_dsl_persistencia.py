@@ -154,14 +154,20 @@ class TestCuadre:
 
 class TestPreSerializacion:
 
-    def test_decimal_en_partida_falla_sin_escritura(self, tmp_store_sqlite):
-        """F6-R2: Decimal no serializable. Falla ANTES de guardar nada."""
-        from decimal import Decimal
+    def test_tipo_no_serializable_en_partida_falla_sin_escritura(
+            self, tmp_store_sqlite):
+        """F6-R2: Tipo no serializable falla ANTES de guardar nada.
+
+        Contrato anterior (fase 1): Decimal era no serializable.
+        ADR-006 (fase 2): Decimal es convertible a monto_cent (int).
+        Se usa complex en naturaleza (field no monetario) para preservar
+        la intención: si el payload no serializa, no se escribe nada.
+        """
         store, _ = tmp_store_sqlite
         a = Asiento(
             lineas=[
-                LineaAsiento("A", "DEBE", Decimal("100")),
-                LineaAsiento("B", "HABER", Decimal("100")),
+                LineaAsiento("A", "DEBE", complex(1, 2)),
+                LineaAsiento("B", "HABER", 100.0),
             ],
             total_debe=100.0, total_haber=100.0, cuadrado=True,
         )
@@ -172,16 +178,19 @@ class TestPreSerializacion:
         ok, _ = store.verificar_cadena()
         assert ok is True
 
+    
     def test_segundo_asiento_no_serializable_no_escribe_el_primero(
             self, tmp_store_sqlite):
-        """Pre-serialización: si #2 falla, #1 NO se escribe."""
-        from decimal import Decimal
+        """Pre-serialización atómica: si #2 falla, #1 NO se escribe.
+
+        ADR-006: se usa complex en naturaleza (no serializable).
+        """
         store, _ = tmp_store_sqlite
         a1 = _asiento_cuadrado("A", "B", 100.0)
         a2 = Asiento(
             lineas=[
-                LineaAsiento("C", "DEBE", Decimal("50")),
-                LineaAsiento("D", "HABER", Decimal("50")),
+                LineaAsiento("C", "DEBE", complex(1, 2)),
+                LineaAsiento("D", "HABER", 50.0),
             ],
             total_debe=50.0, total_haber=50.0, cuadrado=True,
         )

@@ -32,7 +32,22 @@
 
 ```
 
+## Cadena del kernel (ADR-004)
+
+```
+
+procesar_asiento(dicts)           ← capa 4 · mnfc.py
+↓ mnfc.Asiento (líneas=dicts)
+ensamblar(reglas, contexto)       ← capa 7 · assembler.py
+↓ modelos.Asiento (partidas tipadas, fiscal, contexto)
+persistencia · reportes
+
+```
+
+**No son dos kernels. Son dos niveles semánticos de la misma cadena.**
+
 ## Estado por capa
+
 
 | Capa | Madurez |
 |---|---|

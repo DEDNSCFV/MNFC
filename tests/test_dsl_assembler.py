@@ -185,23 +185,41 @@ class TestTolerancia:
         ])]
         assert ensamblar(rs)[0].cuadrado is True
 
-    def test_justo_en_limite(self):
-        """diff=0.001 exacto → descuadrado (tolerancia es < estricto)."""
+    def test_redondeo_bancario_cuadra(self):
+        """ADR-005 (fase 2): 99.999 → 100.00 centavos. Cuadra.
+
+        Contrato anterior (fase 1): tolerancia float 0.001.
+        Contrato nuevo (fase 2): solo centavos exactos.
+        99.999 redondea a 100.00 (ROUND_HALF_EVEN) → DEBE == HABER.
+        """
         rs = [_rc("f", "r", 1, [
             _pa("A", "DEBE", 100.0),
             _pa("B", "HABER", 99.999),
         ])]
-        with pytest.raises(DSLAssemblyError):
-            ensamblar(rs)
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe_cent == 10000
+        assert a.total_haber_cent == 10000
 
-    def test_fuera(self):
-        """diff=0.002 → descuadrado."""
+    def test_diferencia_de_un_centimo_descuadra(self):
+        """ADR-005: diferencia de 1 centavo (0.01) descuadra."""
         rs = [_rc("f", "r", 1, [
             _pa("A", "DEBE", 100.0),
-            _pa("B", "HABER", 99.998),
+            _pa("B", "HABER", 99.99),
         ])]
-        with pytest.raises(DSLAssemblyError):
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
             ensamblar(rs)
+
+    
+    def test_diferencia_centimo_y_medio_descuadra(self):
+        """ADR-005: 99.985 → 99.99 centavos (ROUND_HALF_EVEN). 0.01 de dif → descuadre."""
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.985),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
+            ensamblar(rs)
+    
 
 
 # ═════════════════════════════════════════════════════════════════════
@@ -330,19 +348,35 @@ class TestValidacionMontos:
         with pytest.raises(DSLAssemblyError, match=motivo):
             ensamblar([_rc("f", "r", 1, [pa])])
 
-    def test_monto_decimal_rechazado_por_contrato_de_fase(self):
-        """Decimal NO es inválido contablemente. Está fuera del contrato
-        numérico de Fase 4 porque el kernel opera en float. Se documenta
-        aquí para que la decisión no se confunda con un juicio sobre
-        Decimal como tipo contable."""
-        from decimal import Decimal
-        pa = PartidaAutorizada(
-            cuenta_codigo="X", cuenta_version="v1",
-            monto=Decimal("100"), ubicacion="DEBE", movimiento="AUMENTA",
-        )
-        with pytest.raises(DSLAssemblyError, match="no numérico"):
-            ensamblar([_rc("f", "r", 1, [pa])])
+    def test_monto_decimal_ahora_es_valido_en_fase2(self):
+        """ADR-005 (fase 2): Decimal es el tipo canónico de dinero.
 
+        Test anterior (fase 1): test_monto_decimal_rechazado_por_contrato_de_fase
+        esperaba rechazo porque el kernel operaba en float.
+
+        Fase 2 invierte el contrato: Decimal se convierte a monto_cent (int)
+        y se acepta. Test verifica que un asiento completo con Decimal cuadra.
+        """
+        from decimal import Decimal
+        pa_debe = PartidaAutorizada(
+            cuenta_codigo="A", cuenta_version="v1",
+            monto=Decimal("100.50"), ubicacion="DEBE", movimiento="AUMENTA",
+        )
+        assert pa_debe.monto_cent == 10050
+
+        pa_haber = PartidaAutorizada(
+            cuenta_codigo="B", cuenta_version="v1",
+            monto=Decimal("100.50"), ubicacion="HABER", movimiento="AUMENTA",
+        )
+        assert pa_haber.monto_cent == 10050
+
+        rs = [_rc("f", "r", 1, [pa_debe, pa_haber])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe_cent == 10050
+        assert a.total_haber_cent == 10050
+        assert a.total_debe == 100.50
+    
     def test_monto_cero_valido(self):
         rs = [_rc("f", "r", 1, [
             _pa("A", "DEBE", 0.0),
@@ -370,19 +404,23 @@ class TestValidacionMontos:
             ensamblar([_rc("f", "r", 1, [pa])])
         assert "110101" in str(exc.value)
 
-    def test_overflow_en_total_error_con_regla(self):
-        """Suma de floats finitos desborda a inf. El pre-check detecta
-        antes de fijar cuadrado y el error conserva (fractal, regla)."""
+    def test_monto_fuera_de_rango_rechazado(self):
+        """ADR-005 (fase 2): montos que no caben en centavos se rechazan.
+
+        Contrato anterior (fase 1): float 1e308 se aceptaba como finito;
+        la suma de dos desbordaba a inf → 'total no finito'.
+
+        Contrato nuevo (fase 2): int centavos no desborda en suma.
+        La barrera está en _validar_monto: 1e308 * 100 no cabe en
+        Decimal.quantize estándar → se rechaza como 'fuera de rango'.
+        """
         rs = [_rc("ventas", "registro", 1, [
             _pa("A", "DEBE", 1e308),
-            _pa("B", "DEBE", 1e308),
-            _pa("C", "HABER", 1e308),
-            _pa("D", "HABER", 1e308),
+            _pa("B", "HABER", 1e308),
         ])]
-        with pytest.raises(DSLAssemblyError, match="total no finito") as exc:
+        with pytest.raises(DSLAssemblyError, match="fuera de rango"):
             ensamblar(rs)
-        assert "FRACTAL ventas" in str(exc.value)
-        assert "REGLA registro" in str(exc.value)
+    
 
 
 # ═════════════════════════════════════════════════════════════════════
