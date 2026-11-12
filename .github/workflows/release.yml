@@ -1,0 +1,50 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Certificado fase 1
+        run: python auditar_cierre_decimal.py
+
+      - name: Empaquetar
+        run: |
+          mkdir -p dist
+          tar czf dist/mnfc-${GITHUB_REF_NAME}.tgz \
+            --exclude='.git' --exclude='__pycache__' --exclude='.pytest_cache' \
+            --exclude='legacy' --exclude='*.tgz' \
+            src/ migrations/ tests/ \
+            README.md ARCHITECTURE.md CHANGELOG.md LICENSE \
+            requirements.txt pyproject.toml schema_limpio.sql
+          ls -lh dist/
+
+      - name: Crear release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/mnfc-*.tgz
+          generate_release_notes: true
+          draft: false
+          prerelease: false
