@@ -223,3 +223,39 @@ revertida. El diagnóstico reveló 3 cambios de contrato mayores:
 Decisión: parar en 2.2 (mnfc.py migrado, suite 624 verde).
 2.3-2.6 requieren sesión dedicada con plan de reescritura de tests
 (estimado: 4-6 tests afectados, ~2 h de trabajo enfocado).
+
+### Fase 2.4b — Pausada por regresión de persistencia (2026-11-12)
+
+Intento de migrar `LineaAsiento.monto` a @property reveló una regresión
+silenciosa: **la persistencia deja de guardar los montos**.
+
+## Causa
+`serializar()` (en `extensiones/serializador.py`) usa `dataclasses.fields()`
+para obtener los campos a serializar. Al convertir `monto` de field a
+@property, el campo desaparece del payload JSON:
+
+  ANTES (fase 1):
+    fields(LineaAsiento) = ['cuenta', 'ubicacion', 'monto', 'naturaleza', 'movimiento']
+    serializar incluye monto ✓
+
+  DESPUÉS (2.4b intento):
+    fields(LineaAsiento) = ['cuenta', 'ubicacion', 'naturaleza', 'movimiento']
+    serializar NO incluye monto ✗
+
+## Por qué los tests no lo detectan
+Los tests de persistencia verifican estructura y errores de serialización,
+pero **no verifican que el payload guardado contenga los montos**.
+
+## El test viejo de Decimal
+`test_decimal_en_partida_falla_sin_escritura` estaba verde en fase 1 porque
+`Decimal` era un field. Al migrar a @property, el test pierde su razón de
+ser: ya no hay Decimal en el payload, así que no puede fallar.
+
+## Decisión: ADR-006 antes de reintentar
+
+Antes de reintentar 2.4b, escribir ADR-006 con decisión:
+- ¿`monto_cent` es field del dataclass (int) y se serializa?
+- ¿O se amplía `serializar()` para incluir @properties?
+- ¿Cómo se verifica que el payload incluye todos los montos?
+
+Estado: 2.4a verde, 2.4b revertida. 3/7 sub-fases cerradas.
