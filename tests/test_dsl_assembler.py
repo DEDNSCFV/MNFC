@@ -185,23 +185,41 @@ class TestTolerancia:
         ])]
         assert ensamblar(rs)[0].cuadrado is True
 
-    def test_justo_en_limite(self):
-        """diff=0.001 exacto → descuadrado (tolerancia es < estricto)."""
+    def test_redondeo_bancario_cuadra(self):
+        """ADR-005 (fase 2): 99.999 → 100.00 centavos. Cuadra.
+
+        Contrato anterior (fase 1): tolerancia float 0.001.
+        Contrato nuevo (fase 2): solo centavos exactos.
+        99.999 redondea a 100.00 (ROUND_HALF_EVEN) → DEBE == HABER.
+        """
         rs = [_rc("f", "r", 1, [
             _pa("A", "DEBE", 100.0),
             _pa("B", "HABER", 99.999),
         ])]
-        with pytest.raises(DSLAssemblyError):
-            ensamblar(rs)
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe_cent == 10000
+        assert a.total_haber_cent == 10000
 
-    def test_fuera(self):
-        """diff=0.002 → descuadrado."""
+    def test_diferencia_de_un_centimo_descuadra(self):
+        """ADR-005: diferencia de 1 centavo (0.01) descuadra."""
         rs = [_rc("f", "r", 1, [
             _pa("A", "DEBE", 100.0),
-            _pa("B", "HABER", 99.998),
+            _pa("B", "HABER", 99.99),
         ])]
-        with pytest.raises(DSLAssemblyError):
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
             ensamblar(rs)
+
+    
+    def test_diferencia_centimo_y_medio_descuadra(self):
+        """ADR-005: 99.985 → 99.99 centavos (ROUND_HALF_EVEN). 0.01 de dif → descuadre."""
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.985),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
+            ensamblar(rs)
+    
 
 
 # ═════════════════════════════════════════════════════════════════════
