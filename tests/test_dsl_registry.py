@@ -12,11 +12,12 @@ Verifican:
 Sin marcos reales. Sin fiscal. Todo sintético.
 """
 import pytest
+
 from mnfc.dsl.registry import (
-    Registry,
-    OperacionRegistrada,
-    DSLRegistryError,
     TIPOS_VALIDOS,
+    DSLRegistryError,
+    OperacionRegistrada,
+    Registry,
 )
 
 
@@ -320,7 +321,7 @@ class TestIntegracionConEvaluator:
     def test_registry_pasa_a_evaluar_y_produce_montos_esperados(self):
         """Verifica el resultado observable: cuentas, ubicaciones y
         montos exactos, no solo cantidad de resultados."""
-        from mnfc.dsl import parse, validar, evaluar
+        from mnfc.dsl import evaluar, parse, validar
 
         pcu = {
             "110101": {"naturaleza": "DEUDORA",

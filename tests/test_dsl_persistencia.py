@@ -19,15 +19,14 @@ import tempfile
 
 import pytest
 
-from mnfc.dsl.persistencia import persistir, DSLPersistenceError
+from mnfc.dsl.persistencia import DSLPersistenceError, persistir
 from mnfc.extensiones.modelos import (
     Asiento,
-    LineaAsiento,
     ContextoContable,
+    LineaAsiento,
 )
-from mnfc.extensiones.persistencia.sqlite_store import SQLiteStore
 from mnfc.extensiones.persistencia.json_store import JSONStore
-
+from mnfc.extensiones.persistencia.sqlite_store import SQLiteStore
 
 # ═════════════════════════════════════════════════════════════════════
 # Fixtures
@@ -365,8 +364,8 @@ class TestIntegracion:
 
     def test_pipeline_mnfc_persistir_verificar(self, tmp_store_sqlite):
         """parse -> validar -> evaluar -> ensamblar -> persistir."""
-        from mnfc.dsl import parse, validar, evaluar, ensamblar
-        from mnfc.dsl.registry import Registry, OperacionRegistrada
+        from mnfc.dsl import ensamblar, evaluar, parse, validar
+        from mnfc.dsl.registry import OperacionRegistrada, Registry
 
         store, _ = tmp_store_sqlite
 

@@ -7,18 +7,21 @@ ledger inmutable de capa 6, y analizado estadistica y fractalmente
 por capas 2 y 3.
 """
 from mnfc import (
+    GENESIS,
+    # Capa 6
+    Ledger,
     # Capa 0
     calcular_ubicacion,
-    # Capa 1
-    verificar_cuadre,
-    # Capa 2
-    media, desviacion_muestral,
+    clasificar_cascada,
+    desviacion_muestral,
     # Capa 3
-    exponente_escalante, clasificar_cascada,
+    exponente_escalante,
+    # Capa 2
+    media,
     # Capa 4
     procesar_asiento,
-    # Capa 6
-    Ledger, GENESIS,
+    # Capa 1
+    verificar_cuadre,
 )
 
 

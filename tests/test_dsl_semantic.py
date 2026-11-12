@@ -8,8 +8,8 @@ Verifican que src/mnfc/dsl/semantic.py detecta:
 Solo validación de coherencia. No ejecuta reglas ni carga marcos reales.
 """
 import pytest
-from mnfc.dsl import parse, validar, DSLSemanticError
 
+from mnfc.dsl import DSLSemanticError, parse, validar
 
 # ═════════════════════════════════════════════════════════════════════
 # Fixtures

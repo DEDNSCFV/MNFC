@@ -14,21 +14,41 @@ Si estos tests pasan, MNFC es mas robusto de lo que asumo.
 Si fallan, sabemos exactamente donde apretar.
 """
 import math
+
 import pytest
 
 from mnfc import (
-    media, mediana, moda, modas, varianza_muestral, desviacion_muestral,
-    cuartiles, iqr, z_score, coef_variacion,
-    normal_pdf, normal_cdf,
-    error_estandar_media, error_estandar_proporcion,
-    tamano_muestra_media, tamano_muestra_proporcion,
-    margen_error, ic_media, ic_proporcion, proyeccion_error,
-    es_atipico_z, es_atipico_iqr, z_score_serie,
-    sumar_montos, verificar_cuadre,
-    Ledger, GENESIS,
-    cascada, exponente_escalante, clasificar_cascada,
+    GENESIS,
+    Ledger,
+    cascada,
+    clasificar_cascada,
+    coef_variacion,
+    cuartiles,
+    desviacion_muestral,
+    error_estandar_media,
+    error_estandar_proporcion,
+    es_atipico_iqr,
+    es_atipico_z,
+    exponente_escalante,
+    ic_media,
+    ic_proporcion,
+    iqr,
+    margen_error,
+    media,
+    mediana,
+    moda,
+    modas,
+    normal_cdf,
+    normal_pdf,
+    proyeccion_error,
+    sumar_montos,
+    tamano_muestra_media,
+    tamano_muestra_proporcion,
+    varianza_muestral,
+    verificar_cuadre,
+    z_score,
+    z_score_serie,
 )
-
 
 NAN = float("nan")
 INF = float("inf")

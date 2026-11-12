@@ -1,7 +1,9 @@
 """Tests de aceptación del cierre de deuda decimal."""
-import pytest
 from decimal import Decimal
-from mnfc.money import to_centimos, to_decimal, iva
+
+import pytest
+
+from mnfc.money import iva, to_centimos, to_decimal
 
 
 class TestConversion:

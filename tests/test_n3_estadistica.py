@@ -13,6 +13,7 @@ Criterio N3-textual:
     No se verifica contra formulas del resumen - solo contra ejemplos.
 """
 import pytest
+
 from mnfc.estadistica import media, mediana
 
 
@@ -410,16 +411,19 @@ class TestEjercicio83:
 
     def test_a(self):
         from math import sqrt
+
         from mnfc.estadistica import margen_error
         assert margen_error(1.96, sqrt(.2), self.N) == pytest.approx(.160, abs=0.001)
 
     def test_b(self):
         from math import sqrt
+
         from mnfc.estadistica import margen_error
         assert margen_error(1.96, sqrt(.9), self.N) == pytest.approx(.339, abs=0.001)
 
     def test_c(self):
         from math import sqrt
+
         from mnfc.estadistica import margen_error
         assert margen_error(1.96, sqrt(1.5), self.N) == pytest.approx(.438, abs=0.001)
 
@@ -587,6 +591,7 @@ class TestRedondeoHaciaArriba:
 
     def test_nunca_redondea_abajo(self):
         from math import ceil
+
         from mnfc.estadistica import tamano_muestra_proporcion
         # Caso con n exacto 504.21
         n = tamano_muestra_proporcion(1.96, 0.3, 0.04)
@@ -594,6 +599,7 @@ class TestRedondeoHaciaArriba:
 
     def test_coincide_con_ceil(self):
         from math import ceil
+
         from mnfc.estadistica import tamano_muestra_media
         # Cualquier caso: n == ceil(n_exacto)
         for sigma, B in [(10, 2), (5, 1), (3.7, 0.8), (12.7, 1.6)]:
@@ -633,6 +639,7 @@ class TestEjemplo86:
 
     def test_margen_error(self):
         from math import sqrt
+
         from mnfc.estadistica import margen_error
         me = margen_error(1.96, self.S, self.N)
         assert me == pytest.approx(9.70, abs=0.01)
@@ -804,6 +811,7 @@ class TestEjercicio865:
 
     def test_caso_a(self):
         from math import sqrt
+
         from mnfc.estadistica import ic_una_cola_sup
         n, x_bar, s = 40, 75.0, sqrt(65)
         xs = _muestra_con_parametros(x_bar, s, n)
@@ -820,6 +828,7 @@ class TestEjercicio865:
     def test_mayor_que_la_media(self):
         """El limite superior esta arriba de x_bar. Propiedad estructural."""
         from math import sqrt
+
         from mnfc.estadistica import ic_una_cola_sup
         n, x_bar, s = 40, 75.0, sqrt(65)
         xs = _muestra_con_parametros(x_bar, s, n)

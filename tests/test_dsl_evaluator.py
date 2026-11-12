@@ -9,22 +9,37 @@ Verifican que src/mnfc/dsl/evaluator.py:
 Sin marcos reales. Sin fiscal. Todo inyectado (pcu, operaciones).
 """
 import pytest
+
 from mnfc.dsl import (
-    parse, validar, evaluar,
     DSLEvaluationError,
     ResultadoAccion,
+    evaluar,
+    parse,
+    validar,
 )
 from mnfc.dsl.evaluator import (
-    evaluar_condicion, evaluar_set, evaluar_accion,
+    evaluar_accion,
+    evaluar_condicion,
+    evaluar_set,
 )
 from mnfc.dsl.parser import (
-    HechoRef, NegBool, Conjuncion, Disyuncion, CmpEscalar,
-    CategoriaRef, SetLiteral, Union, Inter, Diff, Complemento,
-    Relacion, Cita, Accion,
+    Accion,
+    CategoriaRef,
+    Cita,
+    CmpEscalar,
+    Complemento,
+    Conjuncion,
+    Diff,
+    Disyuncion,
+    HechoRef,
+    Inter,
+    NegBool,
+    Relacion,
+    SetLiteral,
+    Union,
 )
-from mnfc.extensiones.reticulo import ReticuloCuentas
 from mnfc.extensiones.modelos import PartidaAutorizada
-
+from mnfc.extensiones.reticulo import ReticuloCuentas
 
 # ═════════════════════════════════════════════════════════════════════
 # Fixtures comunes

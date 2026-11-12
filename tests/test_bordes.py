@@ -6,12 +6,26 @@ Cubre: montos cero/negativos/grandes, floats imprecisos, series
 vacias o de un solo elemento, unicode en cuentas, orden de claves.
 """
 import pytest
+
 from mnfc import (
-    calcular_ubicacion, ubicacion_booleana, ubicacion_gf2, ubicacion_signos,
-    verificar_cuadre, sumar_montos, calcular_base_e_iva,
-    capital_final, capital_inicial, tiempo_ic, tasa_ic,
-    media, mediana, varianza_muestral, z_score,
-    procesar_asiento, Ledger, GENESIS,
+    GENESIS,
+    Ledger,
+    calcular_base_e_iva,
+    calcular_ubicacion,
+    capital_final,
+    capital_inicial,
+    media,
+    mediana,
+    procesar_asiento,
+    sumar_montos,
+    tasa_ic,
+    tiempo_ic,
+    ubicacion_booleana,
+    ubicacion_gf2,
+    ubicacion_signos,
+    varianza_muestral,
+    verificar_cuadre,
+    z_score,
 )
 
 

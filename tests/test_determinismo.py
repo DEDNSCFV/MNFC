@@ -17,26 +17,56 @@ Sin random, sin time. Solo permutaciones deterministas.
 import pytest
 
 from mnfc import (
-    # Capa 0
-    calcular_ubicacion, ubicacion_booleana, ubicacion_gf2, ubicacion_signos,
-    # Capa 1
-    ley_de_signos, sumar_montos, verificar_cuadre,
-    # Capa 2
-    media, mediana, moda, modas, varianza_muestral, desviacion_muestral,
-    cuartiles, iqr, z_score, coef_variacion,
-    normal_pdf, normal_cdf, z_critico_90, z_critico_95, z_critico_99,
-    error_estandar_media, error_estandar_proporcion,
-    tamano_muestra_media, tamano_muestra_proporcion,
-    limite_control_media, margen_error, ic_media, ic_proporcion,
-    proyeccion_error, ic_una_cola_sup, ic_una_cola_inf,
-    es_atipico_z, es_atipico_iqr, z_score_serie,
-    stock_seguridad, pronostico_media_movil,
-    # Capa 3
-    cascada, exponente_escalante, clasificar_cascada, reporte_cascada,
+    GENESIS,
     # Capa 6
-    Ledger, GENESIS,
+    Ledger,
+    # Capa 0
+    calcular_ubicacion,
+    # Capa 3
+    cascada,
+    clasificar_cascada,
+    coef_variacion,
+    cuartiles,
+    desviacion_muestral,
+    error_estandar_media,
+    error_estandar_proporcion,
+    es_atipico_iqr,
+    es_atipico_z,
+    exponente_escalante,
+    ic_media,
+    ic_proporcion,
+    ic_una_cola_inf,
+    ic_una_cola_sup,
+    iqr,
+    # Capa 1
+    ley_de_signos,
+    limite_control_media,
+    margen_error,
+    # Capa 2
+    media,
+    mediana,
+    moda,
+    modas,
+    normal_cdf,
+    normal_pdf,
+    pronostico_media_movil,
+    proyeccion_error,
+    reporte_cascada,
+    stock_seguridad,
+    sumar_montos,
+    tamano_muestra_media,
+    tamano_muestra_proporcion,
+    ubicacion_booleana,
+    ubicacion_gf2,
+    ubicacion_signos,
+    varianza_muestral,
+    verificar_cuadre,
+    z_critico_90,
+    z_critico_95,
+    z_critico_99,
+    z_score,
+    z_score_serie,
 )
-
 
 XS = [3.0, 5.0, 4.0, 6.0, 10.0, 5.0, 6.0, 9.0, 2.0, 8.0]
 XS_POS = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
@@ -233,7 +263,7 @@ class TestConstantesInmutables:
     """Las constantes del kernel no se mutan tras importacion."""
 
     def test_naturalezas_validas(self):
-        from mnfc import NATURALEZAS_VALIDAS, MOVIMIENTOS_VALIDOS
+        from mnfc import MOVIMIENTOS_VALIDOS, NATURALEZAS_VALIDAS
         assert NATURALEZAS_VALIDAS == ("DEUDORA", "ACREEDORA")
         assert MOVIMIENTOS_VALIDOS == ("AUMENTA", "DISMINUYE")
 

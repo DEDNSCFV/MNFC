@@ -8,17 +8,31 @@ E - Contratos: cada funcion lanza el tipo de excepcion correcto con
     un mensaje especifico. No hay excepciones genericas silenciosas.
 """
 import json
-import pytest
-from mnfc import (
-    calcular_ubicacion, ubicacion_booleana, ubicacion_gf2, ubicacion_signos,
-    verificar_cuadre, sumar_montos, calcular_base_e_iva,
-    capital_final, tiempo_ic,
-    media, mediana, varianza_muestral, z_score,
-    error_estandar_media, tamano_muestra_media,
-    exponente_escalante, cascada,
-    procesar_asiento, Ledger, GENESIS,
-)
 
+import pytest
+
+from mnfc import (
+    GENESIS,
+    Ledger,
+    calcular_base_e_iva,
+    calcular_ubicacion,
+    capital_final,
+    cascada,
+    error_estandar_media,
+    exponente_escalante,
+    media,
+    mediana,
+    procesar_asiento,
+    sumar_montos,
+    tamano_muestra_media,
+    tiempo_ic,
+    ubicacion_booleana,
+    ubicacion_gf2,
+    ubicacion_signos,
+    varianza_muestral,
+    verificar_cuadre,
+    z_score,
+)
 
 # ─────────────────────────────────────────────────────────────────────
 # D.1 Determinismo del ledger
@@ -44,7 +58,7 @@ class TestDeterminismoLedger:
         # Verificacion manual del hash
         import hashlib
         canonical = json.dumps({"x": 1, "y": 2}, sort_keys=True, separators=(",", ":"))
-        payload = f"{GENESIS}|{canonical}".encode("utf-8")
+        payload = f"{GENESIS}|{canonical}".encode()
         esperado = hashlib.sha256(payload).hexdigest()
         assert h == esperado
 

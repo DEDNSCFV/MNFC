@@ -12,27 +12,38 @@ Cubre:
 """
 import json
 import os
-import tempfile
 import shutil
+import tempfile
+
 import pytest
 
 from mnfc.extensiones import (
-    # Estados
-    VersionContexto, EstadoAsiento, TipoEvento,
-    # Maquina
-    MaquinaEstadosAsiento, Transicion,
+    Asiento,
     # Modelos
-    ContextoContable, PartidaAutorizada, LineaAsiento, Asiento,
-    # Serializador
-    serializar, deserializar, PersistenciaViolacion,
+    ContextoContable,
+    EstadoAsiento,
+    # Examinador
+    ExaminadorEvidencia,
+    JSONStore,
+    LineaAsiento,
+    # Maquina
+    MaquinaEstadosAsiento,
+    PartidaAutorizada,
+    PersistenciaViolacion,
+    Reporte,
     # Reticulo
     ReticuloCuentas,
-    # Examinador
-    ExaminadorEvidencia, Reporte,
+    SQLiteStore,
     # Persistencia
-    StoreBase, SQLiteStore, JSONStore,
+    StoreBase,
+    TipoEvento,
+    Transicion,
+    # Estados
+    VersionContexto,
+    deserializar,
+    # Serializador
+    serializar,
 )
-
 
 VC = {"version_id": "v1", "PCU_version": "1.0"}
 

@@ -9,14 +9,19 @@ Para correrlas:
 Miden rendimiento bajo carga. No buscan bugs funcionales -
 buscan degradacion, fugas de memoria, tiempos excesivos.
 """
-import time
-import tracemalloc
 import gc
 import random
+import time
+import tracemalloc
+
 import pytest
+
 from mnfc import (
-    calcular_ubicacion, procesar_asiento, Ledger,
-    exponente_escalante, clasificar_cascada,
+    Ledger,
+    calcular_ubicacion,
+    clasificar_cascada,
+    exponente_escalante,
+    procesar_asiento,
 )
 
 
@@ -162,7 +167,7 @@ def test_estres_asiento_1000_lineas():
 @pytest.mark.slow
 def test_estres_fractal_serie_100k():
     """Fractal sobre serie de 100.000 elementos."""
-    print(f"\n[ESTRES] Fractal sobre serie de 100.000 elementos")
+    print("\n[ESTRES] Fractal sobre serie de 100.000 elementos")
     rng = random.Random(42)
     xs = [rng.gauss(100, 20) for _ in range(100_000)]
 

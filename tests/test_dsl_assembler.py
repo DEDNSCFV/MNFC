@@ -13,11 +13,12 @@ Verifican:
 Sin marcos reales. Sin fiscal. Todo con datos sintéticos.
 """
 import pytest
-from mnfc.dsl.evaluator import ResultadoAccion, DSLEvaluationError
-from mnfc.dsl.assembler import ensamblar, DSLAssemblyError
+
+from mnfc.dsl.assembler import DSLAssemblyError, ensamblar
+from mnfc.dsl.evaluator import DSLEvaluationError, ResultadoAccion
 from mnfc.extensiones.modelos import (
-    PartidaAutorizada,
     ContextoContable,
+    PartidaAutorizada,
 )
 
 
@@ -272,7 +273,7 @@ class TestErrores:
 class TestIntegracion:
 
     def test_pipeline_completo(self):
-        from mnfc.dsl import parse, validar, evaluar
+        from mnfc.dsl import evaluar, parse, validar
         pcu = {
             "110101": {"naturaleza": "DEUDORA",
                        "marcos": ["caja", "PYMES"]},

@@ -19,8 +19,8 @@ NUMBER con punto. Citas con múltiples niveles son parseables.
 Solo parseo sintáctico. No validan semántica ni cargan marcos.
 """
 import pytest
-from mnfc.dsl import parse, Programa, DSLSyntaxError
 
+from mnfc.dsl import DSLSyntaxError, Programa, parse
 
 DSL_MINIMO = 'DSL_VERSION "1.6";'
 

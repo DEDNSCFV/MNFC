@@ -7,16 +7,26 @@ Cada iteracion verifica un invariante que SIEMPRE debe cumplirse.
 Semilla fija: random.seed(42) -> reproducible bit a bit.
 """
 import random
-import pytest
-from mnfc import (
-    calcular_ubicacion, ubicacion_booleana, ubicacion_gf2, ubicacion_signos,
-    NATURALEZAS_VALIDAS, MOVIMIENTOS_VALIDOS,
-    procesar_asiento, verificar_cuadre,
-    media, mediana, desviacion_muestral,
-    exponente_escalante, clasificar_cascada,
-    Ledger, GENESIS,
-)
 
+import pytest
+
+from mnfc import (
+    GENESIS,
+    MOVIMIENTOS_VALIDOS,
+    NATURALEZAS_VALIDAS,
+    Ledger,
+    calcular_ubicacion,
+    clasificar_cascada,
+    desviacion_muestral,
+    exponente_escalante,
+    media,
+    mediana,
+    procesar_asiento,
+    ubicacion_booleana,
+    ubicacion_gf2,
+    ubicacion_signos,
+    verificar_cuadre,
+)
 
 # ─────────────────────────────────────────────────────────────────────
 # F.1 Fuzzing de xnor - invariante 2.5 con 1000 combinaciones
