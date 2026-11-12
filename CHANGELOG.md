@@ -205,3 +205,21 @@ Tras dos pases de `ruff --fix`, quedan ~59 errores no auto-fixables:
 - ~33 requieren refactor (no automático)
 
 Acción: sprint dedicado por archivo. No bloquea baseline.
+
+### Fase 2.3 — Intento pausado (2026-11-12)
+
+Sub-fase 2.3 (PartidaAutorizada.monto_cent como fuente) intentada y
+revertida. El diagnóstico reveló 3 cambios de contrato mayores:
+
+1. Tolerancia float 0.001 desaparece al redondear a centavos
+   (99.999 → 100.00). Dos tests de TestTolerancia asumen el contrato
+   viejo. Requieren reescritura, no son bugs.
+2. String "100" debe seguir siendo "no numérico" (contrato viejo).
+   Ajuste necesario en constructor.
+3. Detección de overflow (1e308) se mueve de suma (ensamblar) a
+   validación individual (_validar_monto). Cambio de semántica
+   que solo se cierra con 2.4 (acumulación en centavos).
+
+Decisión: parar en 2.2 (mnfc.py migrado, suite 624 verde).
+2.3-2.6 requieren sesión dedicada con plan de reescritura de tests
+(estimado: 4-6 tests afectados, ~2 h de trabajo enfocado).
