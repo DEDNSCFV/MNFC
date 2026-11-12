@@ -195,3 +195,13 @@ Resuelve:
 - tests/test_extensiones.py::test_reportes_csv_mayor
 - tests/test_extensiones.py::test_reportes_csv_balance
 - tests/test_extensiones.py::test_integracion_kernel_y_extensiones
+
+### Deuda: lint residual (~59 errores ruff)
+
+Tras dos pases de `ruff --fix`, quedan ~59 errores no auto-fixables:
+- Complejidad ciclomática (C901) en kpis_* y libro_*
+- Shadowing de nombres (A001/A002)
+- ~26 fixables con `--unsafe-fixes` (requieren revisión manual)
+- ~33 requieren refactor (no automático)
+
+Acción: sprint dedicado por archivo. No bloquea baseline.
