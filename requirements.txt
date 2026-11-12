@@ -1,6 +1,3 @@
-# Dependencias de MNFC
-# Lockfile exacto: requirements.lock
-# Instalación: pip install -r requirements.lock
-
-openpyxl>=3.1.0
-pytest>=8.0.0
+# MNFC — dependencias directas
+openpyxl>=3.1.0,<4
+pytest>=8.0.0,<9
