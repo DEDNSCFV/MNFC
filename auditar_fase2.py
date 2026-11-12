@@ -21,7 +21,7 @@ SUB_FASES = [
     ("2.2", "mnfc.Asiento usa centavos como fuente de verdad",
      lambda: _tiene(ROOT / "src/mnfc/mnfc.py", "total_debe_cent: int")),
     ("2.3", "PartidaAutorizada.monto_cent como fuente de verdad",
-     lambda: _tiene(ROOT / "src/mnfc/extensiones/modelos.py", "monto_cent: int")),
+     lambda: _partida_autorizada_migrada(ROOT / "src/mnfc/extensiones/modelos.py")),
     ("2.4a", "Asiento centavos como fuente",
      lambda: _tiene(ROOT / "src/mnfc/extensiones/modelos.py", "_total_debe_cent")),
     ("2.4b", "LineaAsiento centavos como fuente",
@@ -32,6 +32,20 @@ SUB_FASES = [
      lambda: _sin_float(ROOT / "src/mnfc/mnfc.py")
              and _sin_float(ROOT / "src/mnfc/extensiones/modelos.py")),
 ]
+
+
+def _partida_autorizada_migrada(path: Path) -> bool:
+    """2.3: PartidaAutorizada tiene monto_cent como field (dentro del bloque de la clase)."""
+    if not path.exists():
+        return False
+    txt = path.read_text()
+    # Extraer bloque PartidaAutorizada
+    import re as _re
+    m = _re.search(r'class PartidaAutorizada:.*?(?=\n\n@dataclass|\n\nclass |\Z)', txt, _re.DOTALL)
+    if not m:
+        return False
+    bloque = m.group(0)
+    return "monto_cent: int" in bloque
 
 
 def _tiene(path: Path, needle: str) -> bool:
