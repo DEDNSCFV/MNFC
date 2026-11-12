@@ -20,19 +20,18 @@ Estado epistemico:
 Frontera: el modulo no decide contabilidad. Mide series contables.
 """
 
-from math import sqrt, log, exp, erf, isnan, isinf, ceil
-from typing import List, Tuple
 from collections import Counter
+from math import ceil, erf, exp, isinf, isnan, sqrt
 
 
-def _validar_serie(xs: List[float]) -> None:
+def _validar_serie(xs: list[float]) -> None:
     """Rechaza NaN e Inf. Los montos contables son finitos."""
     for x in xs:
         if isinstance(x, float) and (isnan(x) or isinf(x)):
             raise ValueError("valor no finito en serie: " + repr(x))
 
 
-def media(xs: List[float]) -> float:
+def media(xs: list[float]) -> float:
     """Media aritmetica. Mendenhall L6781-6782 (§2.2).
 
     Limitacion conocida: suma directa. Series con valores > 1e154
@@ -44,7 +43,7 @@ def media(xs: List[float]) -> float:
     return sum(xs) / len(xs)
 
 
-def mediana(xs: List[float]) -> float:
+def mediana(xs: list[float]) -> float:
     """Posicion .5(n+1). Mendenhall L6783 (§2.2)."""
     if not xs:
         raise ValueError("serie vacia")
@@ -54,7 +53,7 @@ def mediana(xs: List[float]) -> float:
     return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
 
 
-def moda(xs: List[float]) -> float:
+def moda(xs: list[float]) -> float:
     """Una de las modas (la primera hallada). Mendenhall L6784 (§2.2).
 
     Nota: en distribuciones multimodales devuelve la primera segun
@@ -67,7 +66,7 @@ def moda(xs: List[float]) -> float:
     return Counter(xs).most_common(1)[0][0]
 
 
-def modas(xs: List[float]) -> List[float]:
+def modas(xs: list[float]) -> list[float]:
     """Todas las modas. Mendenhall L4789 (definicion).
 
     Devuelve la lista de valores con frecuencia maxima. Si la
@@ -85,7 +84,7 @@ def modas(xs: List[float]) -> List[float]:
     return [v for v, f in c.items() if f == max_f]
 
 
-def varianza_muestral(xs: List[float]) -> float:
+def varianza_muestral(xs: list[float]) -> float:
     """s2 = sum((xi-x_bar)^2)/(n-1). Mendenhall L6801-6809 (§2.3).
 
     N3-textual: Ejemplo 2.5 (L5239) - datos [5,7,1,2,4] -> s^2 = 5.70.
@@ -96,7 +95,7 @@ def varianza_muestral(xs: List[float]) -> float:
     return sum((x - m) ** 2 for x in xs) / (len(xs) - 1)
 
 
-def desviacion_muestral(xs: List[float]) -> float:
+def desviacion_muestral(xs: list[float]) -> float:
     """s = sqrt(s2). Mendenhall L6813-6814 (§2.3).
 
     N3-textual: Ejemplo 2.5 (L5239) - datos [5,7,1,2,4] -> s ~= 2.39.
@@ -104,7 +103,7 @@ def desviacion_muestral(xs: List[float]) -> float:
     return sqrt(varianza_muestral(xs))
 
 
-def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
+def cuartiles(xs: list[float]) -> tuple[float, float, float]:
     """Q1 .25(n+1), Q2 .5(n+1), Q3 .75(n+1). Mendenhall L6827-6829 (§2.7).
 
     Interpolacion lineal cuando la posicion no es entera, segun
@@ -132,16 +131,16 @@ def cuartiles(xs: List[float]) -> Tuple[float, float, float]:
             return float(s[n - 1])
         return s[k - 1] + f * (s[k] - s[k - 1])
 
-    return pos(.25), pos(.50), pos(.75)
+    return pos(0.25), pos(0.50), pos(0.75)
 
 
-def iqr(xs: List[float]) -> float:
+def iqr(xs: list[float]) -> float:
     """IQR = Q3 - Q1. Mendenhall L6831 (§2.7)."""
     q1, _, q3 = cuartiles(xs)
     return q3 - q1
 
 
-def z_score(x: float, xs: List[float]) -> float:
+def z_score(x: float, xs: list[float]) -> float:
     """z = (x - x_bar)/s. Mendenhall L6824 (§2.6).
 
     N3-textual: Ejemplo 2.11 (L~6104) - datos [1,1,0,15,2,3,4,0,1,3],
@@ -150,7 +149,7 @@ def z_score(x: float, xs: List[float]) -> float:
     return (x - media(xs)) / desviacion_muestral(xs)
 
 
-def coef_variacion(xs: List[float]) -> float:
+def coef_variacion(xs: list[float]) -> float:
     """CV = s/x_bar. Coeficiente de variacion (forma estandar).
 
     N0: sin locus verificado en el corpus actual.
@@ -280,7 +279,7 @@ def tamano_muestra_proporcion(z: float, p: float, B: float) -> int:
     return ceil(z * z * p * (1 - p) / (B * B))
 
 
-def limite_control_media(xs: List[float], k: float = 3.0) -> Tuple[float, float]:
+def limite_control_media(xs: list[float], k: float = 3.0) -> tuple[float, float]:
     """LCS/LCI = x_bar +/- k*sigma/sqrt(n). Mendenhall L18107 (§7.7).
 
     N3-textual (reconstruccion por parametros):
@@ -309,7 +308,7 @@ def margen_error(z: float, sigma: float, n: int) -> float:
     return z * error_estandar_media(sigma, n)
 
 
-def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
+def ic_media(xs: list[float], z: float = 1.96) -> tuple[float, float]:
     """x_bar +/- Z*sigma/sqrt(n). Mendenhall §8.5.
 
     N3-textual (reconstruccion por parametros):
@@ -329,7 +328,7 @@ def ic_media(xs: List[float], z: float = 1.96) -> Tuple[float, float]:
     return m - me, m + me
 
 
-def ic_proporcion(p: float, n: int, z: float = 1.96) -> Tuple[float, float]:
+def ic_proporcion(p: float, n: int, z: float = 1.96) -> tuple[float, float]:
     """p_hat +/- Z*sqrt(pq/n). Mendenhall §8.5.
 
     N3-textual: Ejemplo 8.5 (L20560) - p=.73, n=100 -> IC=(.64, .82).
@@ -347,7 +346,7 @@ def proyeccion_error(error_muestra: float, N: int, n: int) -> float:
     return error_muestra * (N / n)
 
 
-def ic_una_cola_sup(xs: List[float], z_alpha: float) -> float:
+def ic_una_cola_sup(xs: list[float], z_alpha: float) -> float:
     """x_bar + Z_alpha*sigma/sqrt(n). Mendenhall §8.8.
 
     N3-textual (reconstruccion por parametros):
@@ -362,7 +361,7 @@ def ic_una_cola_sup(xs: List[float], z_alpha: float) -> float:
     return m + z_alpha * s / sqrt(len(xs))
 
 
-def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
+def ic_una_cola_inf(xs: list[float], z_alpha: float) -> float:
     """x_bar - Z_alpha*sigma/sqrt(n). Mendenhall §8.8.
 
     N2: el libro no tiene ejemplo de limite INFERIOR de una cola
@@ -374,7 +373,7 @@ def ic_una_cola_inf(xs: List[float], z_alpha: float) -> float:
     return m - z_alpha * s / sqrt(len(xs))
 
 
-def es_atipico_z(x: float, xs: List[float], umbral: float = 3.0) -> bool:
+def es_atipico_z(x: float, xs: list[float], umbral: float = 3.0) -> bool:
     """|z| > umbral. Mendenhall L6824 (§2.6).
 
     N3-textual: Ejemplo 2.11 (L~6104) - datos [1,1,0,15,2,3,4,0,1,3],
@@ -384,14 +383,14 @@ def es_atipico_z(x: float, xs: List[float], umbral: float = 3.0) -> bool:
     return abs(z_score(x, xs)) > umbral
 
 
-def es_atipico_iqr(x: float, xs: List[float], k: float = 1.5) -> bool:
+def es_atipico_iqr(x: float, xs: list[float], k: float = 1.5) -> bool:
     """Fuera de [Q1-k*IQR, Q3+k*IQR]. Mendenhall L6831 (§2.7)."""
     q1, _, q3 = cuartiles(xs)
     r = q3 - q1
     return x < q1 - k * r or x > q3 + k * r
 
 
-def z_score_serie(xs: List[float]) -> List[float]:
+def z_score_serie(xs: list[float]) -> list[float]:
     """z para toda la serie. Mendenhall L6824 (§2.6)."""
     m = media(xs)
     s = desviacion_muestral(xs)
@@ -403,7 +402,7 @@ def stock_seguridad(z: float, sigma_d: float, L: float) -> float:
     return z * sigma_d * sqrt(L)
 
 
-def pronostico_media_movil(xs: List[float], n: int) -> float:
+def pronostico_media_movil(xs: list[float], n: int) -> float:
     """(y_t + ... + y_t-n)/n. Mendenhall cap 12 (derivado)."""
     if n <= 0 or n > len(xs):
         raise ValueError("n fuera de rango")

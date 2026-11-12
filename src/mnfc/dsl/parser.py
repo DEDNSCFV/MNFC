@@ -14,18 +14,17 @@ Sin dependencias externas. Solo stdlib.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Tuple
-
+from typing import Any
 
 # ═════════════════════════════════════════════════════════════════════
 # Excepción
 # ═════════════════════════════════════════════════════════════════════
 
+
 class DSLSyntaxError(Exception):
     """Error de sintaxis del DSL. Incluye archivo, línea, columna."""
 
-    def __init__(self, mensaje: str, linea: int = 0, col: int = 0,
-                 archivo: str = "<input>"):
+    def __init__(self, mensaje: str, linea: int = 0, col: int = 0, archivo: str = "<input>"):
         self.mensaje = mensaje
         self.linea = linea
         self.col = col
@@ -37,18 +36,41 @@ class DSLSyntaxError(Exception):
 # Tokens reservados
 # ═════════════════════════════════════════════════════════════════════
 
-KEYWORDS = frozenset({
-    "DSL_VERSION", "ELEMENTOS", "MARCOS", "CATEGORIA", "HECHO", "FRACTAL",
-    "REGLA", "SI", "ENTONCES", "GENERAR", "CONSECUENCIA",
-    "Y", "O", "NO", "VERDADERO", "FALSO",
-    "categoria", "elemento", "universal", "operacion", "movimiento",
-    "fuente", "evidencia", "AUMENTA", "DISMINUYE",
-})
+KEYWORDS = frozenset(
+    {
+        "DSL_VERSION",
+        "ELEMENTOS",
+        "MARCOS",
+        "CATEGORIA",
+        "HECHO",
+        "FRACTAL",
+        "REGLA",
+        "SI",
+        "ENTONCES",
+        "GENERAR",
+        "CONSECUENCIA",
+        "Y",
+        "O",
+        "NO",
+        "VERDADERO",
+        "FALSO",
+        "categoria",
+        "elemento",
+        "universal",
+        "operacion",
+        "movimiento",
+        "fuente",
+        "evidencia",
+        "AUMENTA",
+        "DISMINUYE",
+    }
+)
 
 
 # ═════════════════════════════════════════════════════════════════════
 # Token
 # ═════════════════════════════════════════════════════════════════════
+
 
 @dataclass
 class Token:
@@ -66,20 +88,29 @@ class Token:
 # ═════════════════════════════════════════════════════════════════════
 
 _SINGLE = {
-    "=": "ASSIGN", ";": "SEMI", ":": "COLON", ",": "COMMA", ".": "DOT",
-    "[": "LBRACK", "]": "RBRACK", "{": "LBRACE", "}": "RBRACE",
-    "(": "LPAREN", ")": "RPAREN", ">": "GT", "<": "LT",
-    "\u222a": "UNION",    # ∪
-    "\u2229": "INTER",    # ∩
-    "\u2216": "DIFF",     # ∖
-    "\u00ac": "NOT",      # ¬
-    "\u2208": "IN",       # ∈
-    "\u2286": "SUBSET",   # ⊆
+    "=": "ASSIGN",
+    ";": "SEMI",
+    ":": "COLON",
+    ",": "COMMA",
+    ".": "DOT",
+    "[": "LBRACK",
+    "]": "RBRACK",
+    "{": "LBRACE",
+    "}": "RBRACE",
+    "(": "LPAREN",
+    ")": "RPAREN",
+    ">": "GT",
+    "<": "LT",
+    "\u222a": "UNION",  # ∪
+    "\u2229": "INTER",  # ∩
+    "\u2216": "DIFF",  # ∖
+    "\u00ac": "NOT",  # ¬
+    "\u2208": "IN",  # ∈
+    "\u2286": "SUBSET",  # ⊆
 }
 
 
 class Lexer:
-
     def __init__(self, texto: str, archivo: str = "<input>"):
         self.texto = texto
         self.archivo = archivo
@@ -101,8 +132,8 @@ class Lexer:
                     self.col += 1
                 self.i += 1
 
-    def tokenizar(self) -> List[Token]:
-        tokens: List[Token] = []
+    def tokenizar(self) -> list[Token]:
+        tokens: list[Token] = []
         while self.i < len(self.texto):
             c = self.texto[self.i]
 
@@ -128,20 +159,23 @@ class Lexer:
                 continue
 
             if c == "=" and self._peek(1) == "=":
-                tokens.append(self._emit("EQ", "==", 2)); continue
+                tokens.append(self._emit("EQ", "==", 2))
+                continue
             if c == "!" and self._peek(1) == "=":
-                tokens.append(self._emit("NEQ", "!=", 2)); continue
+                tokens.append(self._emit("NEQ", "!=", 2))
+                continue
             if c == ">" and self._peek(1) == "=":
-                tokens.append(self._emit("GE", ">=", 2)); continue
+                tokens.append(self._emit("GE", ">=", 2))
+                continue
             if c == "<" and self._peek(1) == "=":
-                tokens.append(self._emit("LE", "<=", 2)); continue
+                tokens.append(self._emit("LE", "<=", 2))
+                continue
 
             if c in _SINGLE:
-                tokens.append(self._emit(_SINGLE[c], c, 1)); continue
+                tokens.append(self._emit(_SINGLE[c], c, 1))
+                continue
 
-            raise DSLSyntaxError(
-                f"carácter inesperado {c!r}", self.linea, self.col, self.archivo
-            )
+            raise DSLSyntaxError(f"carácter inesperado {c!r}", self.linea, self.col, self.archivo)
 
         tokens.append(Token("EOF", "", self.linea, self.col))
         return tokens
@@ -154,39 +188,42 @@ class Lexer:
     def _lex_string(self) -> Token:
         linea, col = self.linea, self.col
         self._advance()
-        chars: List[str] = []
+        chars: list[str] = []
         while self.i < len(self.texto) and self.texto[self.i] != '"':
             if self.texto[self.i] == "\n":
-                raise DSLSyntaxError(
-                    "string sin cerrar", linea, col, self.archivo)
+                raise DSLSyntaxError("string sin cerrar", linea, col, self.archivo)
             chars.append(self.texto[self.i])
             self._advance()
         if self.i >= len(self.texto):
-            raise DSLSyntaxError(
-                "string sin cerrar", linea, col, self.archivo)
+            raise DSLSyntaxError("string sin cerrar", linea, col, self.archivo)
         self._advance()
         return Token("STRING", "".join(chars), linea, col)
 
     def _lex_number(self) -> Token:
         linea, col = self.linea, self.col
-        chars: List[str] = []
+        chars: list[str] = []
         if self.texto[self.i] == "-":
-            chars.append("-"); self._advance()
+            chars.append("-")
+            self._advance()
         while self.i < len(self.texto) and self.texto[self.i].isdigit():
-            chars.append(self.texto[self.i]); self._advance()
-        if self.i < len(self.texto) and self.texto[self.i] == "." \
-                and self._peek(1).isdigit():
-            chars.append("."); self._advance()
+            chars.append(self.texto[self.i])
+            self._advance()
+        if self.i < len(self.texto) and self.texto[self.i] == "." and self._peek(1).isdigit():
+            chars.append(".")
+            self._advance()
             while self.i < len(self.texto) and self.texto[self.i].isdigit():
-                chars.append(self.texto[self.i]); self._advance()
+                chars.append(self.texto[self.i])
+                self._advance()
         return Token("NUMBER", "".join(chars), linea, col)
 
     def _lex_identifier(self) -> Token:
         linea, col = self.linea, self.col
-        chars: List[str] = []
-        while self.i < len(self.texto) and \
-                (self.texto[self.i].isalnum() or self.texto[self.i] == "_"):
-            chars.append(self.texto[self.i]); self._advance()
+        chars: list[str] = []
+        while self.i < len(self.texto) and (
+            self.texto[self.i].isalnum() or self.texto[self.i] == "_"
+        ):
+            chars.append(self.texto[self.i])
+            self._advance()
         nombre = "".join(chars)
         tipo = nombre if nombre in KEYWORDS else "IDENT"
         return Token(tipo, nombre, linea, col)
@@ -196,66 +233,81 @@ class Lexer:
 # AST
 # ═════════════════════════════════════════════════════════════════════
 
+
 # Condiciones
 @dataclass
 class CmpEscalar:
     izq: str
     op: str
-    der: Any        # str (ident) o str (string) o str (number)
+    der: Any  # str (ident) o str (string) o str (number)
+
 
 @dataclass
 class HechoRef:
     nombre: str
 
+
 @dataclass
 class NegBool:
     interno: "NodoCond"
 
+
 @dataclass
 class Conjuncion:
-    partes: List["NodoCond"]
+    partes: list["NodoCond"]
+
 
 @dataclass
 class Disyuncion:
-    partes: List["NodoCond"]
+    partes: list["NodoCond"]
+
 
 # Conjuntos
 @dataclass
 class CategoriaRef:
     nombre: str
 
+
 @dataclass
 class SetLiteral:
-    items: List[str]
+    items: list[str]
+
 
 @dataclass
 class Union:
     izq: "NodoSet"
     der: "NodoSet"
 
+
 @dataclass
 class Inter:
     izq: "NodoSet"
     der: "NodoSet"
+
 
 @dataclass
 class Diff:
     izq: "NodoSet"
     der: "NodoSet"
 
+
 @dataclass
 class Complemento:
     interno: "NodoSet"
 
+
 @dataclass
 class Relacion:
     """set_expr (∈ | ⊆) set_expr"""
+
     izq: "NodoSet"
-    op: str         # '∈' o '⊆'
+    op: str  # '∈' o '⊆'
     der: "NodoSet"
+
 
 NodoCond = Any
 NodoSet = Any
+
 
 # Acciones
 @dataclass
@@ -263,19 +315,22 @@ class Cita:
     marco: str
     seccion: str
 
+
 @dataclass
 class Accion:
-    categoria: Optional[NodoSet] = None
-    operacion: Optional[str] = None
-    movimiento: Optional[str] = None
-    fuente: Optional[Cita] = None
-    evidencia: Optional[str] = None
+    categoria: NodoSet | None = None
+    operacion: str | None = None
+    movimiento: str | None = None
+    fuente: Cita | None = None
+    evidencia: str | None = None
+
 
 # Estructuras de nivel superior
 @dataclass
 class Elemento:
     nombre: str
-    descripcion: Optional[str] = None
+    descripcion: str | None = None
+
 
 @dataclass
 class Categoria:
@@ -283,34 +338,37 @@ class Categoria:
     elemento: str
     universal: bool
 
+
 @dataclass
 class Regla:
     nombre: str
     condicion: NodoCond
-    acciones: List[Accion]
+    acciones: list[Accion]
+
 
 @dataclass
 class Fractal:
     nombre: str
-    reglas: List[Regla]
+    reglas: list[Regla]
+
 
 @dataclass
 class Programa:
     version: str
-    elementos: List[Elemento] = field(default_factory=list)
-    marcos: List[str] = field(default_factory=list)
-    categorias: List[Categoria] = field(default_factory=list)
-    hechos: List[str] = field(default_factory=list)
-    fractales: List[Fractal] = field(default_factory=list)
+    elementos: list[Elemento] = field(default_factory=list)
+    marcos: list[str] = field(default_factory=list)
+    categorias: list[Categoria] = field(default_factory=list)
+    hechos: list[str] = field(default_factory=list)
+    fractales: list[Fractal] = field(default_factory=list)
 
 
 # ═════════════════════════════════════════════════════════════════════
 # Parser
 # ═════════════════════════════════════════════════════════════════════
 
-class Parser:
 
-    def __init__(self, tokens: List[Token], archivo: str = "<input>"):
+class Parser:
+    def __init__(self, tokens: list[Token], archivo: str = "<input>"):
         self.tokens = tokens
         self.pos = 0
         self.archivo = archivo
@@ -335,7 +393,10 @@ class Parser:
             ctx = f" en {contexto}" if contexto else ""
             raise DSLSyntaxError(
                 f"esperaba {tipo}{ctx}, encontró {t.tipo} ({t.valor!r})",
-                t.linea, t.col, self.archivo)
+                t.linea,
+                t.col,
+                self.archivo,
+            )
         return self._avanzar()
 
     def _es(self, *tipos: str) -> bool:
@@ -368,7 +429,10 @@ class Parser:
                 tt = self._actual()
                 raise DSLSyntaxError(
                     f"declaración inesperada {tt.tipo} ({tt.valor!r})",
-                    tt.linea, tt.col, self.archivo)
+                    tt.linea,
+                    tt.col,
+                    self.archivo,
+                )
         return prog
 
     # --- vocabulario ---
@@ -406,14 +470,16 @@ class Parser:
         self._esperar("universal", "categoria_decl")
         self._esperar("COLON", "categoria_decl")
         if self._es("VERDADERO"):
-            self._avanzar(); uni = True
+            self._avanzar()
+            uni = True
         elif self._es("FALSO"):
-            self._avanzar(); uni = False
+            self._avanzar()
+            uni = False
         else:
             t = self._actual()
             raise DSLSyntaxError(
-                f"esperaba VERDADERO o FALSO, encontró {t.tipo}",
-                t.linea, t.col, self.archivo)
+                f"esperaba VERDADERO o FALSO, encontró {t.tipo}", t.linea, t.col, self.archivo
+            )
         self._esperar("SEMI", "categoria_decl")
         prog.categorias.append(Categoria(nombre, elem, uni))
 
@@ -429,7 +495,7 @@ class Parser:
         self._esperar("FRACTAL")
         nombre = self._esperar("IDENT", "nombre de fractal").valor
         self._esperar("COLON", "fractal")
-        reglas: List[Regla] = []
+        reglas: list[Regla] = []
         # al menos una regla
         reglas.append(self._parsear_regla())
         while self._es("REGLA"):
@@ -443,7 +509,7 @@ class Parser:
         self._esperar("SI", "regla")
         cond = self._parsear_condicion()
         self._esperar("ENTONCES", "regla")
-        acciones: List[Accion] = []
+        acciones: list[Accion] = []
         acciones.append(self._parsear_accion())
         while self._es("GENERAR"):
             acciones.append(self._parsear_accion())
@@ -488,7 +554,10 @@ class Parser:
             return self._parsear_set_chain()
         raise DSLSyntaxError(
             f"átomo inesperado {self._actual().tipo}",
-            self._actual().linea, self._actual().col, self.archivo)
+            self._actual().linea,
+            self._actual().col,
+            self.archivo,
+        )
 
     def _parsear_operand_chain(self) -> NodoCond:
         ident = self._esperar("IDENT", "operando").valor
@@ -501,13 +570,15 @@ class Parser:
     def _parsear_operand(self) -> Any:
         t = self._actual()
         if t.tipo == "IDENT":
-            self._avanzar(); return t.valor
+            self._avanzar()
+            return t.valor
         if t.tipo == "STRING":
-            self._avanzar(); return t.valor
+            self._avanzar()
+            return t.valor
         if t.tipo == "NUMBER":
-            self._avanzar(); return t.valor
-        raise DSLSyntaxError(
-            f"operando inesperado {t.tipo}", t.linea, t.col, self.archivo)
+            self._avanzar()
+            return t.valor
+        raise DSLSyntaxError(f"operando inesperado {t.tipo}", t.linea, t.col, self.archivo)
 
     def _parsear_set_chain(self) -> NodoCond:
         izq = self._parsear_set_expr()
@@ -519,7 +590,10 @@ class Parser:
         t = self._actual()
         raise DSLSyntaxError(
             f"se esperaba ∈ o ⊆ después de expresión de conjunto, encontró {t.tipo}",
-            t.linea, t.col, self.archivo)
+            t.linea,
+            t.col,
+            self.archivo,
+        )
 
     def _parsear_set_expr(self) -> NodoSet:
         return self._parsear_set_union()
@@ -564,7 +638,7 @@ class Parser:
             return CategoriaRef(nombre)
         if t == "LBRACE":
             self._avanzar()
-            items: List[str] = []
+            items: list[str] = []
             if not self._es("RBRACE"):
                 items.append(self._esperar("IDENT", "item").valor)
                 while self._es("COMMA"):
@@ -578,7 +652,11 @@ class Parser:
             self._esperar("RPAREN", "conjunto agrupado")
             return s
         raise DSLSyntaxError(
-            f"conjunto inesperado {self._actual().tipo}", self._actual().linea, self._actual().col, self.archivo)
+            f"conjunto inesperado {self._actual().tipo}",
+            self._actual().linea,
+            self._actual().col,
+            self.archivo,
+        )
 
     # --- acciones ---
 
@@ -610,14 +688,19 @@ class Parser:
             self._avanzar()
             self._esperar("ASSIGN", "movimiento=")
             if self._es("AUMENTA"):
-                self._avanzar(); acc.movimiento = "AUMENTA"
+                self._avanzar()
+                acc.movimiento = "AUMENTA"
             elif self._es("DISMINUYE"):
-                self._avanzar(); acc.movimiento = "DISMINUYE"
+                self._avanzar()
+                acc.movimiento = "DISMINUYE"
             else:
                 tt = self._actual()
                 raise DSLSyntaxError(
                     f"esperaba AUMENTA o DISMINUYE, encontró {tt.tipo}",
-                    tt.linea, tt.col, self.archivo)
+                    tt.linea,
+                    tt.col,
+                    self.archivo,
+                )
             return
         if t == "fuente":
             self._avanzar()
@@ -631,8 +714,8 @@ class Parser:
             return
         tt = self._actual()
         raise DSLSyntaxError(
-            f"argumento desconocido {tt.tipo} ({tt.valor!r})",
-            tt.linea, tt.col, self.archivo)
+            f"argumento desconocido {tt.tipo} ({tt.valor!r})", tt.linea, tt.col, self.archivo
+        )
 
     def _parsear_cita(self) -> Cita:
         marco = self._esperar("IDENT", "marco de cita").valor
@@ -650,22 +733,27 @@ class Parser:
     def _parsear_section_atom(self) -> str:
         t = self._actual()
         if t.tipo == "IDENT":
-            self._avanzar(); return t.valor
+            self._avanzar()
+            return t.valor
         if t.tipo == "NUMBER":
             # Acepta NUMBER con o sin punto (lexer por maximal munch).
             # El '-' no es válido: gramática digits = digit { digit }.
             if t.valor.startswith("-"):
                 raise DSLSyntaxError(
                     f"section_atom: dígitos sin signo, recibió {t.valor!r}",
-                    t.linea, t.col, self.archivo)
-            self._avanzar(); return t.valor
-        raise DSLSyntaxError(
-            f"section_atom inesperado {t.tipo}", t.linea, t.col, self.archivo)
+                    t.linea,
+                    t.col,
+                    self.archivo,
+                )
+            self._avanzar()
+            return t.valor
+        raise DSLSyntaxError(f"section_atom inesperado {t.tipo}", t.linea, t.col, self.archivo)
 
 
 # ═════════════════════════════════════════════════════════════════════
 # Punto de entrada
 # ═════════════════════════════════════════════════════════════════════
+
 
 def parse(texto: str, archivo: str = "<input>") -> Programa:
     """Tokeniza y parsea un texto en el DSL de MNFC. Devuelve Programa."""

@@ -11,14 +11,10 @@ Migrado de SCFV_DSR/scfv_dsr/contable/reportes_motor.py.
 Adaptado para usar StoreBase en lugar de leer SQLite directamente.
 """
 
-import csv
 import calendar
-import json
+import csv
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
-
-from .persistencia.base import StoreBase
 
 
 def _timestamp_rango(periodo_id):
@@ -39,13 +35,12 @@ def _leer_asientos(store, periodo_id):
     prefijo = str(periodo_id)
     todos = store.obtener_por_tipo("ASIENTO_REGISTRADO")
     filtrados = [
-        e["payload"] for e in todos
-        if isinstance(e["payload"], dict)
-        and str(e["payload"].get("fecha", "")).startswith(prefijo)
+        e["payload"]
+        for e in todos
+        if isinstance(e["payload"], dict) and str(e["payload"].get("fecha", "")).startswith(prefijo)
     ]
     filtrados.sort(key=lambda a: a.get("fecha", ""))
     return filtrados
-
 
 
 def _saldos_mayor(asientos):
@@ -72,17 +67,20 @@ def generar_csv_diario(store, periodo_id, output_dir="libros"):
     archivo = _directorio_salida(output_dir) / ("motor_diario_%s.csv" % periodo_id)
     with open(archivo, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Asiento ID", "Fecha", "Periodo",
-                    "Total Debe", "Total Haber", "Correlation ID"])
+        w.writerow(
+            ["Asiento ID", "Fecha", "Periodo", "Total Debe", "Total Haber", "Correlation ID"]
+        )
         for a in asientos:
-            w.writerow([
-                a.get("id", ""),
-                a.get("fecha", ""),
-                a.get("periodo_id", ""),
-                a.get("total_debe", 0),
-                a.get("total_haber", 0),
-                a.get("correlation_id", ""),
-            ])
+            w.writerow(
+                [
+                    a.get("id", ""),
+                    a.get("fecha", ""),
+                    a.get("periodo_id", ""),
+                    a.get("total_debe", 0),
+                    a.get("total_haber", 0),
+                    a.get("correlation_id", ""),
+                ]
+            )
     return str(archivo)
 
 
@@ -140,8 +138,7 @@ def generar_csv_balance(store, periodo_id, output_dir="libros"):
         w.writerow(["GASTOS", gastos])
         w.writerow(["RESULTADO", ingresos - gastos])
         w.writerow(["TOTAL ACTIVO", activo])
-        w.writerow(["TOTAL PASIVO + CAPITAL + RESULTADO",
-                    pasivo + capital + (ingresos - gastos)])
+        w.writerow(["TOTAL PASIVO + CAPITAL + RESULTADO", pasivo + capital + (ingresos - gastos)])
     return str(archivo)
 
 
@@ -154,9 +151,7 @@ def generar_pdf_diario(store, periodo_id, output_dir="libros"):
     try:
         from fpdf import FPDF
     except ImportError:
-        raise RuntimeError(
-            "fpdf no instalado. Ejecutar: pip install fpdf"
-        )
+        raise RuntimeError("fpdf no instalado. Ejecutar: pip install fpdf")
 
     asientos = _leer_asientos(store, periodo_id)
     archivo = _directorio_salida(output_dir) / ("motor_diario_%s.pdf" % periodo_id)

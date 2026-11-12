@@ -8,12 +8,10 @@ Migrado de SCFV_DSR/scfv_dsr/contable/event_store.py.
 Adaptado para heredar de StoreBase y usar el serializador de MNFC.
 """
 
-import sqlite3
-import json
 import hashlib
+import json
+import sqlite3
 import time
-
-from typing import Dict, Any, Optional, List, Tuple
 
 from ..serializador import serializar
 from .base import StoreBase
@@ -53,26 +51,22 @@ class SQLiteStore(StoreBase):
     def guardar(
         self,
         tipo_evento: str,
-        payload: Dict,
+        payload: dict,
         correlation_id: str,
         idempotency_key: str,
-        version_contexto: Optional[Dict] = None,
+        version_contexto: dict | None = None,
     ) -> None:
         cursor = self.conn.cursor()
 
         # 1. Hash anterior
-        cursor.execute(
-            "SELECT hash_actual FROM event_store ORDER BY id DESC LIMIT 1"
-        )
+        cursor.execute("SELECT hash_actual FROM event_store ORDER BY id DESC LIMIT 1")
         row = cursor.fetchone()
         hash_previo = row[0] if row else self.GENESIS_HASH
 
         # 2. Tipo canonico
         tipo_evento_canonico = serializar(tipo_evento)
         if not isinstance(tipo_evento_canonico, (str, int, float, bool)):
-            raise TypeError(
-                "tipo_evento debe producir representacion escalar"
-            )
+            raise TypeError("tipo_evento debe producir representacion escalar")
 
         # 3. Payload canonico
         payload_canonico = serializar(payload)
@@ -84,10 +78,7 @@ class SQLiteStore(StoreBase):
         )
 
         # 4. Version contexto canonica
-        version_canonica = (
-            serializar(version_contexto)
-            if version_contexto is not None else {}
-        )
+        version_canonica = serializar(version_contexto) if version_contexto is not None else {}
         version_json = json.dumps(
             version_canonica,
             ensure_ascii=False,
@@ -96,13 +87,7 @@ class SQLiteStore(StoreBase):
         )
 
         # 5. Hash
-        datos = (
-            payload_json
-            + version_json
-            + correlation_id
-            + idempotency_key
-            + hash_previo
-        )
+        datos = payload_json + version_json + correlation_id + idempotency_key + hash_previo
         hash_actual = hashlib.sha256(datos.encode("utf-8")).hexdigest()
         timestamp = int(time.time())
 
@@ -116,26 +101,27 @@ class SQLiteStore(StoreBase):
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    tipo_evento_canonico, payload_json, correlation_id,
-                    idempotency_key, hash_previo, hash_actual, timestamp,
+                    tipo_evento_canonico,
+                    payload_json,
+                    correlation_id,
+                    idempotency_key,
+                    hash_previo,
+                    hash_actual,
+                    timestamp,
                     version_json,
                 ),
             )
             self.conn.commit()
         except sqlite3.IntegrityError as exc:
-            raise ValueError(
-                "idempotency_key duplicada: " + repr(idempotency_key)
-            ) from exc
+            raise ValueError("idempotency_key duplicada: " + repr(idempotency_key)) from exc
 
     def obtener_hash_final(self) -> str:
         cursor = self.conn.cursor()
-        cursor.execute(
-            "SELECT hash_actual FROM event_store ORDER BY id DESC LIMIT 1"
-        )
+        cursor.execute("SELECT hash_actual FROM event_store ORDER BY id DESC LIMIT 1")
         row = cursor.fetchone()
         return row[0] if row else self.GENESIS_HASH
 
-    def verificar_cadena(self) -> Tuple[bool, str]:
+    def verificar_cadena(self) -> tuple[bool, str]:
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT id, hash_previo, hash_actual, payload, version_contexto,
@@ -153,8 +139,11 @@ class SQLiteStore(StoreBase):
             payload_json = row["payload"]
 
             datos = (
-                payload_json + version_json + row["correlation_id"]
-                + row["idempotency_key"] + row["hash_previo"]
+                payload_json
+                + version_json
+                + row["correlation_id"]
+                + row["idempotency_key"]
+                + row["hash_previo"]
             )
             recomputado = hashlib.sha256(datos.encode("utf-8")).hexdigest()
 
@@ -165,7 +154,7 @@ class SQLiteStore(StoreBase):
 
         return (True, "CADENA_INTEGRA")
 
-    def _fila_a_dict(self, row) -> Dict:
+    def _fila_a_dict(self, row) -> dict:
         return {
             "id": row[0],
             "tipo_evento": row[1],
@@ -178,13 +167,16 @@ class SQLiteStore(StoreBase):
             "version_contexto": json.loads(row[8]) if row[8] else None,
         }
 
-    def obtener_por_id(self, evento_id: int) -> Optional[Dict]:
+    def obtener_por_id(self, evento_id: int) -> dict | None:
         cursor = self.conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, tipo_evento, payload, correlation_id, idempotency_key,
                    hash_previo, hash_actual, timestamp, version_contexto
             FROM event_store WHERE id = ?
-        """, (evento_id,))
+        """,
+            (evento_id,),
+        )
         row = cursor.fetchone()
         if not row:
             return None
@@ -193,35 +185,44 @@ class SQLiteStore(StoreBase):
     def obtener_por_tipo(
         self,
         tipo_evento: str,
-        limite: Optional[int] = None,
-    ) -> List[Dict]:
+        limite: int | None = None,
+    ) -> list[dict]:
         cursor = self.conn.cursor()
         tipo_evento_canonico = serializar(tipo_evento)
 
         if limite is not None:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id, tipo_evento, payload, correlation_id, idempotency_key,
                        hash_previo, hash_actual, timestamp, version_contexto
                 FROM event_store WHERE tipo_evento = ?
                 ORDER BY timestamp DESC, id DESC LIMIT ?
-            """, (tipo_evento_canonico, limite))
+            """,
+                (tipo_evento_canonico, limite),
+            )
         else:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id, tipo_evento, payload, correlation_id, idempotency_key,
                        hash_previo, hash_actual, timestamp, version_contexto
                 FROM event_store WHERE tipo_evento = ?
                 ORDER BY timestamp DESC, id DESC
-            """, (tipo_evento_canonico,))
+            """,
+                (tipo_evento_canonico,),
+            )
 
         return [self._fila_a_dict(row) for row in cursor.fetchall()]
 
-    def obtener_por_correlation(self, correlation_id: str) -> Optional[Dict]:
+    def obtener_por_correlation(self, correlation_id: str) -> dict | None:
         cursor = self.conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, tipo_evento, payload, correlation_id, idempotency_key,
                    hash_previo, hash_actual, timestamp, version_contexto
             FROM event_store WHERE correlation_id = ?
-        """, (correlation_id,))
+        """,
+            (correlation_id,),
+        )
         row = cursor.fetchone()
         if not row:
             return None

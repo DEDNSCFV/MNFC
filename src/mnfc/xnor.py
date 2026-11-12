@@ -24,9 +24,9 @@ NATURALEZAS_VALIDAS = ("DEUDORA", "ACREEDORA")
 MOVIMIENTOS_VALIDOS = ("AUMENTA", "DISMINUYE")
 
 _TABLA = {
-    ("DEUDORA",   "AUMENTA"):   "DEBE",
-    ("DEUDORA",   "DISMINUYE"): "HABER",
-    ("ACREEDORA", "AUMENTA"):   "HABER",
+    ("DEUDORA", "AUMENTA"): "DEBE",
+    ("DEUDORA", "DISMINUYE"): "HABER",
+    ("ACREEDORA", "AUMENTA"): "HABER",
     ("ACREEDORA", "DISMINUYE"): "DEBE",
 }
 
@@ -39,15 +39,9 @@ _M_A_SIGNO = {"AUMENTA": +1, "DISMINUYE": -1}
 
 def _validar(naturaleza: str, movimiento: str) -> None:
     if naturaleza not in NATURALEZAS_VALIDAS:
-        raise ValueError(
-            f"XNOR invalido para naturaleza='{naturaleza}', "
-            f"movimiento='{movimiento}'"
-        )
+        raise ValueError(f"XNOR invalido para naturaleza='{naturaleza}', movimiento='{movimiento}'")
     if movimiento not in MOVIMIENTOS_VALIDOS:
-        raise ValueError(
-            f"XNOR invalido para naturaleza='{naturaleza}', "
-            f"movimiento='{movimiento}'"
-        )
+        raise ValueError(f"XNOR invalido para naturaleza='{naturaleza}', movimiento='{movimiento}'")
 
 
 def ubicacion_booleana(naturaleza: str, movimiento: str) -> str:

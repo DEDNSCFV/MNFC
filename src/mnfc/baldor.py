@@ -23,9 +23,7 @@ Frontera declarada (D-BALDOR-2):
     cálculo de mora legal, operaciones específicas de industria.
 """
 
-from math import isnan, isinf
-from typing import List, Tuple
-
+from math import isinf, isnan
 
 # ═════════════════════════════════════════════════════════════════════
 # BLOQUE 1 · REGISTRO · leyes formales del álgebra
@@ -40,6 +38,7 @@ from typing import List, Tuple
 #    el producto será 0."
 # ─────────────────────────────────────────────────────────────────────
 
+
 def ley_de_signos(signo_a: int, signo_b: int) -> int:
     """Producto algebraico de dos signos (+1 o −1). Raw L1885-1888."""
     if signo_a == 0 or signo_b == 0:
@@ -51,6 +50,7 @@ def ley_de_signos(signo_a: int, signo_b: int) -> int:
 # LEYES FORMALES DE LA SUMA
 # Raw L1676 (conmutativa) · L1678 (asociativa) · L1680 (identidad)
 # ─────────────────────────────────────────────────────────────────────
+
 
 def suma_conmutativa(a, b):
     """Raw L1676: a + b = b + a."""
@@ -71,6 +71,7 @@ def suma_identidad(a):
 # LEYES FORMALES DE LA MULTIPLICACIÓN
 # Raw L1689 · L1691 · L1693 · L1696 · L1699
 # ─────────────────────────────────────────────────────────────────────
+
 
 def multiplicacion_conmutativa(a, b):
     """Raw L1689: ab = ba."""
@@ -104,10 +105,10 @@ def multiplicacion_inverso(a):
 # Raw L874-997 · tres casos
 # ─────────────────────────────────────────────────────────────────────
 
-Termino = Tuple[float, int, str]   # (coeficiente, signo, parte_literal)
+Termino = tuple[float, int, str]  # (coeficiente, signo, parte_literal)
 
 
-def reducir_mismo_signo(terminos: List[Termino]) -> Termino:
+def reducir_mismo_signo(terminos: list[Termino]) -> Termino:
     """
     Raw L877-894 · caso 1.
     "Se suman los coeficientes, poniendo delante de esta suma el mismo
@@ -126,7 +127,7 @@ def reducir_mismo_signo(terminos: List[Termino]) -> Termino:
     return (coef, signo, parte)
 
 
-def reducir_signo_distinto(terminos: List[Termino]) -> Termino:
+def reducir_signo_distinto(terminos: list[Termino]) -> Termino:
     """
     Raw L935-960 · caso 2.
     "Se restan los coeficientes, poniendo delante de esta diferencia
@@ -146,7 +147,7 @@ def reducir_signo_distinto(terminos: List[Termino]) -> Termino:
     return (c2 - c1, s2, p2)
 
 
-def reducir_terminos_semejantes(terminos: List[Termino]) -> Termino:
+def reducir_terminos_semejantes(terminos: list[Termino]) -> Termino:
     """
     Raw L874-997 · los tres casos.
     Caso 3: reducir positivos, reducir negativos, aplicar caso 2.
@@ -171,7 +172,7 @@ def _validar_finito(x, nombre: str = "valor") -> None:
         raise ValueError(nombre + " no finito: " + repr(x))
 
 
-def sumar_montos(montos: List[float]) -> float:
+def sumar_montos(montos: list[float]) -> float:
     """Suma algebraica de montos. Raw L874-997 (reduccion de terminos)."""
     for m in montos:
         _validar_finito(m, "monto")
@@ -207,6 +208,7 @@ def calcular_base_e_iva(monto_con_iva: float, tasa: float) -> tuple:
 # Raw L29113: u = a + (n-1)r
 # Raw L29260+: S = n(a + u) / 2
 # ─────────────────────────────────────────────────────────────────────
+
 
 def termino_nesimo_ap(a: float, r: float, n: int) -> float:
     """Término n-ésimo de progresión aritmética. Raw L29113: u = a + (n-1)r."""
@@ -245,6 +247,7 @@ def numero_terminos_ap(a: float, u: float, r: float) -> int:
 # Raw L253 (pág.): S_inf = a / (1 - r) cuando |r| < 1
 # ─────────────────────────────────────────────────────────────────────
 
+
 def termino_nesimo_pg(a: float, r: float, n: int) -> float:
     """Término n-ésimo de progresión geométrica. Raw L29700: u = a·r^(n-1)."""
     return a * (r ** (n - 1))
@@ -266,7 +269,7 @@ def suma_pg(a: float, r: float, n: int) -> float:
     """
     if r == 1:
         return a * n
-    return a * (r ** n - 1) / (r - 1)
+    return a * (r**n - 1) / (r - 1)
 
 
 def suma_pg_infinita(a: float, r: float) -> float:
@@ -285,6 +288,7 @@ def numero_terminos_pg(a: float, u: float, r: float) -> int:
     'n = (log u − log a) / log r + 1'
     """
     from math import log
+
     if a <= 0 or u <= 0 or r <= 0 or r == 1:
         raise ValueError("a, u, r deben ser > 0 y r ≠ 1")
     return int(round((log(u) - log(a)) / log(r))) + 1
@@ -300,9 +304,11 @@ def numero_terminos_pg(a: float, u: float, r: float) -> int:
 #             elevar otro número llamado base para obtener el número dado."
 # ─────────────────────────────────────────────────────────────────────
 
+
 def logaritmo(x: float, base: float = 10) -> float:
     """Logaritmo. Raw L30176."""
     from math import log
+
     if base <= 0 or base == 1:
         raise ValueError("base debe ser > 0 y ≠ 1")
     if x <= 0:
@@ -312,7 +318,7 @@ def logaritmo(x: float, base: float = 10) -> float:
 
 def antilog(y: float, base: float = 10) -> float:
     """Antilogaritmo: número cuyo log es y. Raw pág. 258."""
-    return base ** y
+    return base**y
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -322,6 +328,7 @@ def antilog(y: float, base: float = 10) -> float:
 # Raw L30286+ (deducción): log(A^n) = n·log A
 # Raw L30286+ (deducción): log(ⁿ√A) = (log A) / n
 # ─────────────────────────────────────────────────────────────────────
+
 
 def log_producto(A: float, B: float, base: float = 10) -> float:
     """Raw L30253: log(A×B) = log A + log B."""
@@ -349,6 +356,7 @@ def log_raiz(A: float, n: float, base: float = 10) -> float:
 #                inverso. colog x = −log x."
 # ─────────────────────────────────────────────────────────────────────
 
+
 def colog(x: float, base: float = 10) -> float:
     """Raw pág. 257: colog x = −log x."""
     return -logaritmo(x, base)
@@ -360,9 +368,11 @@ def colog(x: float, base: float = 10) -> float:
 #                decimal, mantisa."
 # ─────────────────────────────────────────────────────────────────────
 
+
 def caracteristica(x: float) -> int:
     """Parte entera del logaritmo. Raw pág. 257."""
     from math import floor
+
     if x <= 0:
         raise ValueError("x debe ser > 0")
     return int(floor(logaritmo(x)))
@@ -371,11 +381,12 @@ def caracteristica(x: float) -> int:
 def mantisa(x: float) -> float:
     """Parte decimal del logaritmo. Raw pág. 257."""
     from math import floor
+
     l = logaritmo(x)
     return l - floor(l)
 
 
-def log_por_factores(factores: List[Tuple[int, int]], base: float = 10) -> float:
+def log_por_factores(factores: list[tuple[int, int]], base: float = 10) -> float:
     """
     log de un número por descomposición en factores primos.
     Raw pág. 259: ejemplo 108 = 2² × 3³
@@ -400,6 +411,7 @@ def log_por_factores(factores: List[Tuple[int, int]], base: float = 10) -> float
 # Raw L30920: r = (C/c)^(1/t) − 1
 # ─────────────────────────────────────────────────────────────────────
 
+
 def capital_final(c: float, r: float, t: float) -> float:
     """Capital final a interés compuesto. Raw L30886: C = c(1+r)^t."""
     return c * ((1 + r) ** t)
@@ -416,6 +428,7 @@ def tiempo_ic(C: float, c: float, r: float) -> float:
     t = (log C − log c) / log(1+r)
     """
     from math import log
+
     if c <= 0 or C <= 0 or (1 + r) <= 0 or r <= -1:
         raise ValueError("valores fuera de dominio")
     return (log(C) - log(c)) / log(1 + r)
@@ -437,6 +450,7 @@ def tasa_ic(C: float, c: float, t: float) -> float:
 # Raw L17300: "Si A es inversamente proporcional a B, A = k/B."
 # Raw L17326: "Si A es proporcional a B y C, A = kBC."
 # ─────────────────────────────────────────────────────────────────────
+
 
 def constante_directa(A: float, B: float) -> float:
     """Constante de proporcionalidad directa. Raw L17283: k = A/B."""
@@ -498,8 +512,10 @@ def regla_de_tres_inversa(a: float, b: float, c: float) -> float:
 # Tres métodos: igualación, sustitución, reducción.
 # ─────────────────────────────────────────────────────────────────────
 
-def resolver_2x2(a1: float, b1: float, c1: float,
-                a2: float, b2: float, c2: float) -> Tuple[float, float]:
+
+def resolver_2x2(
+    a1: float, b1: float, c1: float, a2: float, b2: float, c2: float
+) -> tuple[float, float]:
     """
     Resuelve el sistema:
         a1·x + b1·y = c1
@@ -522,12 +538,13 @@ def resolver_2x2(a1: float, b1: float, c1: float,
 #    ... x = (−b ± √(b² − 4ac)) / 2a"
 # ─────────────────────────────────────────────────────────────────────
 
+
 def discriminante(a: float, b: float, c: float) -> float:
     """Discriminante: D = b² − 4ac. Raw L27078+."""
     return b * b - 4 * a * c
 
 
-def resolver_cuadratica(a: float, b: float, c: float) -> Tuple:
+def resolver_cuadratica(a: float, b: float, c: float) -> tuple:
     """
     Raíces de ax² + bx + c = 0.
     Raw L27078+ (deducción textual):
@@ -535,6 +552,7 @@ def resolver_cuadratica(a: float, b: float, c: float) -> Tuple:
     Retorna (raíz1, raíz2).
     """
     from math import sqrt
+
     if a == 0:
         raise ValueError("a no puede ser 0 (no es cuadrática)")
     D = discriminante(a, b, c)
@@ -550,6 +568,7 @@ def resolver_cuadratica(a: float, b: float, c: float) -> Tuple:
 # Raw L23632: "Para extraer una raíz a una potencia se divide el
 #             exponente de la potencia por el índice de la raíz."
 # ─────────────────────────────────────────────────────────────────────
+
 
 def raiz_potencia(a: float, m: float, n: float) -> float:
     """
@@ -581,11 +600,13 @@ def raiz_enesima(a: float, n: float) -> float:
 #                dos miembros."
 # ─────────────────────────────────────────────────────────────────────
 
+
 def resolver_exponencial(b: float, k: float) -> float:
     """
     Resuelve b^x = k. Raw pág. 258: x = log(k) / log(b).
     """
     from math import log
+
     if b <= 0 or b == 1 or k <= 0:
         raise ValueError("b > 0, b ≠ 1, k > 0")
     return log(k) / log(b)
@@ -597,8 +618,8 @@ def resolver_exponencial(b: float, k: float) -> float:
 #                de logaritmos."
 # ─────────────────────────────────────────────────────────────────────
 
-def calcular_por_logaritmos(operaciones: List[Tuple[str, float]],
-                            base: float = 10) -> float:
+
+def calcular_por_logaritmos(operaciones: list[tuple[str, float]], base: float = 10) -> float:
     """
     Calcula expresiones con productos y cocientes por medio de logaritmos.
     Raw pág. 258.

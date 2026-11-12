@@ -6,7 +6,8 @@ Reglas duras:
 - Cálculo: Decimal + ROUND_HALF_EVEN (redondeo bancario).
 - float: prohibido en la frontera. Se rechaza con TypeError.
 """
-from decimal import Decimal, ROUND_HALF_EVEN, InvalidOperation
+
+from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation
 from typing import Union
 
 CENT = Decimal("0.01")

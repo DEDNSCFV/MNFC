@@ -10,8 +10,8 @@ Misma ley, distinta escala. Autosimilitud verificable.
 Sin dependencias de xnor.py ni mnfc.py. Solo stdlib.
 Migrado desde SCFV_DSR/scfv_dsr/contable/reticulo.py.
 """
-from typing import Iterable, Mapping
 
+from collections.abc import Iterable, Mapping
 
 Cuenta = str
 Subconjunto = frozenset
@@ -20,9 +20,9 @@ Subconjunto = frozenset
 class ReticuloCuentas:
     """Reticulo booleano sobre el universo de cuentas C."""
 
-    def __init__(self,
-                 universo: Iterable[Cuenta],
-                 subconjuntos: Mapping[str, Iterable[Cuenta]] | None = None):
+    def __init__(
+        self, universo: Iterable[Cuenta], subconjuntos: Mapping[str, Iterable[Cuenta]] | None = None
+    ):
         self._universo = frozenset(universo)
         self._subconjuntos = {}
         if subconjuntos is not None:
@@ -37,9 +37,7 @@ class ReticuloCuentas:
                 self._subconjuntos[nombre] = s
 
     @classmethod
-    def desde_pcu(cls,
-                  pcu: Mapping[str, Mapping],
-                  clave: str = "marcos") -> "ReticuloCuentas":
+    def desde_pcu(cls, pcu: Mapping[str, Mapping], clave: str = "marcos") -> "ReticuloCuentas":
         """Construye el reticulo desde un PCU: cada valor de 'clave' define un subconjunto."""
         universo = frozenset(pcu.keys())
         acumulador = {}
@@ -94,7 +92,7 @@ class ReticuloCuentas:
         if cubierto != self._universo:
             return False
         for i, c1 in enumerate(conjuntos):
-            for c2 in conjuntos[i + 1:]:
+            for c2 in conjuntos[i + 1 :]:
                 if c1 & c2:
                     return False
         return True

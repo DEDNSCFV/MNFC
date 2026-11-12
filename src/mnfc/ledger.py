@@ -34,8 +34,6 @@ cadena. No decide contabilidad (capa 0). No calcula aritmetica (capa 1).
 
 import hashlib
 import json
-from typing import List
-
 
 GENESIS = "0" * 64
 
@@ -48,7 +46,7 @@ def _hash_bloque(prev_hash: str, contenido: dict) -> str:
     ProGit 2014 L494 ("hash SHA-1 como suma de comprobacion").
     """
     canonical = json.dumps(contenido, sort_keys=True, separators=(",", ":"))
-    payload = f"{prev_hash}|{canonical}".encode("utf-8")
+    payload = f"{prev_hash}|{canonical}".encode()
     return hashlib.sha256(payload).hexdigest()
 
 
@@ -64,8 +62,8 @@ class Ledger:
     """
 
     def __init__(self) -> None:
-        self._hashes: List[str] = []
-        self._contenidos: List[dict] = []
+        self._hashes: list[str] = []
+        self._contenidos: list[dict] = []
 
     def append(self, contenido: dict) -> str:
         """Anade un bloque. Devuelve su hash.
@@ -73,9 +71,7 @@ class Ledger:
         Lanza TypeError si contenido no es dict.
         """
         if not isinstance(contenido, dict):
-            raise TypeError(
-                f"contenido debe ser dict, no {type(contenido).__name__}"
-            )
+            raise TypeError(f"contenido debe ser dict, no {type(contenido).__name__}")
         prev = self._hashes[-1] if self._hashes else GENESIS
         h = _hash_bloque(prev, contenido)
         self._hashes.append(h)

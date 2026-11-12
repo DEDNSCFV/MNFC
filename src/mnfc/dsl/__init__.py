@@ -16,12 +16,12 @@ API pública:
 Sin dependencias externas. Solo stdlib.
 """
 
-from .parser import parse, Programa, DSLSyntaxError
-from .semantic import validar, DSLSemanticError
-from .evaluator import evaluar, ResultadoAccion, DSLEvaluationError
-from .assembler import ensamblar, DSLAssemblyError
-from .registry import Registry, OperacionRegistrada, DSLRegistryError
-from .persistencia import persistir, DSLPersistenceError
+from .assembler import DSLAssemblyError, ensamblar
+from .evaluator import DSLEvaluationError, ResultadoAccion, evaluar
+from .parser import DSLSyntaxError, Programa, parse
+from .persistencia import DSLPersistenceError, persistir
+from .registry import DSLRegistryError, OperacionRegistrada, Registry
+from .semantic import DSLSemanticError, validar
 
 __all__ = [
     "parse",

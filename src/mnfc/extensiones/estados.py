@@ -5,8 +5,8 @@ Migrado desde SCFV_DSR/scfv_dsr/contable/estados.py (SHA256 76e76c68...).
 Sin dependencias de contabilidad especifica. Solo stdlib.
 """
 
-from enum import Enum, auto
 from dataclasses import dataclass
+from enum import Enum, auto
 
 
 @dataclass

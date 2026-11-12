@@ -12,26 +12,30 @@ xnor (capa 0) para clasificar y en baldor (capa 1) para verificar.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
-from .xnor import calcular_ubicacion
+from typing import Any
+
 from .baldor import verificar_cuadre
+from .xnor import calcular_ubicacion
 
 
 @dataclass
 class Asiento:
     """Asiento contable procesado."""
-    lineas: List[Dict[str, Any]] = field(default_factory=list)
+
+    lineas: list[dict[str, Any]] = field(default_factory=list)
     total_debe: float = 0.0
     total_haber: float = 0.0
     cuadrado: bool = False
 
     def __repr__(self) -> str:
         estado = "cuadrado" if self.cuadrado else "DESCUADRADO"
-        return (f"Asiento(n={len(self.lineas)}, debe={self.total_debe}, "
-                f"haber={self.total_haber}, {estado})")
+        return (
+            f"Asiento(n={len(self.lineas)}, debe={self.total_debe}, "
+            f"haber={self.total_haber}, {estado})"
+        )
 
 
-def procesar_asiento(lineas: List[Dict[str, Any]]) -> Asiento:
+def procesar_asiento(lineas: list[dict[str, Any]]) -> Asiento:
     """
     Procesa una lista de lineas contables.
 
@@ -53,11 +57,13 @@ def procesar_asiento(lineas: List[Dict[str, Any]]) -> Asiento:
                 raise ValueError(f"linea {i} sin campo '{campo}'")
         ubicacion = calcular_ubicacion(l["naturaleza"], l["movimiento"])
         monto = float(l["monto"])
-        asiento.lineas.append({
-            "cuenta": l.get("cuenta", f"linea_{i}"),
-            "ubicacion": ubicacion,
-            "monto": monto,
-        })
+        asiento.lineas.append(
+            {
+                "cuenta": l.get("cuenta", f"linea_{i}"),
+                "ubicacion": ubicacion,
+                "monto": monto,
+            }
+        )
         if ubicacion == "DEBE":
             asiento.total_debe += monto
         else:
@@ -65,8 +71,7 @@ def procesar_asiento(lineas: List[Dict[str, Any]]) -> Asiento:
 
     if not verificar_cuadre(asiento.total_debe, asiento.total_haber):
         raise ValueError(
-            f"asiento descuadrado: DEBE={asiento.total_debe} "
-            f"HABER={asiento.total_haber}"
+            f"asiento descuadrado: DEBE={asiento.total_debe} HABER={asiento.total_haber}"
         )
     asiento.cuadrado = True
     return asiento

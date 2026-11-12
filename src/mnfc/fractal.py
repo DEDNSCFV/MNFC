@@ -36,10 +36,9 @@ de series contables (saldos, movimientos, consumos).
 """
 
 from math import log
-from typing import List, Tuple
 
 
-def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
+def cascada(xs: list[float], niveles: list[int]) -> list[tuple[int, float]]:
     """
     Aplica la misma operacion (suma y varianza) a la serie agregada
     en cada nivel de escala.
@@ -58,7 +57,7 @@ def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
     for k in niveles:
         if k <= 1 or k > len(xs):
             continue
-        agregada = [sum(xs[i:i+k]) for i in range(0, len(xs) - k + 1, k)]
+        agregada = [sum(xs[i : i + k]) for i in range(0, len(xs) - k + 1, k)]
         if len(agregada) < 2:
             continue
         m = sum(agregada) / len(agregada)
@@ -68,8 +67,7 @@ def cascada(xs: List[float], niveles: List[int]) -> List[Tuple[int, float]]:
     return resultado
 
 
-def exponente_escalante(xs: List[float],
-                         niveles: List[int] = None) -> float:
+def exponente_escalante(xs: list[float], niveles: list[int] = None) -> float:
     """
     Pendiente de log(varianza) vs log(escala) sobre la cascada.
 
@@ -99,7 +97,7 @@ def exponente_escalante(xs: List[float],
     return (n * sxy - sx * sy) / denom
 
 
-def clasificar_cascada(xs: List[float]) -> str:
+def clasificar_cascada(xs: list[float]) -> str:
     """
     Clasifica una serie contable segun su exponente escalante.
 
@@ -122,7 +120,7 @@ def clasificar_cascada(xs: List[float]) -> str:
     return "escalante"
 
 
-def reporte_cascada(xs: List[float]) -> dict:
+def reporte_cascada(xs: list[float]) -> dict:
     """
     Reporte del comportamiento cascante de una serie contable.
     Devuelve exponente, clasificacion, y niveles usados.

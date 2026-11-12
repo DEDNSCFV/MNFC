@@ -52,12 +52,10 @@ ValueError (F6-R3):
     distinguir por tipo de excepción.
 """
 
-from typing import Dict, List, Optional, Tuple
-
-from .evaluator import DSLEvaluationError
 from ..extensiones.modelos import Asiento, ContextoContable
 from ..extensiones.persistencia.base import StoreBase
 from ..extensiones.serializador import serializar
+from .evaluator import DSLEvaluationError
 
 
 class DSLPersistenceError(DSLEvaluationError):
@@ -70,12 +68,12 @@ class DSLPersistenceError(DSLEvaluationError):
 
 
 def persistir(
-    asientos: List[Asiento],
+    asientos: list[Asiento],
     store: StoreBase,
     correlation_id: str,
     periodo_id: str,
     fecha: str,
-) -> List[str]:
+) -> list[str]:
     """Persiste cada Asiento como evento ASIENTO_REGISTRADO.
 
     Ver contrato completo en el docstring del módulo.
@@ -105,26 +103,22 @@ def persistir(
         raise DSLPersistenceError("fecha vacía")
 
     # Pre-serializar todo antes de tocar el store (F6-R2, F6-R4)
-    preparados: List[Tuple[int, Dict]] = []
+    preparados: list[tuple[int, dict]] = []
     for i, asiento in enumerate(asientos, start=1):
         ctx = f"ASIENTO #{i}"
         if not asiento.cuadrado:
             raise DSLPersistenceError(
-                f"asiento no cuadrado (DEBE={asiento.total_debe}, "
-                f"HABER={asiento.total_haber})", ctx
+                f"asiento no cuadrado (DEBE={asiento.total_debe}, HABER={asiento.total_haber})", ctx
             )
-        payload = _construir_payload(asiento, correlation_id,
-                                     periodo_id, fecha, i)
+        payload = _construir_payload(asiento, correlation_id, periodo_id, fecha, i)
         try:
             serializar(payload)
         except Exception as e:
-            raise DSLPersistenceError(
-                f"payload no serializable: {e}", ctx
-            ) from e
+            raise DSLPersistenceError(f"payload no serializable: {e}", ctx) from e
         preparados.append((i, payload))
 
     # Guardar (ventana mid-batch reducida a errores del store)
-    hashes: List[str] = []
+    hashes: list[str] = []
     for i, payload in preparados:
         ctx = f"ASIENTO #{i}"
         idem_key = f"{correlation_id}-{i}"
@@ -142,8 +136,7 @@ def persistir(
             ) from e
         except Exception as e:
             raise DSLPersistenceError(
-                f"store.guardar falló tras {len(hashes)} asiento(s) "
-                f"guardado(s): {e}", ctx
+                f"store.guardar falló tras {len(hashes)} asiento(s) guardado(s): {e}", ctx
             ) from e
         hashes.append(store.obtener_hash_final())
 
@@ -156,7 +149,7 @@ def _construir_payload(
     periodo_id: str,
     fecha: str,
     indice: int,
-) -> Dict:
+) -> dict:
     """Construye el payload serializable del asiento."""
     return {
         "id": f"{correlation_id}-{indice}",
@@ -177,7 +170,7 @@ def _construir_payload(
     }
 
 
-def _contexto_a_dict(ctx: Optional[ContextoContable]) -> Optional[Dict]:
+def _contexto_a_dict(ctx: ContextoContable | None) -> dict | None:
     """Serializa ContextoContable o None."""
     if ctx is None:
         return None

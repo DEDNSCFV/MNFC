@@ -16,23 +16,21 @@ Ejemplo: "FRACTAL ventas > REGLA r1 > GENERAR CONSECUENCIA #2 > fuente="
 Sin dependencias externas. Solo stdlib.
 """
 
-from typing import List, Set
-
 from .parser import (
-    Programa,
     Accion,
-    CmpEscalar,
-    HechoRef,
-    NegBool,
-    Conjuncion,
-    Disyuncion,
     CategoriaRef,
+    CmpEscalar,
+    Complemento,
+    Conjuncion,
+    Diff,
+    Disyuncion,
+    HechoRef,
+    Inter,
+    NegBool,
+    Programa,
+    Relacion,
     SetLiteral,
     Union,
-    Inter,
-    Diff,
-    Complemento,
-    Relacion,
 )
 
 
@@ -58,6 +56,7 @@ def validar(programa: Programa) -> None:
 # A · Unicidad de declaraciones
 # ═════════════════════════════════════════════════════════════════════
 
+
 def _validar_declaraciones(programa: Programa) -> None:
     _unicos([e.nombre for e in programa.elementos], "ELEMENTO")
     _unicos([c.nombre for c in programa.categorias], "CATEGORIA")
@@ -72,19 +71,18 @@ def _validar_declaraciones(programa: Programa) -> None:
         )
 
 
-def _unicos(nombres: List[str], tipo: str, contexto: str = "") -> None:
-    vistos: Set[str] = set()
+def _unicos(nombres: list[str], tipo: str, contexto: str = "") -> None:
+    vistos: set[str] = set()
     for nombre in nombres:
         if nombre in vistos:
-            raise DSLSemanticError(
-                f"{tipo} '{nombre}' declarado dos veces", contexto
-            )
+            raise DSLSemanticError(f"{tipo} '{nombre}' declarado dos veces", contexto)
         vistos.add(nombre)
 
 
 # ═════════════════════════════════════════════════════════════════════
 # B · Referencias resueltas
 # ═════════════════════════════════════════════════════════════════════
+
 
 def _validar_referencias(programa: Programa) -> None:
     elementos = {e.nombre for e in programa.elementos}
@@ -96,8 +94,7 @@ def _validar_referencias(programa: Programa) -> None:
     for cat in programa.categorias:
         if cat.elemento not in elementos:
             raise DSLSemanticError(
-                f"CATEGORIA '{cat.nombre}' referencia elemento "
-                f"'{cat.elemento}' no declarado",
+                f"CATEGORIA '{cat.nombre}' referencia elemento '{cat.elemento}' no declarado",
                 f"CATEGORIA {cat.nombre}",
             )
 
@@ -107,19 +104,25 @@ def _validar_referencias(programa: Programa) -> None:
         for regla in fractal.reglas:
             ctx_regla = f"{ctx_fractal} > REGLA {regla.nombre}"
             _walk_cond(
-                regla.condicion, categorias, hechos,
+                regla.condicion,
+                categorias,
+                hechos,
                 f"{ctx_regla} > condición",
             )
             for i, accion in enumerate(regla.acciones, start=1):
                 _validar_accion(
-                    accion, categorias, marcos,
+                    accion,
+                    categorias,
+                    marcos,
                     f"{ctx_regla} > GENERAR CONSECUENCIA #{i}",
                 )
 
 
 def _validar_accion(
-    accion: Accion, categorias: Set[str],
-    marcos: Set[str], contexto: str,
+    accion: Accion,
+    categorias: set[str],
+    marcos: set[str],
+    contexto: str,
 ) -> None:
     if accion.categoria is not None:
         _walk_set(accion.categoria, categorias, f"{contexto} > categoria=")
@@ -135,8 +138,12 @@ def _validar_accion(
 # C · Walk de condiciones
 # ═════════════════════════════════════════════════════════════════════
 
+
 def _walk_cond(
-    nodo, categorias: Set[str], hechos: Set[str], contexto: str,
+    nodo,
+    categorias: set[str],
+    hechos: set[str],
+    contexto: str,
 ) -> None:
     if nodo is None:
         return
@@ -163,7 +170,8 @@ def _walk_cond(
 # D · Walk de conjuntos
 # ═════════════════════════════════════════════════════════════════════
 
-def _walk_set(nodo, categorias: Set[str], contexto: str) -> None:
+
+def _walk_set(nodo, categorias: set[str], contexto: str) -> None:
     if nodo is None:
         return
     if isinstance(nodo, CategoriaRef):

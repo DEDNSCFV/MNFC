@@ -39,16 +39,15 @@ Sin persistencia. Sin fiscal. Sin marcos reales.
 """
 
 import math
-from typing import Dict, List, Optional, Tuple
 
-from .evaluator import ResultadoAccion, DSLEvaluationError
+from ..baldor import verificar_cuadre
 from ..extensiones.modelos import (
     Asiento,
+    ContextoContable,
     LineaAsiento,
     PartidaAutorizada,
-    ContextoContable,
 )
-from ..baldor import verificar_cuadre
+from .evaluator import DSLEvaluationError, ResultadoAccion
 
 
 class DSLAssemblyError(DSLEvaluationError):
@@ -62,9 +61,9 @@ class DSLAssemblyError(DSLEvaluationError):
 
 
 def ensamblar(
-    resultados: List[ResultadoAccion],
-    contexto: Optional[ContextoContable] = None,
-) -> List[Asiento]:
+    resultados: list[ResultadoAccion],
+    contexto: ContextoContable | None = None,
+) -> list[Asiento]:
     """Agrupa ResultadoAccion por (fractal, regla) → Asiento por grupo.
 
     Args:
@@ -83,8 +82,8 @@ def ensamblar(
     if not resultados:
         return []
 
-    grupos: Dict[Tuple[str, str], List[ResultadoAccion]] = {}
-    orden: List[Tuple[str, str]] = []
+    grupos: dict[tuple[str, str], list[ResultadoAccion]] = {}
+    orden: list[tuple[str, str]] = []
     for r in resultados:
         clave = (r.fractal, r.regla)
         if clave not in grupos:
@@ -92,15 +91,13 @@ def ensamblar(
             orden.append(clave)
         grupos[clave].append(r)
 
-    asientos: List[Asiento] = []
+    asientos: list[Asiento] = []
     for fractal, regla in orden:
         ctx = f"FRACTAL {fractal} > REGLA {regla}"
-        partidas: List[PartidaAutorizada] = []
+        partidas: list[PartidaAutorizada] = []
         for r in grupos[(fractal, regla)]:
             if not r.partidas:
-                raise DSLAssemblyError(
-                    f"acción #{r.indice} sin partidas", ctx
-                )
+                raise DSLAssemblyError(f"acción #{r.indice} sin partidas", ctx)
             partidas.extend(r.partidas)
         asiento = _construir_asiento(partidas, contexto, ctx)
         _verificar_cuadre(asiento, ctx)
@@ -119,31 +116,22 @@ def _validar_monto(monto, cuenta: str, ctx: str) -> float:
       - negativo (rompe semántica de partida doble).
     """
     if isinstance(monto, bool):
-        raise DSLAssemblyError(
-            f"monto booleano en cuenta {cuenta}: {monto!r}", ctx
-        )
+        raise DSLAssemblyError(f"monto booleano en cuenta {cuenta}: {monto!r}", ctx)
     if not isinstance(monto, (int, float)):
-        raise DSLAssemblyError(
-            f"monto no numérico en cuenta {cuenta}: "
-            f"{type(monto).__name__}", ctx
-        )
+        raise DSLAssemblyError(f"monto no numérico en cuenta {cuenta}: {type(monto).__name__}", ctx)
     if not math.isfinite(monto):
-        raise DSLAssemblyError(
-            f"monto no finito en cuenta {cuenta}: {monto!r}", ctx
-        )
+        raise DSLAssemblyError(f"monto no finito en cuenta {cuenta}: {monto!r}", ctx)
     if monto < 0:
-        raise DSLAssemblyError(
-            f"monto negativo en cuenta {cuenta}: {monto}", ctx
-        )
+        raise DSLAssemblyError(f"monto negativo en cuenta {cuenta}: {monto}", ctx)
     return float(monto)
 
 
 def _construir_asiento(
-    partidas: List[PartidaAutorizada],
-    contexto: Optional[ContextoContable],
+    partidas: list[PartidaAutorizada],
+    contexto: ContextoContable | None,
     ctx: str,
 ) -> Asiento:
-    lineas: List[LineaAsiento] = []
+    lineas: list[LineaAsiento] = []
     total_debe = 0.0
     total_haber = 0.0
 
@@ -151,16 +139,18 @@ def _construir_asiento(
         monto = _validar_monto(pa.monto, pa.cuenta_codigo, ctx)
         if pa.ubicacion not in ("DEBE", "HABER"):
             raise DSLAssemblyError(
-                f"ubicación inválida: {pa.ubicacion!r} "
-                f"(cuenta {pa.cuenta_codigo})", ctx,
+                f"ubicación inválida: {pa.ubicacion!r} (cuenta {pa.cuenta_codigo})",
+                ctx,
             )
-        lineas.append(LineaAsiento(
-            cuenta=pa.cuenta_codigo,
-            ubicacion=pa.ubicacion,
-            monto=monto,
-            naturaleza=None,
-            movimiento=pa.movimiento,
-        ))
+        lineas.append(
+            LineaAsiento(
+                cuenta=pa.cuenta_codigo,
+                ubicacion=pa.ubicacion,
+                monto=monto,
+                naturaleza=None,
+                movimiento=pa.movimiento,
+            )
+        )
         if pa.ubicacion == "DEBE":
             total_debe += monto
         else:
@@ -193,8 +183,7 @@ def _describir_diferencia(total_debe: float, total_haber: float) -> str:
 def _verificar_cuadre(asiento: Asiento, ctx: str) -> None:
     # Pre-check: suma de floats finitos puede desbordar a inf.
     # Se ejecuta ANTES de delegar en baldor y ANTES de fijar cuadrado.
-    if not math.isfinite(asiento.total_debe) or \
-       not math.isfinite(asiento.total_haber):
+    if not math.isfinite(asiento.total_debe) or not math.isfinite(asiento.total_haber):
         raise DSLAssemblyError(
             f"total no finito (posible overflow): "
             f"DEBE={asiento.total_debe!r} "
@@ -204,9 +193,7 @@ def _verificar_cuadre(asiento: Asiento, ctx: str) -> None:
     try:
         ok = verificar_cuadre(asiento.total_debe, asiento.total_haber)
     except ValueError as e:
-        raise DSLAssemblyError(
-            f"cuadre no evaluable: {e}", ctx
-        ) from e
+        raise DSLAssemblyError(f"cuadre no evaluable: {e}", ctx) from e
     if not ok:
         raise DSLAssemblyError(
             f"asiento descuadrado: DEBE={asiento.total_debe} "

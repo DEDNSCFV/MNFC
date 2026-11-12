@@ -10,12 +10,12 @@ Sin dependencias externas. Solo stdlib.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 
 @dataclass
 class ContextoContable:
     """Contexto bajo el cual se interpreta un asiento."""
+
     marco_contable: str
     PCU_version: str
     reglas_version: str
@@ -25,38 +25,43 @@ class ContextoContable:
 @dataclass
 class PartidaAutorizada:
     """Linea de un asiento con todos sus metadatos."""
+
     cuenta_codigo: str
     cuenta_version: str
     monto: float
     ubicacion: str
     movimiento: str
-    moneda: Optional[str] = "VES"
+    moneda: str | None = "VES"
     es_fiscal: bool = False
-    norma_id: Optional[str] = None
+    norma_id: str | None = None
 
 
 @dataclass
 class LineaAsiento:
     """Linea de un asiento procesado por MNFC (version tipada)."""
+
     cuenta: str
     ubicacion: str
     monto: float
-    naturaleza: Optional[str] = None
-    movimiento: Optional[str] = None
+    naturaleza: str | None = None
+    movimiento: str | None = None
 
 
 @dataclass
 class Asiento:
     """Asiento procesado por MNFC (version tipada)."""
-    lineas: List[LineaAsiento] = field(default_factory=list)
+
+    lineas: list[LineaAsiento] = field(default_factory=list)
     total_debe: float = 0.0
     total_haber: float = 0.0
     cuadrado: bool = False
-    contexto: Optional[ContextoContable] = None
+    contexto: ContextoContable | None = None
 
     def __repr__(self) -> str:
         estado = "cuadrado" if self.cuadrado else "DESCUADRADO"
-        return (
-            "Asiento(n=%d, debe=%s, haber=%s, %s)"
-            % (len(self.lineas), self.total_debe, self.total_haber, estado)
+        return "Asiento(n=%d, debe=%s, haber=%s, %s)" % (
+            len(self.lineas),
+            self.total_debe,
+            self.total_haber,
+            estado,
         )

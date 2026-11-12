@@ -8,11 +8,11 @@ No contiene logica contable, fiscal ni normativa.
 Migrado de SCFV_DSR/scfv_dsr/contable/maquina_estados_asiento.py.
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
-import uuid
-import time
 import hashlib
+import time
+import uuid
+from dataclasses import dataclass, field
+from typing import Any
 
 from .estados import EstadoAsiento
 
@@ -20,6 +20,7 @@ from .estados import EstadoAsiento
 @dataclass
 class Transicion:
     """Registro inmutable de una transicion de estado."""
+
     id: str
     desde: EstadoAsiento
     hasta: EstadoAsiento
@@ -27,14 +28,22 @@ class Transicion:
     timestamp: int
     justificacion: str
     correlation_id: str
-    version_contexto: Dict[str, Any]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    version_contexto: dict[str, Any]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def hash(self) -> str:
         contenido = (
-            self.id + "|" + self.desde.name + "|" + self.hasta.name
-            + "|" + self.autor + "|" + str(self.timestamp)
-            + "|" + self.correlation_id
+            self.id
+            + "|"
+            + self.desde.name
+            + "|"
+            + self.hasta.name
+            + "|"
+            + self.autor
+            + "|"
+            + str(self.timestamp)
+            + "|"
+            + self.correlation_id
         )
         return hashlib.sha256(contenido.encode("utf-8")).hexdigest()
 
@@ -49,8 +58,7 @@ class MaquinaEstadosAsiento:
         EstadoAsiento.EVALUADO: {
             EstadoAsiento.ADMITIDO: lambda self, **k: k.get("justificacion") is not None,
             EstadoAsiento.MODIFICADO: lambda self, **k: (
-                k.get("justificacion") is not None
-                and k.get("propuesta_modificada") is not None
+                k.get("justificacion") is not None and k.get("propuesta_modificada") is not None
             ),
             EstadoAsiento.RECHAZADO: lambda self, **k: k.get("justificacion") is not None,
         },
@@ -69,27 +77,26 @@ class MaquinaEstadosAsiento:
 
     def __init__(self, estado_inicial: EstadoAsiento = EstadoAsiento.PROPUESTO):
         self.estado_actual = estado_inicial
-        self.historial: List[Transicion] = []
-        self.propuesta_original_id: Optional[str] = None
-        self.propuesta_modificada_id: Optional[str] = None
+        self.historial: list[Transicion] = []
+        self.propuesta_original_id: str | None = None
+        self.propuesta_modificada_id: str | None = None
 
     def transicionar(
         self,
         nuevo_estado: EstadoAsiento,
         autor: str,
         correlation_id: str,
-        version_contexto: Dict[str, Any],
-        justificacion: Optional[str] = None,
-        propuesta_modificada: Optional[Dict] = None,
-        metadata: Optional[Dict] = None
+        version_contexto: dict[str, Any],
+        justificacion: str | None = None,
+        propuesta_modificada: dict | None = None,
+        metadata: dict | None = None,
     ) -> Transicion:
         if metadata is None:
             metadata = {}
 
         if self.estado_actual not in self._TRANSICIONES:
             raise ValueError(
-                "Estado terminal %s no permite transiciones salientes"
-                % self.estado_actual
+                "Estado terminal %s no permite transiciones salientes" % self.estado_actual
             )
 
         if nuevo_estado not in self._TRANSICIONES[self.estado_actual]:
@@ -142,10 +149,7 @@ class MaquinaEstadosAsiento:
         self.historial.append(transicion)
         self.estado_actual = nuevo_estado
 
-        if (
-            nuevo_estado == EstadoAsiento.ADMITIDO
-            and self.propuesta_original_id is None
-        ):
+        if nuevo_estado == EstadoAsiento.ADMITIDO and self.propuesta_original_id is None:
             self.propuesta_original_id = correlation_id
 
         return transicion
@@ -157,7 +161,7 @@ class MaquinaEstadosAsiento:
             EstadoAsiento.ANULADO,
         }
 
-    def obtener_historial(self) -> List[Dict]:
+    def obtener_historial(self) -> list[dict]:
         return [
             {
                 "id": t.id,

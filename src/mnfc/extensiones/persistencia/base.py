@@ -11,7 +11,6 @@ Sin dependencias externas. Solo stdlib.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List, Tuple
 
 
 class StoreBase(ABC):
@@ -23,10 +22,10 @@ class StoreBase(ABC):
     def guardar(
         self,
         tipo_evento: str,
-        payload: Dict,
+        payload: dict,
         correlation_id: str,
         idempotency_key: str,
-        version_contexto: Optional[Dict] = None,
+        version_contexto: dict | None = None,
     ) -> None:
         """
         Persiste un evento.
@@ -45,7 +44,7 @@ class StoreBase(ABC):
         pass
 
     @abstractmethod
-    def verificar_cadena(self) -> Tuple[bool, str]:
+    def verificar_cadena(self) -> tuple[bool, str]:
         """
         Verifica la integridad de toda la cadena hash.
 
@@ -56,7 +55,7 @@ class StoreBase(ABC):
         pass
 
     @abstractmethod
-    def obtener_por_id(self, evento_id: int) -> Optional[Dict]:
+    def obtener_por_id(self, evento_id: int) -> dict | None:
         """Devuelve el evento con ese id, o None si no existe."""
         pass
 
@@ -64,8 +63,8 @@ class StoreBase(ABC):
     def obtener_por_tipo(
         self,
         tipo_evento: str,
-        limite: Optional[int] = None,
-    ) -> List[Dict]:
+        limite: int | None = None,
+    ) -> list[dict]:
         """Devuelve eventos de un tipo, ordenados por timestamp descendente."""
         pass
 
@@ -73,7 +72,7 @@ class StoreBase(ABC):
     def obtener_por_correlation(
         self,
         correlation_id: str,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Devuelve el primer evento con ese correlation_id, o None."""
         pass
 

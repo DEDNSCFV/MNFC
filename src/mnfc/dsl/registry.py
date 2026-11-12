@@ -46,9 +46,9 @@ El dict de Python preserva orden de inserción desde 3.7. listar()
 y to_dict() devuelven los elementos en orden de registro.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Literal, Optional
-
+from typing import Literal
 
 TIPOS_VALIDOS = frozenset({"ley", "norma", "compuesta"})
 
@@ -75,11 +75,12 @@ class OperacionRegistrada:
     interno, ni que sea thread-safe. La garantía es de campos del
     dataclass, no del callable referenciado.
     """
+
     nombre: str
     fn: Callable[[dict], float]
     tipo: Literal["ley", "norma", "compuesta"] = "ley"
-    fuente: Optional[str] = None
-    descripcion: Optional[str] = None
+    fuente: str | None = None
+    descripcion: str | None = None
 
 
 class Registry:
@@ -94,7 +95,7 @@ class Registry:
     """
 
     def __init__(self) -> None:
-        self._ops: Dict[str, OperacionRegistrada] = {}
+        self._ops: dict[str, OperacionRegistrada] = {}
 
     def registrar(self, op: OperacionRegistrada) -> None:
         """Registra una operación. Orden de validación documentado
@@ -103,26 +104,19 @@ class Registry:
         """
         # 1. Tipo del argumento
         if not isinstance(op, OperacionRegistrada):
-            raise DSLRegistryError(
-                f"se esperaba OperacionRegistrada, no {type(op).__name__}"
-            )
+            raise DSLRegistryError(f"se esperaba OperacionRegistrada, no {type(op).__name__}")
 
         # 2. Nombre: str, no vacío, no solo espacios
         if not isinstance(op.nombre, str):
-            raise DSLRegistryError(
-                f"nombre debe ser str, no {type(op.nombre).__name__}"
-            )
+            raise DSLRegistryError(f"nombre debe ser str, no {type(op.nombre).__name__}")
         if not op.nombre.strip():
             raise DSLRegistryError(
-                f"nombre no puede estar vacío ni ser solo espacios: "
-                f"{op.nombre!r}"
+                f"nombre no puede estar vacío ni ser solo espacios: {op.nombre!r}"
             )
 
         # 3. Tipo: str y en TIPOS_VALIDOS
         if not isinstance(op.tipo, str):
-            raise DSLRegistryError(
-                f"tipo debe ser str, no {type(op.tipo).__name__}"
-            )
+            raise DSLRegistryError(f"tipo debe ser str, no {type(op.tipo).__name__}")
         if op.tipo not in TIPOS_VALIDOS:
             raise DSLRegistryError(
                 f"tipo inválido '{op.tipo}' para operación "
@@ -131,27 +125,19 @@ class Registry:
 
         # 4. fn invocable
         if not callable(op.fn):
-            raise DSLRegistryError(
-                f"fn no es callable en operación '{op.nombre}'"
-            )
+            raise DSLRegistryError(f"fn no es callable en operación '{op.nombre}'")
 
         # 5. fuente y descripcion: str o None
         if op.fuente is not None and not isinstance(op.fuente, str):
-            raise DSLRegistryError(
-                f"fuente debe ser str o None, no "
-                f"{type(op.fuente).__name__}"
-            )
+            raise DSLRegistryError(f"fuente debe ser str o None, no {type(op.fuente).__name__}")
         if op.descripcion is not None and not isinstance(op.descripcion, str):
             raise DSLRegistryError(
-                f"descripcion debe ser str o None, no "
-                f"{type(op.descripcion).__name__}"
+                f"descripcion debe ser str o None, no {type(op.descripcion).__name__}"
             )
 
         # 6. No duplicado
         if op.nombre in self._ops:
-            raise DSLRegistryError(
-                f"operación '{op.nombre}' ya registrada"
-            )
+            raise DSLRegistryError(f"operación '{op.nombre}' ya registrada")
 
         # 7. Única escritura (después de todas las validaciones)
         self._ops[op.nombre] = op
@@ -160,9 +146,7 @@ class Registry:
         """Devuelve la operación. Contrato: 'nombre' debe ser str.
         Con no-str lanza DSLRegistryError('no está en el registry')."""
         if nombre not in self._ops:
-            raise DSLRegistryError(
-                f"operación '{nombre}' no está en el registry"
-            )
+            raise DSLRegistryError(f"operación '{nombre}' no está en el registry")
         return self._ops[nombre]
 
     def contiene(self, nombre: str) -> bool:
@@ -173,11 +157,11 @@ class Registry:
     def __contains__(self, nombre: str) -> bool:
         return self.contiene(nombre)
 
-    def listar(self) -> List[OperacionRegistrada]:
+    def listar(self) -> list[OperacionRegistrada]:
         """Devuelve operaciones en orden de registro."""
         return list(self._ops.values())
 
-    def to_dict(self) -> Dict[str, Callable]:
+    def to_dict(self) -> dict[str, Callable]:
         """Compat con evaluator de Fase 3b: {nombre: fn} sin metadatos.
 
         Devuelve un dict nuevo en cada llamada. Mutarlo no afecta

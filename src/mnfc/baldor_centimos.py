@@ -1,5 +1,6 @@
 """Puente de dinero. Rechaza float. Delega en money.py."""
-from .money import to_centimos, to_decimal, to_str, iva
+
+from .money import iva, to_centimos, to_decimal
 
 
 def a_centimos(monto) -> int:
