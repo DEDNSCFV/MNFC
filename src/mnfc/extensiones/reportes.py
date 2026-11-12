@@ -31,15 +31,21 @@ def _timestamp_rango(periodo_id):
 
 
 def _leer_asientos(store, periodo_id):
-    """Devuelve payloads dict de ASIENTO_REGISTRADO del periodo."""
-    inicio, fin = _timestamp_rango(periodo_id)
+    """Devuelve payloads dict de ASIENTO_REGISTRADO del periodo.
+
+    Filtra por la FECHA CONTABLE del asiento (payload["fecha"]),
+    no por el timestamp del evento (que refleja cuándo se persistió).
+    """
+    prefijo = str(periodo_id)
     todos = store.obtener_por_tipo("ASIENTO_REGISTRADO")
     filtrados = [
         e["payload"] for e in todos
-        if inicio <= e["timestamp"] <= fin and isinstance(e["payload"], dict)
+        if isinstance(e["payload"], dict)
+        and str(e["payload"].get("fecha", "")).startswith(prefijo)
     ]
-    filtrados.sort(key=lambda a: a.get("timestamp", 0))
+    filtrados.sort(key=lambda a: a.get("fecha", ""))
     return filtrados
+
 
 
 def _saldos_mayor(asientos):

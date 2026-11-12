@@ -180,3 +180,18 @@ Los 4 fallos siguientes son **preexistentes** (no regresión del cierre decimal)
 
 Son `AssertionError` en `src/mnfc/extensiones/reportes.py` (formato de salida CSV).
 Diagnóstico pendiente. No bloquean fase 1.
+
+### Fix: reportes CSV (deuda heredada)
+
+Causa: `_leer_asientos` filtraba por `e["timestamp"]` (fecha de persistencia
+del evento, "hoy") en lugar de `payload["fecha"]` (fecha contable del asiento).
+Resultado: los 3 reportes CSV (diario, mayor, balance) generaban solo headers.
+
+Fix: filtro por `payload["fecha"].startswith(periodo_id)` y orden por
+`payload["fecha"]`. `_timestamp_rango` queda huérfano (no se borra).
+
+Resuelve:
+- tests/test_extensiones.py::test_reportes_csv_diario
+- tests/test_extensiones.py::test_reportes_csv_mayor
+- tests/test_extensiones.py::test_reportes_csv_balance
+- tests/test_extensiones.py::test_integracion_kernel_y_extensiones
