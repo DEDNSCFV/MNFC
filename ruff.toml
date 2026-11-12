@@ -1,0 +1,13 @@
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+  "E501",   # line-length lo maneja el formatter
+  "B008",   # default mutable en fixtures (pytest)
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["B011", "F401"]
+"legacy/*" = ["ALL"]
