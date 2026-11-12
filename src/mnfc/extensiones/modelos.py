@@ -10,7 +10,7 @@ Sin dependencias externas. Solo stdlib.
 """
 
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 @dataclass
@@ -23,25 +23,103 @@ class ContextoContable:
     politica_monetaria_version: str
 
 
-@dataclass
+@dataclass(init=False)
 class PartidaAutorizada:
-    """Linea de un asiento con todos sus metadatos."""
+    """Linea de un asiento con todos sus metadatos.
+
+    Fuente de verdad: monto_cent (int, centavos). Field serializable.
+    monto es @property derivada (compat hasta 2.6).
+
+    __init__ acepta monto= (pesos: int/float/Decimal/str) o monto_cent= (int).
+    Preserva raw para valores inválidos (bool, string, negativo, inf, nan,
+    no numérico) para que _validar_monto los rechace con el mensaje correcto.
+    """
 
     cuenta_codigo: str
     cuenta_version: str
-    monto: float
+    monto_cent: int
     ubicacion: str
     movimiento: str
     moneda: str | None = "VES"
     es_fiscal: bool = False
     norma_id: str | None = None
 
-    @property
-    def monto_cent(self) -> int:
-        """Derivado. Fuente de verdad sigue siendo monto (float) hasta 2.4."""
-        from ..money import to_centimos
-        return to_centimos(Decimal(str(self.monto)))
+    def __init__(
+        self,
+        cuenta_codigo: str,
+        cuenta_version: str,
+        monto=None,
+        ubicacion: str = "DEBE",
+        movimiento: str = "AUMENTA",
+        moneda: str | None = "VES",
+        es_fiscal: bool = False,
+        norma_id: str | None = None,
+        monto_cent=None,
+    ):
+        self.cuenta_codigo = cuenta_codigo
+        self.cuenta_version = cuenta_version
+        self.ubicacion = ubicacion
+        self.movimiento = movimiento
+        self.moneda = moneda
+        self.es_fiscal = es_fiscal
+        self.norma_id = norma_id
+        self.monto_cent = 0
 
+        if monto is not None and monto_cent is not None:
+            raise TypeError(
+                "PartidaAutorizada: especificar solo uno de monto o monto_cent"
+            )
+        if monto is None and monto_cent is None:
+            raise TypeError(
+                "PartidaAutorizada: se requiere monto o monto_cent"
+            )
+
+        if monto_cent is not None:
+            if isinstance(monto_cent, bool) or not isinstance(monto_cent, int):
+                raise TypeError(
+                    f"monto_cent debe ser int, no {type(monto_cent).__name__}"
+                )
+            self.monto_cent = monto_cent
+            return
+
+        # monto: preservar raw para inválidos; convertir a centavos para válidos
+        if isinstance(monto, bool):
+            self._monto_raw = monto
+            return
+        if isinstance(monto, str):
+            # Fase 2: string no es monto válido (ADR-005 decisión 2)
+            self._monto_raw = monto
+            return
+        if not isinstance(monto, (int, float, Decimal)):
+            self._monto_raw = monto
+            return
+        try:
+            dec = Decimal(str(monto))
+        except Exception:
+            self._monto_raw = monto
+            return
+        if not dec.is_finite():
+            self._monto_raw = monto
+            return
+        # Preservar raw si es negativo (incluye -0.001 que redondearía a 0)
+        if dec < 0:
+            self._monto_raw = monto
+            return
+
+        from ..money import to_centimos
+        try:
+            self.monto_cent = to_centimos(dec)
+        except (InvalidOperation, OverflowError):
+            self._monto_raw = monto
+            return
+
+    @property
+    def monto(self):
+        """Compatibilidad. Devuelve raw si inválido; float derivado si no."""
+        raw = getattr(self, "_monto_raw", None)
+        if raw is not None:
+            return raw
+        return self.monto_cent / 100.0
 
 @dataclass(init=False)
 class LineaAsiento:
