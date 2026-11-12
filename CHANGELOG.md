@@ -259,3 +259,46 @@ Antes de reintentar 2.4b, escribir ADR-006 con decisión:
 - ¿Cómo se verifica que el payload incluye todos los montos?
 
 Estado: 2.4a verde, 2.4b revertida. 3/7 sub-fases cerradas.
+
+## [v0.5.0] — Fase 2 decimal CERRADA (2026-11-12)
+
+Kernel de MNFC opera 100% en centavos (int). Fase 2 completa.
+
+### Sub-fases cerradas (7/7)
+- 2.1: @property monto_cent derivadas en ambas capas
+- 2.2: mnfc.Asiento usa centavos como fuente (total_debe_cent int)
+- 2.3: PartidaAutorizada.monto_cent como field serializable
+- 2.4a: Asiento (modelos) con total_*_cent como field
+- 2.4b: LineaAsiento con monto_cent como field serializable
+- 2.5: assembler._validar_monto retorna int centavos
+- 2.6: Migración de datos + tag (esta versión)
+
+### Cambios en API
+- @property monto/total_debe/total_haber: deprecated, eliminar en v0.6.0
+- Código nuevo debe usar .monto_cent / .total_*_cent
+- Persistencia serializa monto_cent (int) en payload
+- Constructor sigue aceptando monto= (pesos) para compat
+
+### Migración de datos
+- Script: migrar_monto_a_cent.py (idempotente, dry-run por defecto)
+- Uso: python migrar_monto_a_cent.py <db> --aplicar
+- Backup automático antes de aplicar
+
+### ADRs
+- ADR-003: migración completa del kernel a centavos
+- ADR-004: cadena capa 4 → capa 7 (no duplicación)
+- ADR-005: decisiones de contrato (tolerancia, strings, overflow)
+- ADR-006: persistencia de centavos en dataclasses
+- ADR-007: deprecación de @property monto para v0.6.0
+
+### Deuda explícita (fase 3, v0.6.0)
+- Eliminar @property monto/total_debe/total_haber
+- Reescribir ~25 tests para usar .monto_cent
+- Warnings de deprecación opcionales
+
+### Tests
+- Suite: 625 passed, 0 failed, 1 xfailed
+- Reescritos: test_redondeo_bancario_cuadra, test_diferencia_de_un_centimo_descuadra,
+  test_diferencia_centimo_y_medio_descuadra, test_monto_decimal_ahora_es_valido_en_fase2,
+  test_monto_fuera_de_rango_rechazado, test_tipo_no_serializable_en_partida_...,
+  test_segundo_asiento_no_serializable_...
