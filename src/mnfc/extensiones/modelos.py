@@ -10,6 +10,7 @@ Sin dependencias externas. Solo stdlib.
 """
 
 from dataclasses import dataclass, field
+from decimal import Decimal
 
 
 @dataclass
@@ -35,6 +36,12 @@ class PartidaAutorizada:
     es_fiscal: bool = False
     norma_id: str | None = None
 
+    @property
+    def monto_cent(self) -> int:
+        """Derivado. Fuente de verdad sigue siendo monto (float) hasta 2.4."""
+        from ..money import to_centimos
+        return to_centimos(Decimal(str(self.monto)))
+
 
 @dataclass
 class LineaAsiento:
@@ -46,6 +53,11 @@ class LineaAsiento:
     naturaleza: str | None = None
     movimiento: str | None = None
 
+    @property
+    def monto_cent(self) -> int:
+        from ..money import to_centimos
+        return to_centimos(Decimal(str(self.monto)))
+
 
 @dataclass
 class Asiento:
@@ -56,6 +68,20 @@ class Asiento:
     total_haber: float = 0.0
     cuadrado: bool = False
     contexto: ContextoContable | None = None
+
+    @property
+    def total_debe_cent(self) -> int:
+        from ..money import to_centimos
+        return to_centimos(Decimal(str(self.total_debe)))
+
+    @property
+    def total_haber_cent(self) -> int:
+        from ..money import to_centimos
+        return to_centimos(Decimal(str(self.total_haber)))
+
+    @property
+    def cuadrado_cent(self) -> bool:
+        return self.total_debe_cent == self.total_haber_cent
 
     def __repr__(self) -> str:
         estado = "cuadrado" if self.cuadrado else "DESCUADRADO"

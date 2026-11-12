@@ -12,6 +12,7 @@ xnor (capa 0) para clasificar y en baldor (capa 1) para verificar.
 """
 
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Any
 
 from .baldor import verificar_cuadre
@@ -26,6 +27,21 @@ class Asiento:
     total_debe: float = 0.0
     total_haber: float = 0.0
     cuadrado: bool = False
+
+    @property
+    def total_debe_cent(self) -> int:
+        """Derivado. Fuente de verdad sigue siendo total_debe (float) hasta 2.6."""
+        from .money import to_centimos
+        return to_centimos(Decimal(str(self.total_debe)))
+
+    @property
+    def total_haber_cent(self) -> int:
+        from .money import to_centimos
+        return to_centimos(Decimal(str(self.total_haber)))
+
+    @property
+    def cuadrado_cent(self) -> bool:
+        return self.total_debe_cent == self.total_haber_cent
 
     def __repr__(self) -> str:
         estado = "cuadrado" if self.cuadrado else "DESCUADRADO"
