@@ -36,7 +36,13 @@ def to_centimos(x: MontoInput) -> int:
             raise ValueError(f"str no convertible a Decimal: {x!r}") from e
     if not isinstance(x, Decimal):
         raise TypeError(f"Tipo no soportado: {type(x).__name__}")
-    return int((x * 100).quantize(Decimal("1"), rounding=ROUND_HALF_EVEN))
+    
+    # El Fuzzer descubrió que "Infinity" o "NaN" explotan aquí.
+    # Debemos capturar el InvalidOperation y lanzar un ValueError controlado.
+    try:
+        return int((x * 100).quantize(Decimal("1"), rounding=ROUND_HALF_EVEN))
+    except InvalidOperation as e:
+        raise ValueError(f"Monto no finito o inválido (Infinity/NaN): {x!r}") from e
 
 
 def to_decimal(centimos: int) -> Decimal:

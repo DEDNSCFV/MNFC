@@ -109,7 +109,7 @@ class PartidaAutorizada:
         from ..money import to_centimos
         try:
             self.monto_cent = to_centimos(dec)
-        except (InvalidOperation, OverflowError):
+        except (InvalidOperation, OverflowError, ValueError):
             self._monto_raw = monto
             return
 

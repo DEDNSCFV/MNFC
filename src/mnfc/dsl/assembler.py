@@ -148,10 +148,10 @@ def _validar_monto(monto, cuenta: str, ctx: str) -> int:
 
     try:
         return to_centimos(dec)
-    except (InvalidOperation, OverflowError) as e:
+    except (InvalidOperation, OverflowError, ValueError) as e:
         raise DSLAssemblyError(
             f"monto fuera de rango en cuenta {cuenta}: {monto!r} "
-            f"(no cabe en centavos)",
+            f"(no cabe en centavos o es infinito)",
             ctx,
         ) from e
 
