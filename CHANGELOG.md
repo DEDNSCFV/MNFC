@@ -170,3 +170,13 @@ Ninguna. Solo stdlib de Python 3.10+.
 
 Cambios que aun no forman parte de un release. Se documentaran en la
 proxima version.
+
+### Deuda separada (NO fase 2) — detectada al cerrar fase 1
+Los 4 fallos siguientes son **preexistentes** (no regresión del cierre decimal):
+- tests/test_extensiones.py::test_reportes_csv_diario
+- tests/test_extensiones.py::test_reportes_csv_mayor
+- tests/test_extensiones.py::test_reportes_csv_balance
+- tests/test_extensiones.py::test_integracion_kernel_y_extensiones
+
+Son `AssertionError` en `src/mnfc/extensiones/reportes.py` (formato de salida CSV).
+Diagnóstico pendiente. No bloquean fase 1.

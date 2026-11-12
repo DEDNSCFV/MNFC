@@ -15,7 +15,7 @@ CREATE TABLE conteo_fisico(
   empresa TEXT,
   sku TEXT,
   descripcion TEXT,
-  cantidad_fisica REAL,
+  cantidad_fisica REAL,  -- magnitud física NO monetaria; nunca entra a SUM() de dinero
   fecha_conteo TEXT,
   archivo_origen TEXT
 );
@@ -38,10 +38,10 @@ SELECT
   json_extract(payload, '$.fecha') AS fecha,
   json_extract(payload, '$.tipo') AS tipo,
   json_extract(payload, '$.renglon') AS renglon,
-  CAST(ROUND(CAST(json_extract(payload,'$.entradas') AS REAL) * 100) AS INTEGER) AS entradas_cent,
-  CAST(ROUND(CAST(json_extract(payload,'$.salidas')  AS REAL) * 100) AS INTEGER) AS salidas_cent,
-  CAST(ROUND(CAST(json_extract(payload,'$.stock_actual') AS REAL) * 100) AS INTEGER) AS stock_cent,
-  CAST(ROUND(CAST(json_extract(payload,'$.costo_unitario') AS REAL) * 100) AS INTEGER) AS costo_cent
+  CAST(json_extract(payload,'$.entradas') * 100 + 0.5 AS INTEGER) AS entradas_cent,
+  CAST(json_extract(payload,'$.salidas') * 100 + 0.5 AS INTEGER) AS salidas_cent,
+  CAST(json_extract(payload,'$.stock_actual') * 100 + 0.5 AS INTEGER) AS stock_cent,
+  CAST(json_extract(payload,'$.costo_unitario') * 100 + 0.5 AS INTEGER) AS costo_cent
 FROM event_store
 WHERE tipo_evento = 'ASIENTO_INGERIDO'
 /* v_movimientos_centimos(id,sku,nodo,almacen,fecha,tipo,renglon,entradas_cent,salidas_cent,stock_cent,costo_cent) */;
@@ -105,7 +105,7 @@ CREATE TABLE grafo_aristas (
   origen_id INTEGER,       -- Nodo de donde sale la flecha
   destino_id INTEGER,      -- Nodo a donde llega la flecha
   relacion TEXT,           -- 'TIENE_MOVIMIENTO', 'GENERA_HALLAZGO', 'SE_RESUELVE_CON', 'VIOLA_NORMA'
-  peso REAL,               -- Opcional: para dar grosor a la línea (ej. impacto en $)
+  peso REAL,  -- SOLO presentación; prohibido en agregaciones monetarias               -- Opcional: para dar grosor a la línea (ej. impacto en $)
   fecha TEXT,
   FOREIGN KEY(origen_id) REFERENCES grafo_nodos(id),
   FOREIGN KEY(destino_id) REFERENCES grafo_nodos(id)
