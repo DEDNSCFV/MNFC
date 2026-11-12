@@ -38,3 +38,8 @@ Thumbs.db
 *.db-shm
 __pycache__/
 *.pyc
+
+# Backups locales de edición
+*.bak
+*.bak2
+*.bak.*
