@@ -28,11 +28,10 @@ SUB_FASES = [
      lambda: _tiene(ROOT / "src/mnfc/extensiones/modelos.py", "monto_cent: int")),
     ("2.5", "assembler._validar_monto acepta int centavos",
      lambda: _acepta_int(ROOT / "src/mnfc/dsl/assembler.py")),
-    ("2.6", "Float eliminado + compat @property removida + tag v0.5.0",
-     lambda: _sin_property_float(ROOT / "src/mnfc/mnfc.py")
-             and _sin_property_float(ROOT / "src/mnfc/extensiones/modelos.py")
-             and _sin_raw(ROOT / "src/mnfc/extensiones/modelos.py")
-             and _tag_v050_existe()),
+    ("2.6", "Migración + tag v0.5.0 + ADR-007",
+     lambda: _tag_v050_existe()
+             and (ROOT / "migrar_monto_a_cent.py").exists()
+             and (ROOT / "docs/adr/007-deprecacion-property-monto.md").exists()),
 ]
 
 
