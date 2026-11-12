@@ -43,21 +43,90 @@ class PartidaAutorizada:
         return to_centimos(Decimal(str(self.monto)))
 
 
-@dataclass
+@dataclass(init=False)
 class LineaAsiento:
-    """Linea de un asiento procesado por MNFC (version tipada)."""
+    """Linea de un asiento procesado (version tipada).
+
+    Fuente de verdad: monto_cent (int, centavos). Field serializable.
+    monto es @property derivada (compat hasta 2.6).
+
+    __init__ acepta:
+        LineaAsiento("A", "DEBE", 100.50)                   # posicional (compat)
+        LineaAsiento(cuenta="A", ubicacion="DEBE", monto=100.50)
+        LineaAsiento(cuenta="A", ubicacion="DEBE", monto_cent=10050)
+
+    Ver ADR-006.
+    """
 
     cuenta: str
     ubicacion: str
-    monto: float
+    monto_cent: int
     naturaleza: str | None = None
     movimiento: str | None = None
 
-    @property
-    def monto_cent(self) -> int:
-        from ..money import to_centimos
-        return to_centimos(Decimal(str(self.monto)))
+    def __init__(
+        self,
+        cuenta: str,
+        ubicacion: str,
+        monto=None,
+        monto_cent=None,
+        naturaleza: str | None = None,
+        movimiento: str | None = None,
+    ):
+        self.cuenta = cuenta
+        self.ubicacion = ubicacion
+        self.naturaleza = naturaleza
+        self.movimiento = movimiento
+        self.monto_cent = 0
 
+        if monto is not None and monto_cent is not None:
+            raise TypeError(
+                "LineaAsiento: especificar solo uno de monto o monto_cent"
+            )
+        if monto is None and monto_cent is None:
+            raise TypeError(
+                "LineaAsiento: se requiere monto o monto_cent"
+            )
+
+        if monto_cent is not None:
+            if isinstance(monto_cent, bool) or not isinstance(monto_cent, int):
+                raise TypeError(
+                    f"monto_cent debe ser int, no {type(monto_cent).__name__}"
+                )
+            self.monto_cent = monto_cent
+            return
+
+        # monto: intentar convertir a centavos; si falla, dejar 0 y preservar raw
+        if isinstance(monto, bool):
+            self._monto_raw = monto
+            return
+        if not isinstance(monto, (int, float, Decimal, str)):
+            self._monto_raw = monto
+            return
+        try:
+            dec = Decimal(str(monto))
+        except Exception:
+            self._monto_raw = monto
+            return
+        if not dec.is_finite():
+            self._monto_raw = monto
+            return
+
+        from ..money import to_centimos
+        from decimal import InvalidOperation
+        try:
+            self.monto_cent = to_centimos(dec)
+        except (InvalidOperation, OverflowError):
+            self._monto_raw = monto
+            return
+
+    @property
+    def monto(self) -> float:
+        """Compatibilidad. Devuelve raw si inválido; float derivado si no."""
+        raw = getattr(self, "_monto_raw", None)
+        if raw is not None:
+            return raw
+        return float(self.monto_cent) / 100.0
 
 @dataclass
 class Asiento:
