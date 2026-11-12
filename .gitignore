@@ -43,3 +43,6 @@ __pycache__/
 *.bak
 *.bak2
 *.bak.*
+
+# Backups con guion bajo (2.3, 2.4b, 2.5)
+*.bak_*
