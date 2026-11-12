@@ -106,63 +106,98 @@ def ensamblar(
     return asientos
 
 
-def _validar_monto(monto, cuenta: str, ctx: str) -> float:
-    """Valida monto individual. Devuelve float normalizado.
+def _validar_monto(monto, cuenta: str, ctx: str) -> int:
+    """Valida monto individual. Devuelve int (centavos enteros).
 
-    Rechaza explícitamente:
-      - bool (aunque es subclase de int): sin sentido contable.
-      - no numérico (str, Decimal, list, ...).
-      - no finito (NaN, +inf, -inf).
-      - negativo (rompe semántica de partida doble).
+    Contrato fase 2 (ADR-005):
+      - bool: rechazado (sin sentido contable).
+      - no numérico (str, list, dict): rechazado.
+      - no finito (NaN, +inf, -inf): rechazado.
+      - negativo: rechazado (rompe semántica de partida doble).
+      - Decimal/int/float válido: convertido a centavos.
     """
+    from decimal import Decimal, InvalidOperation
+    from ..money import to_centimos
+
     if isinstance(monto, bool):
-        raise DSLAssemblyError(f"monto booleano en cuenta {cuenta}: {monto!r}", ctx)
-    if not isinstance(monto, (int, float)):
-        raise DSLAssemblyError(f"monto no numérico en cuenta {cuenta}: {type(monto).__name__}", ctx)
-    if not math.isfinite(monto):
-        raise DSLAssemblyError(f"monto no finito en cuenta {cuenta}: {monto!r}", ctx)
-    if monto < 0:
-        raise DSLAssemblyError(f"monto negativo en cuenta {cuenta}: {monto}", ctx)
-    return float(monto)
+        raise DSLAssemblyError(
+            f"monto booleano en cuenta {cuenta}: {monto!r}", ctx
+        )
+    if not isinstance(monto, (int, float, Decimal)):
+        raise DSLAssemblyError(
+            f"monto no numérico en cuenta {cuenta}: "
+            f"{type(monto).__name__}", ctx
+        )
+
+    # Convertir a Decimal para validar finitud y signo
+    try:
+        dec = monto if isinstance(monto, Decimal) else Decimal(str(monto))
+    except (InvalidOperation, ValueError) as e:
+        raise DSLAssemblyError(
+            f"monto no numérico en cuenta {cuenta}: {monto!r}", ctx
+        ) from e
+
+    if not dec.is_finite():
+        raise DSLAssemblyError(
+            f"monto no finito en cuenta {cuenta}: {monto!r}", ctx
+        )
+    if dec < 0:
+        raise DSLAssemblyError(
+            f"monto negativo en cuenta {cuenta}: {monto}", ctx
+        )
+
+    try:
+        return to_centimos(dec)
+    except (InvalidOperation, OverflowError) as e:
+        raise DSLAssemblyError(
+            f"monto fuera de rango en cuenta {cuenta}: {monto!r} "
+            f"(no cabe en centavos)",
+            ctx,
+        ) from e
+
+
 
 
 def _construir_asiento(
-    partidas: list[PartidaAutorizada],
-    contexto: ContextoContable | None,
-    ctx: str,
-) -> Asiento:
-    lineas: list[LineaAsiento] = []
-    total_debe = 0.0
-    total_haber = 0.0
+    partidas,
+    contexto,
+    ctx,
+):
+    lineas = []
+    total_debe_cent = 0
+    total_haber_cent = 0
 
     for pa in partidas:
-        monto = _validar_monto(pa.monto, pa.cuenta_codigo, ctx)
+        monto_cent = _validar_monto(pa.monto, pa.cuenta_codigo, ctx)
         if pa.ubicacion not in ("DEBE", "HABER"):
             raise DSLAssemblyError(
-                f"ubicación inválida: {pa.ubicacion!r} (cuenta {pa.cuenta_codigo})",
+                f"ubicación inválida: {pa.ubicacion!r} "
+                f"(cuenta {pa.cuenta_codigo})",
                 ctx,
             )
         lineas.append(
             LineaAsiento(
                 cuenta=pa.cuenta_codigo,
                 ubicacion=pa.ubicacion,
-                monto=monto,
+                monto_cent=monto_cent,
                 naturaleza=None,
                 movimiento=pa.movimiento,
             )
         )
         if pa.ubicacion == "DEBE":
-            total_debe += monto
+            total_debe_cent += monto_cent
         else:
-            total_haber += monto
+            total_haber_cent += monto_cent
 
     return Asiento(
         lineas=lineas,
-        total_debe=total_debe,
-        total_haber=total_haber,
+        total_debe_cent=total_debe_cent,
+        total_haber_cent=total_haber_cent,
         cuadrado=False,
         contexto=contexto,
     )
+
+
 
 
 def _describir_diferencia(total_debe: float, total_haber: float) -> str:

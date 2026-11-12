@@ -404,19 +404,23 @@ class TestValidacionMontos:
             ensamblar([_rc("f", "r", 1, [pa])])
         assert "110101" in str(exc.value)
 
-    def test_overflow_en_total_error_con_regla(self):
-        """Suma de floats finitos desborda a inf. El pre-check detecta
-        antes de fijar cuadrado y el error conserva (fractal, regla)."""
+    def test_monto_fuera_de_rango_rechazado(self):
+        """ADR-005 (fase 2): montos que no caben en centavos se rechazan.
+
+        Contrato anterior (fase 1): float 1e308 se aceptaba como finito;
+        la suma de dos desbordaba a inf → 'total no finito'.
+
+        Contrato nuevo (fase 2): int centavos no desborda en suma.
+        La barrera está en _validar_monto: 1e308 * 100 no cabe en
+        Decimal.quantize estándar → se rechaza como 'fuera de rango'.
+        """
         rs = [_rc("ventas", "registro", 1, [
             _pa("A", "DEBE", 1e308),
-            _pa("B", "DEBE", 1e308),
-            _pa("C", "HABER", 1e308),
-            _pa("D", "HABER", 1e308),
+            _pa("B", "HABER", 1e308),
         ])]
-        with pytest.raises(DSLAssemblyError, match="total no finito") as exc:
+        with pytest.raises(DSLAssemblyError, match="fuera de rango"):
             ensamblar(rs)
-        assert "FRACTAL ventas" in str(exc.value)
-        assert "REGLA registro" in str(exc.value)
+    
 
 
 # ═════════════════════════════════════════════════════════════════════
