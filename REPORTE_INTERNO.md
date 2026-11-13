@@ -35,3 +35,10 @@
 
 ---
 *Este reporte fue generado automáticamente por el módulo de auditoría interna del MNFC.*
+
+## 6. Módulo de Contabilidad Perpetua (Nuevo)
+*   **Movimientos procesados:** 454,225 asientos de partida doble
+*   **Balance de Comprobación:** DEBE = HABER ($ 7,971,686.23) ✅
+*   **Utilidad Bruta calculada:** $424,875.95
+*   **Plan de Cuentas:** 9 cuentas base (Activo, Pasivo, Patrimonio, Ingreso, Gasto)
+*   **Estado de Resultados:** Generado automáticamente
