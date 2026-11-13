@@ -1,0 +1,10 @@
+import sqlite3
+con = sqlite3.connect("nodo_principal_dartony.db")
+cur = con.cursor()
+cur.execute("CREATE INDEX IF NOT EXISTS idx_mov_sku ON movimientos_dartony(sku)")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_mov_fecha ON movimientos_dartony(fecha)")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_mov_tipo ON movimientos_dartony(tipo)")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_inv_sku ON inventario_nodo(sku)")
+con.commit()
+print("✅ Índices creados.")
+con.close()
