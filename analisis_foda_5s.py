@@ -3,7 +3,13 @@ import json
 from decimal import Decimal, ROUND_HALF_EVEN
 from mnfc.money import to_decimal
 
-DB_PATH = "nodo_principal_dartony.db"
+import json
+try:
+    with open("config.json", "r") as _f:
+        _config = json.load(_f)
+        DB_PATH = _config.get("db_path", "nodo_principal_cliente.db")
+except Exception:
+    DB_PATH = "nodo_principal_cliente.db"
 
 def generar_analisis_gerencial():
     con = sqlite3.connect(DB_PATH)

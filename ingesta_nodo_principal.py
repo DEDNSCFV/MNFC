@@ -1,3 +1,4 @@
+
 import sqlite3
 import csv
 import os
@@ -110,3 +111,4 @@ if __name__ == "__main__":
         print("⚠️ No se encontró tasas_bcv.json. Usando tasa 0 para prueba.")
         
     ingerir_inventario_nodo("inventario_prueba.csv", DB_PATH, tasa_usd)
+

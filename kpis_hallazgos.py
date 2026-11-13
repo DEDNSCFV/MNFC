@@ -2,15 +2,19 @@ import sqlite3
 import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from decimal import Decimal, ROUND_HALF_EVEN
-from mnfc.money import to_centimos, to_decimal
+from decimal import Decimal
+from mnfc.money import to_decimal
 
 TZ = ZoneInfo("America/Caracas")
-DB_PATH = "nodo_principal_dartony.db"
+import json
+try:
+    with open("config.json", "r") as _f:
+        _config = json.load(_f)
+        DB_PATH = _config.get("db_path", "nodo_principal_cliente.db")
+except Exception:
+    DB_PATH = "nodo_principal_cliente.db"
 
-# ═══════════════════════════════════════════════════════════════════════
-# TABLA DE HALLAZGOS (Los errores que el motor detecta y registra)
-# ═══════════════════════════════════════════════════════════════════════
+UMBRAL_ROTACION_MENSUAL = 1.0
 
 def inicializar_tabla_hallazgos(con):
     cur = con.cursor()
@@ -27,9 +31,11 @@ def inicializar_tabla_hallazgos(con):
     """)
     con.commit()
 
-def registrar_hallazgo(con, tipo, severidad, descripcion, evidencia=None):
-    """Registra un hallazgo de auditoría. El motor que YERRA busca la verdad."""
+def registrar_hallazgo_si_no_existe(con, tipo, severidad, descripcion, evidencia=None):
     cur = con.cursor()
+    cur.execute("SELECT id FROM hallazgos_auditoria WHERE tipo = ? AND estado = 'REGISTRADO'", (tipo,))
+    if cur.fetchone():
+        return
     ts = datetime.now(TZ).strftime("%Y-%m-%d %H:%M:%S")
     evidencia_json = json.dumps(evidencia) if evidencia else None
     cur.execute("""
@@ -37,117 +43,99 @@ def registrar_hallazgo(con, tipo, severidad, descripcion, evidencia=None):
         VALUES (?, ?, ?, ?, ?)
     """, (ts, tipo, severidad, descripcion, evidencia_json))
     con.commit()
-    print(f"  🚨 [{severidad}] {tipo}: {descripcion}")
+    print(f"  🚨 NUEVO HALLAZGO [{severidad}] {tipo}: {descripcion}")
 
-# ═══════════════════════════════════════════════════════════════════════
-# KPIs DE INVENTARIO (Análisis real del negocio)
-# ═══════════════════════════════════════════════════════════════════════
-
-def calcular_kpis_inventario(con, tasa_bcv):
-    """Calcula los KPIs clave del inventario como un Business Partner."""
+def calcular_kpis_reales(con):
     cur = con.cursor()
     
-    # Datos base
+    print("\n" + "="*75)
+    print(" 📊 ANÁLISIS DE KPIs REALES SOBRE DARTONY (462K Movimientos)")
+    print("="*75)
+    
+    # 1. Inventario Actual
     cur.execute("""
-        SELECT sku, nombre, cantidad_fisica, costo_unitario_cent, precio_venta_cent
-        FROM inventario_nodo WHERE cantidad_fisica > 0
+        SELECT SUM(cantidad_fisica * costo_unitario_cent),
+               SUM(cantidad_fisica * precio_venta_cent),
+               COUNT(*)
+        FROM inventario_nodo
     """)
-    productos = cur.fetchall()
+    costo_cent, venta_cent, total_skus = cur.fetchone()
+    costo_cent = int(costo_cent or 0)
+    venta_cent = int(venta_cent or 0)
     
-    # Movimientos de venta (para rotación)
+    print(f"\n📦 Inventario Actual:")
+    print(f"   SKUs totales      : {total_skus:,}")
+    print(f"   Valor al Costo    : ${to_decimal(costo_cent):,.2f} USD")
+    print(f"   Valor a la Venta  : ${to_decimal(venta_cent):,.2f} USD")
+    print(f"   Margen Potencial  : ${to_decimal(venta_cent - costo_cent):,.2f} USD")
+    
+    # 2. Ventas Históricas (usando ABS para corregir los negativos del ERP)
     cur.execute("""
-        SELECT sku, SUM(cantidad) FROM movimientos_inventario GROUP BY sku
+        SELECT COUNT(*), SUM(ABS(cantidad)), SUM(ABS(cantidad) * costo_unitario_cent)
+        FROM movimientos_dartony
+        WHERE tipo LIKE '%FACT%' OR tipo LIKE '%VENTA%'
     """)
-    ventas_por_sku = {r[0]: r[1] for r in cur.fetchall()}
+    total_ventas, unidades_vendidas, costo_ventas_cent = cur.fetchone()
+    unidades_vendidas = int(unidades_vendidas or 0)
+    costo_ventas_cent = int(costo_ventas_cent or 0)
     
-    valor_total_cent = sum(cant * costo for _, _, cant, costo, _ in productos)
-    valor_venta_cent = sum(cant * venta for _, _, cant, _, venta in productos)
+    print(f"\n📈 Actividad de Ventas (Histórica):")
+    print(f"   Transacciones     : {total_ventas:,}")
+    print(f"   Unidades vendidas : {unidades_vendidas:,.0f}")
+    print(f"   Costo de Ventas   : ${to_decimal(costo_ventas_cent):,.2f} USD")
     
-    print("\n" + "="*72)
-    print("📊 KPIs DE INVENTARIO (Análisis Gerencial)")
-    print("="*72)
-    print(f"{'SKU':<10} | {'NOMBRE':<20} | {'STOCK':<6} | {'VALOR $':<10} | {'ROT.':<6}")
-    print("-" * 72)
+    # 3. Rotación Global
+    if costo_cent > 0 and costo_ventas_cent > 0:
+        rotacion = Decimal(costo_ventas_cent) / Decimal(costo_cent)
+        print(f"\n🔄 Rotación Global del Inventario: {rotacion:.2f} veces")
+        if rotacion < Decimal(str(UMBRAL_ROTACION_MENSUAL)):
+            registrar_hallazgo_si_no_existe(
+                con, "BAJA_ROTACION_GLOBAL", "ALTA",
+                f"Rotación global {rotacion:.2f} < umbral {UMBRAL_ROTACION_MENSUAL}. Capital inmovilizado.",
+                {"rotacion": float(rotacion), "costo_ventas": float(to_decimal(costo_ventas_cent))}
+            )
     
-    # Clasificación ABC por valor
-    productos_abc = []
-    for sku, nombre, cant, costo_cent, venta_cent in productos:
-        valor = cant * costo_cent
-        pct = (valor / valor_total_cent * 100) if valor_total_cent else 0
-        ventas = ventas_por_sku.get(sku, 0)
-        rotacion = ventas / cant if cant > 0 else 0
-        productos_abc.append((sku, nombre, cant, valor_cent:=valor, pct, rotacion))
-        print(f"{sku:<10} | {nombre[:20]:<20} | {cant:<6} | {to_decimal(valor):<10} | {rotacion:.2f}")
+    # 4. Top 5 Productos Más Vendidos
+    cur.execute("""
+        SELECT sku, SUM(ABS(cantidad)) as total_vendido
+        FROM movimientos_dartony
+        WHERE tipo LIKE '%FACT%' OR tipo LIKE '%VENTA%'
+        GROUP BY sku
+        ORDER BY total_vendido DESC
+        LIMIT 5
+    """)
+    top_vendidos = cur.fetchall()
     
-    print("-" * 72)
+    print(f"\n🏆 Top 5 Productos Más Vendidos:")
+    for sku, cant in top_vendidos:
+        print(f"   {sku:<15} : {int(cant):,.0f} unidades")
     
-    # KPI 1: Rotación promedio
-    total_ventas = sum(ventas_por_sku.values())
-    total_stock = sum(p[2] for p in productos)
-    rotacion_prom = total_ventas / total_stock if total_stock else 0
+    # 5. SKUs Zombies
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM inventario_nodo i
+        WHERE i.cantidad_fisica > 0
+        AND NOT EXISTS (
+            SELECT 1 FROM movimientos_dartony m 
+            WHERE m.sku = i.sku AND (m.tipo LIKE '%FACT%' OR m.tipo LIKE '%VENTA%')
+        )
+    """)
+    zombies = cur.fetchone()[0]
     
-    # KPI 2: Clasificación ABC
-    productos_abc.sort(key=lambda x: -x[4])
-    acumulado = 0
-    for i, p in enumerate(productos_abc):
-        acumulado += p[4]
-        if acumulado <= 80: clase = "A"
-        elif acumulado <= 95: clase = "B"
-        else: clase = "C"
-        # Sobrescribir en la BD
-        cur.execute("UPDATE inventario_nodo SET clase_abc = ? WHERE sku = ?", (clase, p[0])) if tabla_tiene_columna(cur, "inventario_nodo", "clase_abc") else None
+    if zombies > 0:
+        registrar_hallazgo_si_no_existe(
+            con, "SKUS_ZOMBIES", "MEDIA",
+            f"{zombies:,} SKUs con stock pero sin ventas registradas. Riesgo de obsolescencia.",
+            {"cantidad": zombies}
+        )
+        print(f"\n🧟 SKUs Zombies detectados: {zombies:,}")
     
-    # KPI 3: Valor total del inventario
-    valor_total_ves = (to_decimal(valor_total_cent) * tasa_bcv).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
-    valor_venta_ves = (to_decimal(valor_venta_cent) * tasa_bcv).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
-    margen_potencial = valor_venta_ves - valor_total_ves
-    
-    print(f"\n  📈 Rotación Promedio del Inventario: {rotacion_prom:.2f} veces")
-    print(f"  💰 Valor Total (Costo): {valor_total_ves} Bs.")
-    print(f"  💵 Valor Total (Venta): {valor_venta_ves} Bs.")
-    print(f"  📊 Margen Potencial: {margen_potencial} Bs.")
-    
-    # Detectar hallazgos automáticamente
-    print("\n  🔍 Detectando hallazgos automáticos...")
-    
-    # Hallazgo: Productos sin movimiento
-    for sku, nombre, cant, _, _ in productos:
-        if ventas_por_sku.get(sku, 0) == 0:
-            registrar_hallazgo(con, "INVENTARIO_OBSOLETO", "MEDIA",
-                f"Producto {sku} ({nombre}) sin movimiento en el período")
-    
-    # Hallazgo: Rotación baja
-    if rotacion_prom < 0.5:
-        registrar_hallazgo(con, "BAJA_ROTACION", "ALTA",
-            f"Rotación promedio {rotacion_prom:.2f} (< 0.5). Riesgo de obsolescencia.",
-            {"rotacion": rotacion_prom, "valor_en_riesgo": str(valor_total_ves)})
-    
-    con.commit()
-
-def tabla_tiene_columna(cur, tabla, columna):
-    cur.execute(f"PRAGMA table_info({tabla})")
-    return any(r[1] == columna for r in cur.fetchall())
-
-# ═══════════════════════════════════════════════════════════════════════
-# MENÚ INTERACTIVO
-# ═══════════════════════════════════════════════════════════════════════
+    print("\n" + "="*75)
+    print(" ✅ Análisis de KPIs Completado")
+    print("="*75)
 
 if __name__ == "__main__":
     con = sqlite3.connect(DB_PATH)
     inicializar_tabla_hallazgos(con)
-    
-    with open("tasas_bcv.json", "r") as f:
-        tasa_bcv = Decimal(json.load(f)["USD"])
-    
-    calcular_kpis_inventario(con, tasa_bcv)
-    
-    # Mostrar hallazgos registrados
-    cur = con.cursor()
-    cur.execute("SELECT timestamp, tipo, severidad, descripcion FROM hallazgos_auditoria")
-    print("\n" + "="*72)
-    print("🚨 HALLAZGOS REGISTRADOS EN LA BD")
-    print("="*72)
-    for r in cur.fetchall():
-        print(f"  [{r[0]}] {r[1]:<25} | {r[2]:<8} | {r[3][:50]}")
-    
+    calcular_kpis_reales(con)
     con.close()

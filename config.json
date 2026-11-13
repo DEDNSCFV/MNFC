@@ -1,0 +1,5 @@
+{
+    "cliente_activo": "Cliente Nuevo (Prueba)",
+    "db_path": "nodo_principal_cliente.db",
+    "tasa_bcv_file": "tasas_bcv.json"
+}

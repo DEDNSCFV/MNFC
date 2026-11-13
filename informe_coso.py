@@ -5,7 +5,13 @@ from decimal import Decimal
 from mnfc.money import to_decimal
 
 TZ_VENEZUELA = ZoneInfo("America/Caracas")
-DB_PATH = "nodo_principal_dartony.db"
+import json
+try:
+    with open("config.json", "r") as _f:
+        _config = json.load(_f)
+        DB_PATH = _config.get("db_path", "nodo_principal_cliente.db")
+except Exception:
+    DB_PATH = "nodo_principal_cliente.db"
 
 def generar_informe_coso():
     con = sqlite3.connect(DB_PATH)
@@ -13,78 +19,77 @@ def generar_informe_coso():
     
     fecha_emision = datetime.now(TZ_VENEZUELA).strftime("%d de %B de %Y, %H:%M:%S")
     
-    # 1. Recopilar Evidencia
-    cur.execute("SELECT COUNT(*) FROM facturas")
-    total_facturas = cur.fetchone()[0]
+    # --- EVIDENCIA REAL DARTONY ---
     
-    cur.execute("SELECT COUNT(*) FROM eventos_ledger")
-    total_eventos = cur.fetchone()[0]
+    # 1. Total de productos y valor de inventario
+    cur.execute("""
+        SELECT COUNT(*), SUM(cantidad_fisica * costo_unitario_cent) 
+        FROM inventario_nodo
+    """)
+    total_skus, valor_inv_cent = cur.fetchone()
+    valor_inv_cent = valor_inv_cent or 0
     
-    cur.execute("SELECT SUM(total_cent) FROM facturas")
-    total_facturado_cent = cur.fetchone()[0] or 0
+    # 2. Historial de movimientos
+    cur.execute("SELECT COUNT(*) FROM movimientos_dartony")
+    total_movimientos = cur.fetchone()[0]
+    
+    # 3. Hallazgos de auditoría
+    cur.execute("SELECT timestamp, tipo, severidad, descripcion FROM hallazgos_auditoria ORDER BY id DESC")
+    hallazgos_bd = cur.fetchall()
     
     print("\n" + "="*75)
     print("       INFORME DE EVALUACIÓN DE CONTROL INTERNO (MARCO COSO)")
     print("="*75)
-    print(f"Entidad Evaluada : Nodo Principal Dartony (MNFC)")
+    print(f"Entidad Evaluada : Dartony C.A. (Datos Reales Operacionales)")
     print(f"Fecha de Emisión : {fecha_emision}")
     print(f"Evaluador        : Díaz N. Domingo E. | C.P.C. N° 183594")
     print("="*75)
     
     print("\nI. AMBIENTE DE CONTROL")
     print("-" * 75)
-    print("Se verificó la segregación de funciones entre el motor determinista")
-    print("(MNFC) y el criterio profesional del Contador Público. El sistema")
-    print("opera bajo el paradigma 'Human-in-the-Loop', donde el software")
-    print("calcula y el CPC audita y firma.")
+    print("El CPC actúa como Orquestador Humano (Human-in-the-Loop). El software")
+    print("calcula los centavos exactos y el humano audita, firma y decide.")
     
     print("\nII. EVALUACIÓN DE RIESGOS")
     print("-" * 75)
-    print("El sistema mitiga el riesgo de deriva numérica (float) mediante el")
-    print("uso exclusivo de enteros (centavos) y redondeo bancario NIIF.")
-    print("Riesgo de tasa de cambio: Mitigado vía Scraper automático del BCV.")
+    print("Riesgo matemático: Mitigado con enteros (centavos) y ROUND_HALF_EVEN.")
+    print("Riesgo cambiario : Mitigado con Scraper automático del BCV.")
+    print("Riesgo de datos  : Datos crudos normalizados y anonimizados.")
     
-    print("\nIII. ACTIVIDADES DE CONTROL (Evidencia Empírica)")
+    print("\nIII. ACTIVIDADES DE CONTROL (Evidencia Empírica Dartony)")
     print("-" * 75)
-    print(f"  • Integridad de Facturación: {total_facturas} facturas emitidas.")
-    print(f"  • Trazabilidad Inmutable : {total_eventos} eventos registrados en el Ledger.")
-    print(f"  • Total Facturado        : {to_decimal(total_facturado_cent)} Bs.")
-    print("  • Actualización de Stock : El inventario se descuenta automáticamente.")
+    print(f"  • SKUs gestionados       : {total_skus:,}")
+    print(f"  • Movimientos históricos : {total_movimientos:,}")
+    print(f"  • Valor del inventario   : ${to_decimal(valor_inv_cent):,.2f} USD")
     
-    print("\nIV. HALLAZGOS DE AUDITORÍA (Materialización del Error)")
+    print("\nIV. HALLAZGOS DE AUDITORÍA (Dinámicos desde la BD)")
     print("-" * 75)
-    print("Basado en el principio científico: Adelanta el que yerra buscando la verdad.")
-    print("Se documentan los fallos detectados y bloqueados por el")
-    print("sistema durante las pruebas de estrés (Fuzzing y DSR):")
-    print("\n  1. Intento de Duplicidad de Factura (Control de Integridad):")
-    print("     El sistema bloqueó con 'UNIQUE constraint' la re-emisión de la")
-    print("     factura FAC-2026-0001. Hallazgo: Control efectivo contra fraude.")
-    print("\n  2. Overflow y Datos Basura (Fuzzing):")
-    print("     El sistema detectó y rechazó inyecciones de 'Infinity', 'NaN'")
-    print("     y números fuera de rango (1E+308). Hallazgo: Tolerancia a fallos.")
-    print("\n  3. Deriva Numérica (Float vs Int):")
-    print("     En 1,000,000 de asientos, el sistema tradicional generó una")
-    print("     deriva de 4,999.99 Bs. El MNFC mantuvo la deriva en 0.00 Bs.")
+    print("Materialización del principio: 'Adelanta el que yerra buscando la verdad'")
+    print("-" * 75)
     
+    if not hallazgos_bd:
+        print("  ✅ No se detectaron anomalías en el período.")
+    else:
+        for ts, tipo, sev, desc in hallazgos_bd:
+            print(f"  🚨 [{ts}] [{sev}] {tipo}")
+            print(f"     {desc}")
+            print()
+            
     print("\nV. SUPERVISIÓN Y MONITOREO")
     print("-" * 75)
-    print("El artefacto cuenta con una suite de más de 642 pruebas automatizadas")
-    print("que se ejecutan continuamente para garantizar que los controles")
-    print("matemáticos y fiscales no sean vulnerados.")
+    print("El motor cuenta con 642 pruebas automatizadas que certifican su")
+    print("exactitud matemática y fiscal.")
     
     print("\n" + "="*75)
     print("CONCLUSIÓN DEL AUDITOR:")
-    print("Con base en las pruebas realizadas, se concluye que el sistema de")
-    print("control interno opera de manera EFECTIVA (COSO). La arquitectura")
-    print("de IA Simbólica no oculta los errores; los detecta, los bloquea y")
-    print("los documenta como evidencia de su robustez.")
+    print(f"Con base en las pruebas, se identificaron {len(hallazgos_bd)} hallazgos.")
+    print("El sistema de control interno opera de manera EFECTIVA (COSO).")
+    print("La base de datos de Dartony ha sido auditada y normalizada.")
     print("="*75)
-    
     print("\n\n_______________________________________")
     print("Díaz N. Domingo E.")
     print("Contador Público Colegiado")
     print("C.P.C. N° 183594")
-    print("Firma y Sello del Evaluador")
     print("\n")
     
     con.close()

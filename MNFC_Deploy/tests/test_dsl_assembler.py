@@ -1,0 +1,514 @@
+"""Tests del assembler del DSL (Fase 4).
+
+Verifican:
+- Agrupación por (fractal, regla).
+- Transformación PartidaAutorizada → LineaAsiento.
+- Cuadre por regla individual (no compensable entre reglas).
+- Tolerancia 0.001 estricta de verificar_cuadre (< no <=).
+- Validación de montos individuales (bool, no numérico, no finito, negativo).
+- Contrato de error de DSLAssemblyError.
+- Diagnóstico seguro de diferencias (no propaga inf/nan al mensaje).
+- Pipeline completo: parse → validar → evaluar → ensamblar.
+
+Sin marcos reales. Sin fiscal. Todo con datos sintéticos.
+"""
+import pytest
+
+from mnfc.dsl.assembler import DSLAssemblyError, ensamblar
+from mnfc.dsl.evaluator import DSLEvaluationError, ResultadoAccion
+from mnfc.extensiones.modelos import (
+    ContextoContable,
+    PartidaAutorizada,
+)
+
+
+def _pa(cuenta, ubicacion, monto, movimiento="AUMENTA"):
+    return PartidaAutorizada(
+        cuenta_codigo=cuenta,
+        cuenta_version="v1",
+        monto=monto,
+        ubicacion=ubicacion,
+        movimiento=movimiento,
+    )
+
+
+def _rc(fractal, regla, indice, partidas):
+    return ResultadoAccion(fractal, regla, indice, partidas)
+
+
+# ═════════════════════════════════════════════════════════════════════
+# A · Agrupación
+# ═════════════════════════════════════════════════════════════════════
+
+class TestAgrupacion:
+
+    def test_vacio(self):
+        assert ensamblar([]) == []
+
+    def test_una_sola_regla(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("1101", "DEBE", 100.0),
+            _pa("4101", "HABER", 100.0),
+        ])]
+        assert len(ensamblar(rs)) == 1
+
+    def test_dos_reglas_distintas(self):
+        rs = [
+            _rc("f", "r1", 1, [_pa("A", "DEBE", 100.0),
+                               _pa("B", "HABER", 100.0)]),
+            _rc("f", "r2", 1, [_pa("C", "DEBE", 50.0),
+                               _pa("D", "HABER", 50.0)]),
+        ]
+        assert len(ensamblar(rs)) == 2
+
+    def test_mismo_nombre_regla_en_fractales_distintos(self):
+        rs = [
+            _rc("f1", "r", 1, [_pa("A", "DEBE", 10.0),
+                               _pa("B", "HABER", 10.0)]),
+            _rc("f2", "r", 1, [_pa("C", "DEBE", 20.0),
+                               _pa("D", "HABER", 20.0)]),
+        ]
+        asientos = ensamblar(rs)
+        assert len(asientos) == 2
+        assert asientos[0].lineas[0].cuenta == "A"
+        assert asientos[1].lineas[0].cuenta == "C"
+
+    def test_una_regla_dos_acciones(self):
+        rs = [
+            _rc("f", "r", 1, [_pa("A", "DEBE", 100.0)]),
+            _rc("f", "r", 2, [_pa("B", "HABER", 100.0)]),
+        ]
+        asientos = ensamblar(rs)
+        assert len(asientos) == 1
+        assert len(asientos[0].lineas) == 2
+
+    def test_orden_primera_aparicion(self):
+        rs = [
+            _rc("f2", "r", 1, [_pa("A", "DEBE", 10.0),
+                               _pa("B", "HABER", 10.0)]),
+            _rc("f1", "r", 1, [_pa("C", "DEBE", 20.0),
+                               _pa("D", "HABER", 20.0)]),
+            _rc("f2", "r", 2, [_pa("E", "DEBE", 5.0),
+                               _pa("F", "HABER", 5.0)]),
+        ]
+        asientos = ensamblar(rs)
+        assert len(asientos) == 2
+        assert len(asientos[0].lineas) == 4
+        assert len(asientos[1].lineas) == 2
+
+
+# ═════════════════════════════════════════════════════════════════════
+# B · Transformación PartidaAutorizada → LineaAsiento
+# ═════════════════════════════════════════════════════════════════════
+
+class TestTransformacion:
+
+    def test_campos_preservados(self):
+        pa = _pa("1101", "DEBE", 100.5, "DISMINUYE")
+        rs = [_rc("f", "r", 1, [pa, _pa("4101", "HABER", 100.5)])]
+        linea = ensamblar(rs)[0].lineas[0]
+        assert linea.cuenta == "1101"
+        assert linea.ubicacion == "DEBE"
+        assert linea.monto == 100.5
+        assert linea.movimiento == "DISMINUYE"
+        assert linea.naturaleza is None
+
+    def test_orden_de_partidas(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 10.0),
+            _pa("B", "HABER", 6.0),
+            _pa("C", "HABER", 4.0),
+        ])]
+        asiento = ensamblar(rs)[0]
+        assert [l.cuenta for l in asiento.lineas] == ["A", "B", "C"]
+
+
+# ═════════════════════════════════════════════════════════════════════
+# C · Cuadre por regla individual
+# ═════════════════════════════════════════════════════════════════════
+
+class TestCuadre:
+
+    def test_cuadrado(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 100.0),
+        ])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe == 100.0
+        assert a.total_haber == 100.0
+
+    def test_multiples_partidas_por_lado(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 60.0),
+            _pa("B", "DEBE", 40.0),
+            _pa("C", "HABER", 50.0),
+            _pa("D", "HABER", 50.0),
+        ])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe == 100.0
+        assert a.total_haber == 100.0
+
+    def test_descuadrado_error(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 90.0),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
+            ensamblar(rs)
+
+    def test_descuadre_no_compensa_entre_reglas(self):
+        """Regla 1 descuadra +10, regla 2 descuadra -10. No se compensan."""
+        rs = [
+            _rc("f", "r1", 1, [_pa("A", "DEBE", 100.0),
+                               _pa("B", "HABER", 90.0)]),
+            _rc("f", "r2", 1, [_pa("C", "DEBE", 90.0),
+                               _pa("D", "HABER", 100.0)]),
+        ]
+        with pytest.raises(DSLAssemblyError):
+            ensamblar(rs)
+
+
+# ═════════════════════════════════════════════════════════════════════
+# D · Tolerancia 0.001 (estricta, < no <=)
+# ═════════════════════════════════════════════════════════════════════
+
+class TestTolerancia:
+
+    def test_dentro(self):
+        """diff=0.0005 → cuadrado."""
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.9995),
+        ])]
+        assert ensamblar(rs)[0].cuadrado is True
+
+    def test_redondeo_bancario_cuadra(self):
+        """ADR-005 (fase 2): 99.999 → 100.00 centavos. Cuadra.
+
+        Contrato anterior (fase 1): tolerancia float 0.001.
+        Contrato nuevo (fase 2): solo centavos exactos.
+        99.999 redondea a 100.00 (ROUND_HALF_EVEN) → DEBE == HABER.
+        """
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.999),
+        ])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe_cent == 10000
+        assert a.total_haber_cent == 10000
+
+    def test_diferencia_de_un_centimo_descuadra(self):
+        """ADR-005: diferencia de 1 centavo (0.01) descuadra."""
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.99),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
+            ensamblar(rs)
+
+    
+    def test_diferencia_centimo_y_medio_descuadra(self):
+        """ADR-005: 99.985 → 99.99 centavos (ROUND_HALF_EVEN). 0.01 de dif → descuadre."""
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 99.985),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="descuadrado"):
+            ensamblar(rs)
+    
+
+
+# ═════════════════════════════════════════════════════════════════════
+# E · Contexto
+# ═════════════════════════════════════════════════════════════════════
+
+class TestContexto:
+
+    def test_adjuntado(self):
+        ctx = ContextoContable("PYMES", "v1", "v1", "v1")
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 100.0),
+        ])]
+        a = ensamblar(rs, contexto=ctx)[0]
+        assert a.contexto is ctx
+
+    def test_sin_contexto(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 100.0),
+        ])]
+        assert ensamblar(rs)[0].contexto is None
+
+
+# ═════════════════════════════════════════════════════════════════════
+# F · Errores con contexto
+# ═════════════════════════════════════════════════════════════════════
+
+class TestErrores:
+
+    def test_accion_sin_partidas(self):
+        rs = [_rc("f", "r", 1, [])]
+        with pytest.raises(DSLAssemblyError, match="acción #1 sin partidas"):
+            ensamblar(rs)
+
+    def test_ubicacion_invalida(self):
+        pa = PartidaAutorizada(
+            cuenta_codigo="X", cuenta_version="v1",
+            monto=100.0, ubicacion="OTRA", movimiento="AUMENTA",
+        )
+        rs = [_rc("f", "r", 1, [pa])]
+        with pytest.raises(DSLAssemblyError, match="ubicación inválida"):
+            ensamblar(rs)
+
+    def test_contexto_en_error_descuadre(self):
+        rs = [_rc("ventas", "registro", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 90.0),
+        ])]
+        try:
+            ensamblar(rs)
+            assert False, "debería haber lanzado"
+        except DSLAssemblyError as e:
+            assert "FRACTAL ventas" in str(e)
+            assert "REGLA registro" in str(e)
+
+    def test_dsl_assembly_error_hereda_de_dsl_evaluation_error(self):
+        """Catchable con except DSLEvaluationError."""
+        rs = [_rc("f", "r", 1, [])]
+        with pytest.raises(DSLEvaluationError):
+            ensamblar(rs)
+
+
+# ═════════════════════════════════════════════════════════════════════
+# G · Integración: parse → validar → evaluar → ensamblar
+# ═════════════════════════════════════════════════════════════════════
+
+class TestIntegracion:
+
+    def test_pipeline_completo(self):
+        from mnfc.dsl import evaluar, parse, validar
+        pcu = {
+            "110101": {"naturaleza": "DEUDORA",
+                       "marcos": ["caja", "PYMES"]},
+            "410101": {"naturaleza": "ACREEDORA",
+                       "marcos": ["ingreso", "PYMES"]},
+        }
+        ops = {"cien": lambda ctx: 100.0}
+        src = '''
+        DSL_VERSION "1.6";
+        ELEMENTOS { activo; ingreso; }
+        MARCOS { PYMES; }
+        CATEGORIA caja = elemento: activo; universal: VERDADERO;
+        CATEGORIA ingreso = elemento: ingreso; universal: FALSO;
+        HECHO activo;
+        FRACTAL ventas:
+            REGLA registro:
+                SI activo
+                ENTONCES
+                    GENERAR CONSECUENCIA(categoria=categoria(caja), operacion=cien, movimiento=AUMENTA, fuente=PYMES:S23)
+                    GENERAR CONSECUENCIA(categoria=categoria(ingreso), operacion=cien, movimiento=AUMENTA, fuente=PYMES:S23);
+        '''
+        prog = parse(src)
+        validar(prog)
+        rs = evaluar(prog, {"activo": True}, pcu, ops, "PYMES")
+        asientos = ensamblar(rs)
+        assert len(asientos) == 1
+        assert asientos[0].cuadrado is True
+        assert asientos[0].total_debe == 100.0
+        assert asientos[0].total_haber == 100.0
+        assert len(asientos[0].lineas) == 2
+
+
+# ═════════════════════════════════════════════════════════════════════
+# H · Validación de montos individuales
+# ═════════════════════════════════════════════════════════════════════
+
+class TestValidacionMontos:
+
+    @pytest.mark.parametrize("monto_inv,motivo", [
+        (float("nan"),  "no finito"),
+        (float("inf"),  "no finito"),
+        (float("-inf"), "no finito"),
+        (-100.0,        "negativo"),
+        (-0.001,        "negativo"),
+        (True,          "booleano"),
+        (False,         "booleano"),
+        ("100",         "no numérico"),
+    ])
+    def test_monto_invalido(self, monto_inv, motivo):
+        pa = PartidaAutorizada(
+            cuenta_codigo="X", cuenta_version="v1",
+            monto=monto_inv, ubicacion="DEBE", movimiento="AUMENTA",
+        )
+        with pytest.raises(DSLAssemblyError, match=motivo):
+            ensamblar([_rc("f", "r", 1, [pa])])
+
+    def test_monto_decimal_ahora_es_valido_en_fase2(self):
+        """ADR-005 (fase 2): Decimal es el tipo canónico de dinero.
+
+        Test anterior (fase 1): test_monto_decimal_rechazado_por_contrato_de_fase
+        esperaba rechazo porque el kernel operaba en float.
+
+        Fase 2 invierte el contrato: Decimal se convierte a monto_cent (int)
+        y se acepta. Test verifica que un asiento completo con Decimal cuadra.
+        """
+        from decimal import Decimal
+        pa_debe = PartidaAutorizada(
+            cuenta_codigo="A", cuenta_version="v1",
+            monto=Decimal("100.50"), ubicacion="DEBE", movimiento="AUMENTA",
+        )
+        assert pa_debe.monto_cent == 10050
+
+        pa_haber = PartidaAutorizada(
+            cuenta_codigo="B", cuenta_version="v1",
+            monto=Decimal("100.50"), ubicacion="HABER", movimiento="AUMENTA",
+        )
+        assert pa_haber.monto_cent == 10050
+
+        rs = [_rc("f", "r", 1, [pa_debe, pa_haber])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe_cent == 10050
+        assert a.total_haber_cent == 10050
+        assert a.total_debe == 100.50
+    
+    def test_monto_cero_valido(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 0.0),
+            _pa("B", "HABER", 0.0),
+        ])]
+        a = ensamblar(rs)[0]
+        assert a.cuadrado is True
+        assert a.total_debe == 0.0
+
+    def test_monto_int_se_normaliza_a_float(self):
+        pa = PartidaAutorizada(
+            cuenta_codigo="A", cuenta_version="v1",
+            monto=100, ubicacion="DEBE", movimiento="AUMENTA",
+        )
+        rs = [_rc("f", "r", 1, [pa, _pa("B", "HABER", 100.0)])]
+        a = ensamblar(rs)[0]
+        assert isinstance(a.lineas[0].monto, float)
+
+    def test_error_monto_indica_cuenta(self):
+        pa = PartidaAutorizada(
+            cuenta_codigo="110101", cuenta_version="v1",
+            monto=float("nan"), ubicacion="DEBE", movimiento="AUMENTA",
+        )
+        with pytest.raises(DSLAssemblyError) as exc:
+            ensamblar([_rc("f", "r", 1, [pa])])
+        assert "110101" in str(exc.value)
+
+    def test_monto_fuera_de_rango_rechazado(self):
+        """ADR-005 (fase 2): montos que no caben en centavos se rechazan.
+
+        Contrato anterior (fase 1): float 1e308 se aceptaba como finito;
+        la suma de dos desbordaba a inf → 'total no finito'.
+
+        Contrato nuevo (fase 2): int centavos no desborda en suma.
+        La barrera está en _validar_monto: 1e308 * 100 no cabe en
+        Decimal.quantize estándar → se rechaza como 'fuera de rango'.
+        """
+        rs = [_rc("ventas", "registro", 1, [
+            _pa("A", "DEBE", 1e308),
+            _pa("B", "HABER", 1e308),
+        ])]
+        with pytest.raises(DSLAssemblyError, match="fuera de rango"):
+            ensamblar(rs)
+    
+
+
+# ═════════════════════════════════════════════════════════════════════
+# I · Contrato de error y agrupación
+# ═════════════════════════════════════════════════════════════════════
+
+class TestContratoError:
+
+    def test_constructor_sin_contexto(self):
+        e = DSLAssemblyError("msg")
+        assert str(e) == "msg"
+        assert e.mensaje == "msg"
+        assert e.contexto == ""
+
+    def test_constructor_con_contexto(self):
+        e = DSLAssemblyError("msg", "FRACTAL f > REGLA r")
+        assert str(e) == "FRACTAL f > REGLA r: msg"
+
+    def test_hereda_de_dsl_evaluation_error(self):
+        assert issubclass(DSLAssemblyError, DSLEvaluationError)
+
+    def test_lista_vacia_devuelve_lista_vacia(self):
+        assert ensamblar([]) == []
+
+    def test_partidas_vacias_en_resultado_es_error(self):
+        with pytest.raises(DSLAssemblyError, match="acción #1 sin partidas"):
+            ensamblar([_rc("f", "r", 1, [])])
+
+    def test_lista_vacia_vs_partidas_vacias_son_distintas(self):
+        assert ensamblar([]) == []
+        with pytest.raises(DSLAssemblyError):
+            ensamblar([_rc("f", "r", 1, [])])
+
+
+# ═════════════════════════════════════════════════════════════════════
+# J · Diagnóstico seguro de diferencias (Corrección A)
+# ═════════════════════════════════════════════════════════════════════
+
+class TestDiferenciaSeguraEnMensaje:
+    """El helper _describir_diferencia no debe propagar inf ni nan al
+    texto diagnóstico. La decisión de cuadre la toma verificar_cuadre()
+    antes; este helper sólo construye el mensaje de error.
+
+    Nota: el branch `except (OverflowError, ValueError)` de
+    _describir_diferencia no se ejercita desde aquí porque
+    total_debe - total_haber (ambos finitos, no negativos) no
+    lanza excepción en CPython. El try/except es defensa
+    anticipada para fases futuras. Su verificación queda como
+    deuda explícita si en v0.4 se admite un contrato numérico
+    más amplio (Decimal, negativos, etc.).
+    """
+
+    def test_diferencia_normal(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(100.0, 90.0) == "10.000000"
+
+    def test_diferencia_cero(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(100.0, 100.0) == "0.000000"
+
+    def test_diferencia_negativa_usa_abs(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(90.0, 100.0) == "10.000000"
+
+    def test_entrada_no_finita_inf_positivo(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(float("inf"), 90.0) == \
+            "no calculable (overflow)"
+
+    def test_entrada_no_finita_inf_negativo(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(float("-inf"), 90.0) == \
+            "no calculable (overflow)"
+
+    def test_entrada_nan(self):
+        from mnfc.dsl.assembler import _describir_diferencia
+        assert _describir_diferencia(float("nan"), 90.0) == \
+            "no calculable (overflow)"
+
+    def test_mensaje_de_error_no_contiene_inf_ni_nan(self):
+        rs = [_rc("f", "r", 1, [
+            _pa("A", "DEBE", 100.0),
+            _pa("B", "HABER", 90.0),
+        ])]
+        with pytest.raises(DSLAssemblyError) as exc:
+            ensamblar(rs)
+        msg = str(exc.value)
+        assert "diferencia=10.000000" in msg
+        assert "inf" not in msg
+        assert "nan" not in msg
+        assert "tolerancia=<0.001" in msg

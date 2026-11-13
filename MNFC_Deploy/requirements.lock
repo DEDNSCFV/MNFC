@@ -1,0 +1,10 @@
+# MNFC — lockfile cross-platform (Linux/macOS/Windows/Termux)
+# Generado a mano. Actualizar al subir versión mínima en requirements.txt.
+# Paquetes del entorno Termux NO van aquí (numpy, cryptography, proot-distro
+# son del sistema Android, no de MNFC).
+#
+# Instalación: pip install -r requirements.lock
+
+openpyxl==3.1.5
+pytest==8.3.4
+pytest-cov==5.0.0

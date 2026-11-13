@@ -1,0 +1,10 @@
+🏛️ MNFC - GUÍA DE INSTALACIÓN RÁPIDA
+=====================================
+1. Instale Python 3.11+ (marque "Add to PATH" en Windows)
+2. Abra una terminal en esta carpeta
+3. Ejecute: pip install -r requirements.txt
+4. Ejecute: python scraper_bcv.py   (para descargar la tasa del día)
+5. Ejecute: python setup_pc.py      (para crear la base de datos en blanco)
+6. Copie su archivo CSV o TXT en la carpeta 'raw_data'
+7. Ejecute: python ingesta_cruda.py (para cargar sus datos)
+8. Ejecute: python mnfc_cli.py      (para abrir el panel de control)
