@@ -1,0 +1,38 @@
+{
+  "fecha": "2026-11-15",
+  "timestamp": "2026-11-15T17:19:22.257556",
+  "filtro": "mapeo_handoff_estricto",
+  "mapeo": {
+    "04 LA URBINA": "0401",
+    "05 CUA": "CUA",
+    "06 TERE": "TERE",
+    "07 LA RAIZA": "RAIZA",
+    "07 PALO VERDE": "0701",
+    "08 CHARALLAVE": "0801"
+  },
+  "detales_disponibles": [
+    "04 LA URBINA"
+  ],
+  "detales_sin_datos": [
+    "05 CUA",
+    "06 TERE",
+    "07 LA RAIZA",
+    "07 PALO VERDE",
+    "08 CHARALLAVE"
+  ],
+  "total_disponible": {
+    "skus": 2504,
+    "cuad": 98,
+    "rupt": 2406
+  },
+  "por_detal": [
+    {
+      "detal": "04 LA URBINA",
+      "almacen": "0401",
+      "skus": 2504,
+      "cuadrados": 98,
+      "rupturas": 2406,
+      "pct": 96.1
+    }
+  ]
+}

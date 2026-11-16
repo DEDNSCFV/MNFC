@@ -46,3 +46,20 @@ __pycache__/
 
 # Backups con guion bajo (2.3, 2.4b, 2.5)
 *.bak_*
+
+# ─── Fix 2026-11-15: huecos detectados ───
+*.zip
+*.tgz
+*.tar.gz
+mnfc_bd_*
+MNFC_backup_*
+nodo_principal_*.db.*
+*.db.bak*
+*.db.bak_*
+raw_data/
+incoming/
+sync_out/
+*.xlsx
+config_local.json
+.env
+.env.*

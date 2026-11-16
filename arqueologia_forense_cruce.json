@@ -1,0 +1,137 @@
+{
+  "caso": "JG-1304/LJ896",
+  "fecha_analisis": "2026-11-15T01:35:24.079440",
+  "paradigmas": [
+    {
+      "fecha": "05/07/2026",
+      "detalle": "PRIMER INGRESO",
+      "documento": "8000001",
+      "tipo": "AJUE",
+      "delta_jg": 1,
+      "delta_lj": 1,
+      "stock_jg": 1,
+      "stock_lj": 1,
+      "efecto": "JG +1 → 1 | LJ +1 → 1",
+      "es_traspaso": false,
+      "A": "AJUE 8000001 del 05/07/2026",
+      "B": "PRIMER INGRESO → JG +1 → 1 | LJ +1 → 1"
+    },
+    {
+      "fecha": "28/07/2026",
+      "detalle": "INGRESO MERCANCIA",
+      "documento": "8000003",
+      "tipo": "AJUE",
+      "delta_jg": 3,
+      "delta_lj": 1,
+      "stock_jg": 4,
+      "stock_lj": 2,
+      "efecto": "JG +3 → 4 | LJ +1 → 2",
+      "es_traspaso": false,
+      "A": "AJUE 8000003 del 28/07/2026",
+      "B": "INGRESO MERCANCIA → JG +3 → 4 | LJ +1 → 2"
+    },
+    {
+      "fecha": "02/09/2026",
+      "detalle": "FACTURA VENTA",
+      "documento": "8002475",
+      "tipo": "FACT",
+      "delta_jg": 0,
+      "delta_lj": -1,
+      "stock_jg": 4,
+      "stock_lj": 1,
+      "efecto": "LJ -1 → 1",
+      "es_traspaso": false,
+      "A": "FACT 8002475 del 02/09/2026",
+      "B": "FACTURA VENTA → LJ -1 → 1"
+    },
+    {
+      "fecha": "10/09/2026",
+      "detalle": "NOTA RECEPCION",
+      "documento": "8000023",
+      "tipo": "NREC",
+      "delta_jg": 0,
+      "delta_lj": 2,
+      "stock_jg": 4,
+      "stock_lj": 3,
+      "efecto": "LJ +2 → 3",
+      "es_traspaso": false,
+      "A": "NREC 8000023 del 10/09/2026",
+      "B": "NOTA RECEPCION → LJ +2 → 3"
+    },
+    {
+      "fecha": "12/10/2026",
+      "detalle": "FACTURA VENTA",
+      "documento": "8005960",
+      "tipo": "FACT",
+      "delta_jg": -1,
+      "delta_lj": 0,
+      "stock_jg": 3,
+      "stock_lj": 3,
+      "efecto": "JG -1 → 3",
+      "es_traspaso": false,
+      "A": "FACT 8005960 del 12/10/2026",
+      "B": "FACTURA VENTA → JG -1 → 3"
+    },
+    {
+      "fecha": "21/10/2026",
+      "detalle": "DEPURACION STOCK",
+      "documento": "8000007",
+      "tipo": "AJUE",
+      "delta_jg": 1,
+      "delta_lj": -1,
+      "stock_jg": 4,
+      "stock_lj": 2,
+      "efecto": "JG +1 → 4 | LJ -1 → 2",
+      "es_traspaso": true,
+      "A": "AJUE 8000007 del 21/10/2026",
+      "B": "DEPURACION STOCK → JG +1 → 4 | LJ -1 → 2"
+    },
+    {
+      "fecha": "29/10/2026",
+      "detalle": "FACTURA VENTA",
+      "documento": "8007364",
+      "tipo": "FACT",
+      "delta_jg": 0,
+      "delta_lj": -1,
+      "stock_jg": 4,
+      "stock_lj": 1,
+      "efecto": "LJ -1 → 1",
+      "es_traspaso": false,
+      "A": "FACT 8007364 del 29/10/2026",
+      "B": "FACTURA VENTA → LJ -1 → 1"
+    }
+  ],
+  "paradigma_inferencial": {
+    "A": "Si el cruce hubiera existido ANTES del 21/10",
+    "B": "el ajuste del 21/10 habría corregido 1 unidad → el conteo del 14/11 mostraría 1 unidad de cruce residual",
+    "estado": "REFUTADO",
+    "ruptura": "El conteo del 14/11 muestra 2 unidades de cruce, no 1",
+    "conclusion": "Por lo tanto, el cruce ocurrió DESPUÉS del 21/10"
+  },
+  "sinopsis": {
+    "sistema": {
+      "JG": 4,
+      "LJ": 1,
+      "total": 5
+    },
+    "fisico": {
+      "JG": 2,
+      "LJ": 3,
+      "total": 5
+    },
+    "diferencia": {
+      "JG": -2,
+      "LJ": 2,
+      "neto": 0
+    },
+    "cruce_confirmado": 2
+  },
+  "ventana_temporal": {
+    "inicio": "29/10/2026",
+    "fin": "14/11/2026",
+    "dias": 16
+  },
+  "responsable": "Operación de piso del almacén 0801",
+  "impacto_patrimonial": 0,
+  "sha256": "4cb5b1a0b9317b8a7c17b2994ee541d5fb6317d6bfe9cd90e8ff5cdf723512ce"
+}

@@ -1,0 +1,214 @@
+{
+  "fecha": "2026-11-15",
+  "timestamp": "2026-11-15T17:03:03.392428",
+  "resumen_global": {
+    "total_skus": 13602,
+    "cuadrados": 3936,
+    "con_rupturas": 9666,
+    "pares_total": 95214,
+    "pares_rotos": 12338
+  },
+  "por_dimension": [
+    {
+      "dim": "D5_CONSISTENCIA",
+      "roturas": 9368,
+      "pct": 68.9,
+      "sev": "CRITICA"
+    },
+    {
+      "dim": "D3_ROTACION",
+      "roturas": 1979,
+      "pct": 14.5,
+      "sev": "MEDIA"
+    },
+    {
+      "dim": "D2_UBICACION",
+      "roturas": 662,
+      "pct": 4.9,
+      "sev": "BAJA"
+    },
+    {
+      "dim": "D6_INTEGRIDAD",
+      "roturas": 269,
+      "pct": 2.0,
+      "sev": "BAJA"
+    },
+    {
+      "dim": "D4_COSTO",
+      "roturas": 60,
+      "pct": 0.4,
+      "sev": "BAJA"
+    }
+  ],
+  "por_detal": [
+    {
+      "detal": "04 LA URBINA",
+      "skus": 5164,
+      "cuadrados": 224,
+      "rupturas": 5523,
+      "pct": 96.1
+    },
+    {
+      "detal": "05 CUA",
+      "skus": 4761,
+      "cuadrados": 256,
+      "rupturas": 5097,
+      "pct": 95.2
+    },
+    {
+      "detal": "08 CHARALLAVE",
+      "skus": 12554,
+      "cuadrados": 3374,
+      "rupturas": 10247,
+      "pct": 75.2
+    }
+  ],
+  "top_20_skus": [
+    {
+      "sku": "DR-962",
+      "familia": "CORREA",
+      "stock_fisico": 4.0,
+      "pares_rotos": 4,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "DR-61",
+      "familia": "STOP",
+      "stock_fisico": 1.0,
+      "pares_rotos": 4,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "CVZT011",
+      "familia": "TORNILLOS",
+      "stock_fisico": 18982.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D4_COSTO, D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "ANTIESPICHE-01 BEN",
+      "familia": "ANTI",
+      "stock_fisico": 1538.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "MO-605",
+      "familia": "FRANELAS",
+      "stock_fisico": 729.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "MZ-273",
+      "familia": "REFLECTOR",
+      "stock_fisico": 407.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "TS659-909018 BEN",
+      "familia": "CAUCHO",
+      "stock_fisico": 183.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "V358",
+      "familia": "EMPACADURA",
+      "stock_fisico": 133.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "01163",
+      "familia": "MANGUERA",
+      "stock_fisico": 109.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "PARCH-1",
+      "familia": "MONTURA",
+      "stock_fisico": 79.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "IP-800061 BEN",
+      "familia": "ACEITE",
+      "stock_fisico": 68.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "DR-45",
+      "familia": "CONECTOR",
+      "stock_fisico": 60.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "MZ-2235",
+      "familia": "SUAVIZADOR",
+      "stock_fisico": 60.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "CA-43",
+      "familia": "ACEITE",
+      "stock_fisico": 59.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "014",
+      "familia": "FARO",
+      "stock_fisico": 50.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "4094",
+      "familia": "EMPACADURA",
+      "stock_fisico": 49.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "PARCH-00",
+      "familia": "MONTURA",
+      "stock_fisico": 45.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "IP-801027",
+      "familia": "ACEITE",
+      "stock_fisico": 44.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D3_ROTACION, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "M050",
+      "familia": "EMPACADURA",
+      "stock_fisico": 38.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "9097",
+      "familia": "CARBURADOR",
+      "stock_fisico": 36.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D2_UBICACION, D5_CONSISTENCIA, D6_INTEGRIDAD"
+    }
+  ],
+  "severidad": {
+    "criticos": 2,
+    "altos": 255,
+    "medios": 8006,
+    "bajos": 1403
+  }
+}

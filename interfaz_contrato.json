@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "generado_en": "2026-11-15T18:30:00",
+  "operador": "Domingo E. Díaz N. (C.P.C. 183594)",
+  "esperado": {
+    "tablas": {
+      "bitacora_ventanas": {
+        "count": 13,
+        "tolerancia": "exacto"
+      },
+      "hipotesis_trabajo": {
+        "count": 13,
+        "tolerancia": "exacto"
+      },
+      "ciclos_hitos": {
+        "count": 20,
+        "tolerancia": "exacto"
+      },
+      "janus_pisos": {
+        "count": 8,
+        "tolerancia": "exacto"
+      },
+      "janus_ast": {
+        "count": 70,
+        "tolerancia": "exacto"
+      },
+      "materializaciones": {
+        "count": 7,
+        "tolerancia": "minimo"
+      },
+      "libro_folios": {
+        "count": 0,
+        "tolerancia": "exacto"
+      }
+    },
+    "hipotesis_pendientes": [
+      "H3",
+      "H6",
+      "H7",
+      "H8"
+    ],
+    "hitos_ciclo4_pendientes": 8,
+    "ultimo_evento_bitacora": "E-11"
+  },
+  "si_no_cuadra": {
+    "accion": "DETENER",
+    "razon": "Estado actual no coincide con el contrato del handoff 2026-11-15",
+    "que_hacer": "Revisar sync BOM→BOO, verificar AM0 del día, o reportar al operador"
+  }
+}

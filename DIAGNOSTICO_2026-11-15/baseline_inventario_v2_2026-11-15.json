@@ -1,0 +1,170 @@
+{
+  "fecha": "2026-11-15",
+  "timestamp": "2026-11-15T17:11:57.128996",
+  "filtro": "almacen_local_por_detal",
+  "detales_mapeados": {
+    "04 LA URBINA": "0401",
+    "05 CUA": "CUA",
+    "06 TERE": "TERE",
+    "07 LA RAIZA": "RAIZA",
+    "07 PALO VERDE": "0701",
+    "08 CHARALLAVE": "0801"
+  },
+  "total_global": {
+    "skus": 2599,
+    "cuad": 98,
+    "rupt": 2406
+  },
+  "por_detal": [
+    {
+      "detal": "04 LA URBINA",
+      "almacen": "0401",
+      "skus_con_stock": 2599,
+      "cuadrados": 98,
+      "rupturas": 2406,
+      "pct": 96.1
+    }
+  ],
+  "top_20": [
+    {
+      "sku": "CVZT011",
+      "familia": "TORNILLOS",
+      "stock_fisico": 18982.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D4_COSTO, D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "01163",
+      "familia": "MANGUERA",
+      "stock_fisico": 109.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "DR-627",
+      "familia": "ROLINERA",
+      "stock_fisico": 11.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "MZ-733A",
+      "familia": "CHAPALETA",
+      "stock_fisico": 2.0,
+      "pares_rotos": 3,
+      "dims_rotas": "D3_ROTACION, D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "6238",
+      "familia": "TRIPA",
+      "stock_fisico": 4439.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "CVZR020",
+      "familia": "ROLINERA",
+      "stock_fisico": 3231.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "ROS37536",
+      "familia": "ACEITE",
+      "stock_fisico": 1799.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "CVZR006",
+      "familia": "ROLINERA",
+      "stock_fisico": 1718.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "MZ-1749",
+      "familia": "CDI",
+      "stock_fisico": 1130.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "2513",
+      "familia": "CAUCHO",
+      "stock_fisico": 1044.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "IP-801091",
+      "familia": "ACEITE",
+      "stock_fisico": 987.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "MZ-2731",
+      "familia": "REFLECTOR",
+      "stock_fisico": 717.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "11829",
+      "familia": "ESPARRAGO",
+      "stock_fisico": 532.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "CVZB080",
+      "familia": "BUJIA",
+      "stock_fisico": 338.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "LJ565",
+      "familia": "BATERIA",
+      "stock_fisico": 297.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D4_COSTO, D5_CONSISTENCIA"
+    },
+    {
+      "sku": "MZ-313",
+      "familia": "BUJIA",
+      "stock_fisico": 254.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "V776",
+      "familia": "LUZ",
+      "stock_fisico": 252.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "2587 GP",
+      "familia": "CAUCHO",
+      "stock_fisico": 229.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "4358",
+      "familia": "KIT",
+      "stock_fisico": 229.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    },
+    {
+      "sku": "IP-801087",
+      "familia": "ACEITE",
+      "stock_fisico": 207.0,
+      "pares_rotos": 2,
+      "dims_rotas": "D5_CONSISTENCIA, D6_INTEGRIDAD"
+    }
+  ]
+}

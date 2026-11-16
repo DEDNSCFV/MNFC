@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-11-15T01:45:19.496592",
+  "resultados": [
+    {
+      "hipotesis": "H1",
+      "descripcion": "Los 4 paradigmas evalúan todos los SKUs del inventario",
+      "valor": 0,
+      "umbral": 0,
+      "refutada": false,
+      "razon": "0 SKUs sin ningún par de adyacencia"
+    },
+    {
+      "hipotesis": "H2",
+      "descripcion": "SEITON roto implica SHITSUKE roto (jerarquía necesaria)",
+      "valor": 557,
+      "umbral": 0,
+      "refutada": true,
+      "razon": "557 SKUs con SEITON roto pero SHITSUKE cerrado"
+    },
+    {
+      "hipotesis": "H3",
+      "descripcion": "La forma pintada reduce el tiempo de decisión",
+      "valor": null,
+      "umbral": null,
+      "refutada": null,
+      "razon": "Requiere medir tiempo de decisión con el gerente — pendiente de validación humana el lunes"
+    },
+    {
+      "hipotesis": "H4",
+      "descripcion": "Los 4 paradigmas son suficientes para el inventario",
+      "valor": 708,
+      "umbral": 0,
+      "refutada": true,
+      "razon": "708 movimientos con stock negativo (no capturado por los 4 paradigmas)"
+    },
+    {
+      "hipotesis": "H5",
+      "descripcion": "La sinopsis es un compuesto fiel de paradigmas",
+      "valor": 0,
+      "umbral": 0,
+      "refutada": false,
+      "razon": "0 sinopsis con pares_totales incorrecto"
+    },
+    {
+      "hipotesis": "H6",
+      "descripcion": "El ajuste del 21/10 fue el único traspaso JG↔LJ",
+      "valor": 0,
+      "umbral": 1,
+      "refutada": null,
+      "razon": "0 documentos con traspaso — el doc 8000007 no está en movimientos_dartony. Requiere verificar en reportes de Profit del PC."
+    },
+    {
+      "hipotesis": "H7",
+      "descripcion": "La FORMA del DISCURSO es trans-dominio",
+      "valor": null,
+      "umbral": null,
+      "refutada": null,
+      "razon": "Requiere corpus de comunicación (chats, notas) — pendiente de cargar el lunes"
+    },
+    {
+      "hipotesis": "H8",
+      "descripcion": "La ventana 29/10–14/11 es máxima",
+      "valor": 0,
+      "umbral": 0,
+      "refutada": false,
+      "razon": "0 movimientos entre 30/10 y 13/11 (reducen la ventana)"
+    }
+  ],
+  "resumen": {
+    "refutadas": 2,
+    "confirmadas": 3,
+    "pendientes": 3
+  }
+}
